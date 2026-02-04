@@ -9,7 +9,7 @@ import ServiceCard from "../../components/cards/ServiceCard";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 
-import { getServices } from "../../services/service.service";
+import getServices from "../../services/service.service";
 import { SERVICE_CATEGORIES } from "../../utils/constants";
 
 const Services = () => {

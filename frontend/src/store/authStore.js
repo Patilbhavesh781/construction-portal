@@ -1,4 +1,4 @@
-import create from "zustand";
+import {create} from "zustand";
 import AuthService from "../services/auth.service";
 import { setToken, getToken, removeToken } from "../utils/helpers";
 

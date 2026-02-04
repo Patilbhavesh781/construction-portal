@@ -2,8 +2,8 @@ import React from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import { Toaster } from "react-hot-toast"; // For notifications
 import AppRoutes from "./routes/AppRoutes";
-import "./styles/index.css";
 import "./styles/tailwind.css";
+import "./styles/index.css";
 import "./styles/animations.css";
 
 /**

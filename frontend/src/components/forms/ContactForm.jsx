@@ -4,7 +4,7 @@ import { Send, CheckCircle } from "lucide-react";
 
 import Button from "../common/Button";
 import Loader from "../common/Loader";
-import { sendContactMessage } from "../../services/user.service";
+import sendContactMessage from "../../services/user.service";
 
 const ContactForm = () => {
   const [loading, setLoading] = useState(false);

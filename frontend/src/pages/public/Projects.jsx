@@ -9,7 +9,7 @@ import ProjectCard from "../../components/cards/ProjectCard";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 
-import { getProjects } from "../../services/project.service";
+import getProjects from "../../services/project.service";
 
 const Projects = () => {
   const navigate = useNavigate();

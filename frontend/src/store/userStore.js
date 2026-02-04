@@ -1,4 +1,4 @@
-import create from "zustand";
+import {create} from "zustand";
 import UserService from "../services/user.service";
 
 const useUserStore = create((set, get) => ({

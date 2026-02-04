@@ -10,10 +10,8 @@ import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 import ServiceCard from "../../components/cards/ServiceCard";
 
-import {
-  getServiceById,
-  getServices,
-} from "../../services/service.service";
+import getServiceById from "../../services/service.service";
+import getServices from "../../services/service.service";
 
 const ServiceDetails = () => {
   const { id } = useParams();

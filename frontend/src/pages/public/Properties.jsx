@@ -9,7 +9,7 @@ import PropertyCard from "../../components/cards/PropertyCard";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 
-import { getProperties } from "../../services/property.service";
+import getProperties from "../../services/property.service";
 
 const Properties = () => {
   const navigate = useNavigate();

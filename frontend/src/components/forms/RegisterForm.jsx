@@ -5,8 +5,8 @@ import { Eye, EyeOff } from "lucide-react";
 
 import Button from "../common/Button";
 import Loader from "../common/Loader";
-import { registerUser } from "../../services/auth.service";
-import { useAuthStore } from "../../store/authStore";
+import registerUser from "../../services/auth.service";
+import useAuthStore from "../../store/authStore";
 
 const RegisterForm = () => {
   const navigate = useNavigate();

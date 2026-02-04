@@ -11,7 +11,7 @@ import {
   LogOut,
 } from "lucide-react";
 import clsx from "clsx";
-import { useAuthStore } from "../../store/authStore";
+import useAuthStore from "../../store/authStore";
 import Button from "../common/Button";
 
 const AdminSidebar = ({ isOpen = true, onClose }) => {

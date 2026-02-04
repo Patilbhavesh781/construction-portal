@@ -14,7 +14,7 @@ export const USER_ROLES = {
 // ========================
 // Construction Services Categories
 // ========================
-export const SERVICE_TYPES = [
+export const SERVICE_CATEGORIES = [
   "Bricks & Plaster Work",
   "Plumbing",
   "Waterproof Work",

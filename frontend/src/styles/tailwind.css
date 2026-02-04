@@ -1,7 +1,6 @@
 /* ==========================
    TailwindCSS Base, Components, Utilities
 ========================== */
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -12,40 +11,42 @@
 
 /* Example: custom colors */
 :root {
-  --color-primary: #4f46e5;
-  --color-secondary: #6b7280;
+    --color-primary: #4f46e5;
+    --color-secondary: #6b7280;
 }
 
 /* Buttons using Tailwind utilities */
-.btn-primary {
-  @apply bg-primary text-white font-semibold py-2 px-4 rounded shadow hover:bg-indigo-700 transition-all;
-}
+@layer components {
+    .btn-primary {
+        @apply bg-primary text-white font-semibold py-2 px-4 rounded shadow hover:bg-indigo-700 transition-all;
+    }
 
-.btn-secondary {
-  @apply bg-secondary text-gray-900 font-semibold py-2 px-4 rounded shadow hover:bg-gray-300 transition-all;
-}
+    .btn-secondary {
+        @apply bg-secondary text-gray-900 font-semibold py-2 px-4 rounded shadow hover:bg-gray-300 transition-all;
+    }
 
-/* Cards */
-.card {
-  @apply bg-white shadow rounded p-4 transition-all hover:shadow-lg;
-}
+    /* Cards */
+    .card {
+        @apply bg-white shadow rounded p-4 transition-all hover:shadow-lg;
+    }
 
-/* Modal backdrop */
-.modal-backdrop {
-  @apply fixed inset-0 bg-black bg-opacity-50 z-40;
-}
+    /* Modal backdrop */
+    .modal-backdrop {
+        @apply fixed inset-0 bg-black bg-opacity-50 z-40;
+    }
 
-/* Loader */
-.loader {
-  @apply border-4 border-t-4 border-gray-200 border-t-primary rounded-full w-12 h-12 animate-spin;
-}
+    /* Loader */
+    .loader {
+        @apply border-4 border-t-4 border-gray-200 border-t-primary rounded-full w-12 h-12 animate-spin;
+    }
 
-/* Navbar customizations */
-.navbar {
-  @apply flex items-center justify-between p-4 bg-white shadow sticky top-0 z-50;
-}
+    /* Navbar customizations */
+    .navbar {
+        @apply flex items-center justify-between p-4 bg-white shadow sticky top-0 z-50;
+    }
 
-/* Footer customizations */
-.footer {
-  @apply bg-gray-100 text-gray-700 p-6 text-center;
+    /* Footer customizations */
+    .footer {
+        @apply bg-gray-100 text-gray-700 p-6 text-center;
+    }
 }
