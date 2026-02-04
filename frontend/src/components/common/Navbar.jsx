@@ -43,7 +43,7 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Links */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="md:flex items-center gap-8">
             {navLinks.map((link) => (
               <NavLink
                 key={link.name}
@@ -56,23 +56,13 @@ const Navbar = () => {
                   }`
                 }
               >
-                {({ isActive }) => (
-                  <>
-                    {link.name}
-                    {isActive && (
-                      <motion.span
-                        layoutId="nav-underline"
-                        className="absolute left-0 -bottom-1 w-full h-0.5 bg-orange-600 rounded-full"
-                      />
-                    )}
-                  </>
-                )}
+                {link.name}
               </NavLink>
             ))}
           </div>
 
           {/* Right Section */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="md:flex items-center gap-4">
             {!isAuthenticated ? (
               <>
                 <button
@@ -148,7 +138,7 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center">
+          <div className="hidden md:flex items-center">
             <button
               onClick={toggleMobile}
               className="p-2 rounded-lg hover:bg-gray-100 transition"
