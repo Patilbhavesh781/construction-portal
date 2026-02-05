@@ -13,7 +13,7 @@ import ServiceCard from "../../components/cards/ServiceCard";
 import getServiceById from "../../services/service.service";
 import getServices from "../../services/service.service";
 
-const ServiceDetails = () => {
+const ServiceDetails = ({ servicesPathBase = "/services" }) => {
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -64,7 +64,7 @@ const ServiceDetails = () => {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-6">
         <p className="text-red-600 mb-4">{error}</p>
-        <Button onClick={() => navigate("/services")}>
+        <Button onClick={() => navigate(servicesPathBase)}>
           Back to Services
         </Button>
       </div>
@@ -247,7 +247,7 @@ const ServiceDetails = () => {
                 </h2>
                 <Button
                   variant="outline"
-                  onClick={() => navigate("/services")}
+                  onClick={() => navigate(servicesPathBase)}
                 >
                   View All
                 </Button>
@@ -257,7 +257,10 @@ const ServiceDetails = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {relatedServices.map((service) => (
                 <ScrollReveal key={service._id}>
-                  <ServiceCard service={service} />
+                  <ServiceCard
+                    service={service}
+                    detailsPathBase={servicesPathBase}
+                  />
                 </ScrollReveal>
               ))}
             </div>

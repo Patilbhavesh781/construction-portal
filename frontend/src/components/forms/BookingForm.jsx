@@ -4,7 +4,7 @@ import { Calendar, Clock, CheckCircle } from "lucide-react";
 
 import Button from "../common/Button";
 import Loader from "../common/Loader";
-import { createBooking } from "../../services/booking.service";
+import BookingService from "../../services/booking.service";
 
 const BookingForm = ({ serviceId, serviceName }) => {
   const [loading, setLoading] = useState(false);
@@ -35,11 +35,22 @@ const BookingForm = ({ serviceId, serviceName }) => {
 
     try {
       const payload = {
-        ...data,
-        serviceId,
+        bookingType: "service",
+        service: serviceId,
+        bookingDate: data.preferredDate,
+        timeSlot: data.preferredTime,
+        notes: data.message,
+        contactDetails: {
+          name: data.fullName,
+          phone: data.phone,
+          email: data.email,
+        },
+        address: {
+          fullAddress: data.address,
+        },
       };
 
-      await createBooking(payload);
+      await BookingService.createBooking(payload);
       setSuccess(true);
       reset();
     } catch (error) {

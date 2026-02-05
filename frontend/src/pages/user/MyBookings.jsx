@@ -5,6 +5,7 @@ import FadeIn from "../../components/animations/FadeIn";
 import SlideIn from "../../components/animations/SlideIn";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
+import BookingService from "../../services/booking.service";
 
 const MyBookings = () => {
   const [loading, setLoading] = useState(true);
@@ -12,34 +13,11 @@ const MyBookings = () => {
   const [filter, setFilter] = useState("all");
 
   useEffect(() => {
-    // TODO: Replace with real API call
     const fetchBookings = async () => {
       setLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setBookings([
-          {
-            id: 1,
-            service: "Interior Design",
-            date: "2026-02-01",
-            status: "Pending",
-            location: "Mumbai",
-          },
-          {
-            id: 2,
-            service: "Renovation Work",
-            date: "2026-01-20",
-            status: "Completed",
-            location: "Pune",
-          },
-          {
-            id: 3,
-            service: "Plumbing Service",
-            date: "2026-01-10",
-            status: "In Progress",
-            location: "Delhi",
-          },
-        ]);
+        const bookingsRes = await BookingService.getMyBookings();
+        setBookings(bookingsRes || []);
       } catch (error) {
         console.error("Failed to load bookings", error);
       } finally {
@@ -53,7 +31,7 @@ const MyBookings = () => {
   const filteredBookings =
     filter === "all"
       ? bookings
-      : bookings.filter((b) => b.status.toLowerCase() === filter);
+      : bookings.filter((b) => b.status?.toLowerCase() === filter);
 
   if (loading) {
     return (
@@ -76,7 +54,7 @@ const MyBookings = () => {
               View and manage all your service bookings.
             </p>
           </div>
-          <Button to="/services">Book New Service</Button>
+          <Button to="/user/services">Book New Service</Button>
         </div>
       </SlideIn>
 
@@ -87,7 +65,7 @@ const MyBookings = () => {
             <Filter className="w-5 h-5" />
             <span className="font-medium">Filter:</span>
           </div>
-          {["all", "pending", "in progress", "completed"].map((status) => (
+          {["all", "pending", "confirmed", "completed", "cancelled"].map((status) => (
             <button
               key={status}
               onClick={() => setFilter(status)}
@@ -126,27 +104,32 @@ const MyBookings = () => {
                 </thead>
                 <tbody>
                   {filteredBookings.map((booking) => (
-                    <tr key={booking.id} className="border-b last:border-none">
+                    <tr key={booking._id} className="border-b last:border-none">
                       <td className="py-3 px-4 font-medium text-gray-800">
-                        {booking.service}
+                        {booking.service?.title || booking.bookingType}
                       </td>
                       <td className="py-3 px-4 text-gray-600">
-                        {booking.location}
+                        {booking.address?.city ||
+                          booking.address?.fullAddress ||
+                          "-"}
                       </td>
                       <td className="py-3 px-4 text-gray-600">
-                        {new Date(booking.date).toLocaleDateString()}
+                        {new Date(booking.bookingDate).toLocaleDateString()}
                       </td>
                       <td className="py-3 px-4">
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            booking.status === "Completed"
+                            booking.status === "completed"
                               ? "bg-green-100 text-green-700"
-                              : booking.status === "In Progress"
+                              : booking.status === "cancelled"
+                              ? "bg-red-100 text-red-700"
+                              : booking.status === "confirmed"
                               ? "bg-blue-100 text-blue-700"
                               : "bg-yellow-100 text-yellow-700"
                           }`}
                         >
-                          {booking.status}
+                          {booking.status?.charAt(0).toUpperCase() +
+                            booking.status?.slice(1)}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-right space-x-2">
@@ -157,17 +140,6 @@ const MyBookings = () => {
                         >
                           View
                         </Button>
-                        {booking.status === "Pending" && (
-                          <Button
-                            size="sm"
-                            variant="danger"
-                            onClick={() =>
-                              alert("Cancel booking feature coming soon!")
-                            }
-                          >
-                            Cancel
-                          </Button>
-                        )}
                       </td>
                     </tr>
                   ))}

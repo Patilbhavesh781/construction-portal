@@ -39,7 +39,7 @@ const UserSidebar = ({ isOpen = true, onClose }) => {
     },
     {
       name: "Services",
-      path: "/services",
+      path: "/user/services",
       icon: <Wrench className="w-5 h-5" />,
     },
   ];

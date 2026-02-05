@@ -14,7 +14,7 @@ export const createBooking = async (req, res, next) => {
 
     res
       .status(201)
-      .json(new ApiResponse(201, "Booking created successfully", booking));
+      .json(new ApiResponse(201, booking, "Booking created successfully"));
   } catch (error) {
     next(error);
   }
@@ -32,7 +32,7 @@ export const getAllBookings = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Bookings fetched successfully", bookings));
+      .json(new ApiResponse(200, bookings, "Bookings fetched successfully"));
   } catch (error) {
     next(error);
   }
@@ -49,7 +49,7 @@ export const getMyBookings = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "My bookings fetched successfully", bookings));
+      .json(new ApiResponse(200, bookings, "My bookings fetched successfully"));
   } catch (error) {
     next(error);
   }
@@ -75,7 +75,7 @@ export const getBookingById = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Booking fetched successfully", booking));
+      .json(new ApiResponse(200, booking, "Booking fetched successfully"));
   } catch (error) {
     next(error);
   }
@@ -98,7 +98,9 @@ export const updateBookingStatus = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Booking status updated successfully", booking));
+      .json(
+        new ApiResponse(200, booking, "Booking status updated successfully")
+      );
   } catch (error) {
     next(error);
   }
@@ -122,7 +124,7 @@ export const cancelBooking = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Booking cancelled successfully", booking));
+      .json(new ApiResponse(200, booking, "Booking cancelled successfully"));
   } catch (error) {
     next(error);
   }

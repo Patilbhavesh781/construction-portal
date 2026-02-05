@@ -28,6 +28,8 @@ import UserDashboard from "../pages/user/UserDashboard";
 import MyBookings from "../pages/user/MyBookings";
 import Profile from "../pages/user/Profile";
 import Messages from "../pages/user/Messages";
+import UserServices from "../pages/user/UserServices";
+import UserServiceDetails from "../pages/user/UserServiceDetails";
 
 // Admin Pages
 import AdminDashboard from "../pages/admin/AdminDashboard";
@@ -71,6 +73,8 @@ const AppRoutes = () => {
         <Route path="bookings" element={<MyBookings />} />
         <Route path="profile" element={<Profile />} />
         <Route path="messages" element={<Messages />} />
+        <Route path="services" element={<UserServices />} />
+        <Route path="services/:id" element={<UserServiceDetails />} />
       </Route>
 
       {/* Admin Protected Routes */}

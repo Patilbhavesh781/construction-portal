@@ -12,7 +12,7 @@ import Loader from "../../components/common/Loader";
 import getServices from "../../services/service.service";
 import { SERVICE_CATEGORIES } from "../../utils/constants";
 
-const Services = () => {
+const Services = ({ detailsPathBase = "/services" }) => {
   const navigate = useNavigate();
 
   const [services, setServices] = useState([]);
@@ -134,7 +134,10 @@ const Services = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredServices.map((service) => (
                 <ScrollReveal key={service._id}>
-                  <ServiceCard service={service} />
+                  <ServiceCard
+                    service={service}
+                    detailsPathBase={detailsPathBase}
+                  />
                 </ScrollReveal>
               ))}
             </div>

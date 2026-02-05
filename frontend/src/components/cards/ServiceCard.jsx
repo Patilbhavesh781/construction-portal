@@ -6,7 +6,11 @@ import clsx from "clsx";
 import FadeIn from "../animations/FadeIn";
 import Button from "../common/Button";
 
-const ServiceCard = ({ service, className = "" }) => {
+const ServiceCard = ({
+  service,
+  className = "",
+  detailsPathBase = "/services",
+}) => {
   const navigate = useNavigate();
 
   if (!service) return null;
@@ -87,7 +91,7 @@ const ServiceCard = ({ service, className = "" }) => {
           <div className="mt-auto">
             <Button
               fullWidth
-              onClick={() => navigate(`/services/${_id}`)}
+              onClick={() => navigate(`${detailsPathBase}/${_id}`)}
               variant="primary"
             >
               View Details

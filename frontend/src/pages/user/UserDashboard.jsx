@@ -1,75 +1,28 @@
-import React, { useEffect, useState } from "react";
-import { CalendarCheck, ClipboardList, MessageSquare, User } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  CalendarCheck,
+  CheckCircle,
+  XCircle,
+  Hourglass,
+} from "lucide-react";
 
 import FadeIn from "../../components/animations/FadeIn";
 import SlideIn from "../../components/animations/SlideIn";
 import DashboardStats from "../../components/dashboard/DashboardStats";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
+import BookingService from "../../services/booking.service";
 
 const UserDashboard = () => {
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState([]);
-  const [recentBookings, setRecentBookings] = useState([]);
+  const [bookings, setBookings] = useState([]);
 
   useEffect(() => {
-    // TODO: Replace with real API calls
     const fetchDashboardData = async () => {
       setLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1200));
-
-        setStats([
-          {
-            key: "bookings",
-            label: "My Bookings",
-            value: 5,
-            icon: <CalendarCheck className="w-6 h-6 text-green-600" />,
-            bg: "bg-green-50",
-          },
-          {
-            key: "projects",
-            label: "My Projects",
-            value: 2,
-            icon: <ClipboardList className="w-6 h-6 text-blue-600" />,
-            bg: "bg-blue-50",
-          },
-          {
-            key: "messages",
-            label: "Messages",
-            value: 3,
-            icon: <MessageSquare className="w-6 h-6 text-purple-600" />,
-            bg: "bg-purple-50",
-          },
-          {
-            key: "profile",
-            label: "Profile Completion",
-            value: 80,
-            icon: <User className="w-6 h-6 text-orange-600" />,
-            bg: "bg-orange-50",
-          },
-        ]);
-
-        setRecentBookings([
-          {
-            id: 1,
-            service: "Interior Design",
-            date: "2026-02-01",
-            status: "Pending",
-          },
-          {
-            id: 2,
-            service: "Renovation Work",
-            date: "2026-01-20",
-            status: "Completed",
-          },
-          {
-            id: 3,
-            service: "Plumbing Service",
-            date: "2026-01-10",
-            status: "In Progress",
-          },
-        ]);
+        const bookingsRes = await BookingService.getMyBookings();
+        setBookings(bookingsRes || []);
       } catch (error) {
         console.error("Failed to load dashboard data", error);
       } finally {
@@ -79,6 +32,50 @@ const UserDashboard = () => {
 
     fetchDashboardData();
   }, []);
+
+  const stats = useMemo(() => {
+    const total = bookings.length;
+    const pending = bookings.filter((b) => b.status === "pending").length;
+    const completed = bookings.filter((b) => b.status === "completed").length;
+    const cancelled = bookings.filter((b) => b.status === "cancelled").length;
+
+    return [
+      {
+        key: "total",
+        label: "My Bookings",
+        value: total,
+        icon: <CalendarCheck className="w-6 h-6 text-green-600" />,
+        bg: "bg-green-50",
+      },
+      {
+        key: "pending",
+        label: "Pending",
+        value: pending,
+        icon: <Hourglass className="w-6 h-6 text-yellow-600" />,
+        bg: "bg-yellow-50",
+      },
+      {
+        key: "completed",
+        label: "Completed",
+        value: completed,
+        icon: <CheckCircle className="w-6 h-6 text-blue-600" />,
+        bg: "bg-blue-50",
+      },
+      {
+        key: "cancelled",
+        label: "Cancelled",
+        value: cancelled,
+        icon: <XCircle className="w-6 h-6 text-red-600" />,
+        bg: "bg-red-50",
+      },
+    ];
+  }, [bookings]);
+
+  const recentBookings = useMemo(() => {
+    return [...bookings]
+      .sort((a, b) => new Date(b.bookingDate) - new Date(a.bookingDate))
+      .slice(0, 5);
+  }, [bookings]);
 
   if (loading) {
     return (
@@ -102,7 +99,7 @@ const UserDashboard = () => {
             </p>
           </div>
           <div className="flex gap-3">
-            <Button to="/services">Book a Service</Button>
+            <Button to="/user/services">Book a Service</Button>
             <Button variant="outline" to="/user/profile">
               View Profile
             </Button>
@@ -137,24 +134,27 @@ const UserDashboard = () => {
                 </thead>
                 <tbody>
                   {recentBookings.map((booking) => (
-                    <tr key={booking.id} className="border-b last:border-none">
+                    <tr key={booking._id} className="border-b last:border-none">
                       <td className="py-3 px-4 font-medium text-gray-800">
-                        {booking.service}
+                        {booking.service?.title || booking.bookingType}
                       </td>
                       <td className="py-3 px-4 text-gray-600">
-                        {new Date(booking.date).toLocaleDateString()}
+                        {new Date(booking.bookingDate).toLocaleDateString()}
                       </td>
                       <td className="py-3 px-4">
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            booking.status === "Completed"
+                            booking.status === "completed"
                               ? "bg-green-100 text-green-700"
-                              : booking.status === "In Progress"
+                              : booking.status === "cancelled"
+                              ? "bg-red-100 text-red-700"
+                              : booking.status === "confirmed"
                               ? "bg-blue-100 text-blue-700"
                               : "bg-yellow-100 text-yellow-700"
                           }`}
                         >
-                          {booking.status}
+                          {booking.status?.charAt(0).toUpperCase() +
+                            booking.status?.slice(1)}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-right">
