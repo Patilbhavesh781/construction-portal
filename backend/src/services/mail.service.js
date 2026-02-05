@@ -1,5 +1,4 @@
-import nodemailer from "nodemailer";
-import { mailConfig } from "../config/mail.js";
+import mailTransporter from "../config/mail.js";
 import ApiError from "../utils/ApiError.js";
 
 /**
@@ -7,19 +6,18 @@ import ApiError from "../utils/ApiError.js";
  */
 export const sendMail = async ({ to, subject, html, text }) => {
   try {
-    const transporter = nodemailer.createTransport(mailConfig);
-
     const mailOptions = {
-      from: mailConfig.auth.user,
+      from: process.env.MAIL_FROM_EMAIL,
       to,
       subject,
       text,
       html,
     };
 
-    const info = await transporter.sendMail(mailOptions);
+    const info = await mailTransporter.sendMail(mailOptions);
     return info;
   } catch (error) {
+    console.error("Mail error:", error);
     throw new ApiError(500, "Failed to send email");
   }
 };
@@ -40,7 +38,7 @@ export const sendWelcomeEmail = async (user) => {
  * Send password reset email
  */
 export const sendPasswordResetEmail = async (user, resetToken) => {
-  const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+  const resetUrl = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}`;
   const subject = "Password Reset Request";
   const html = `
     <p>You requested a password reset.</p>

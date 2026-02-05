@@ -8,7 +8,7 @@ import {
 } from "../controllers/project.controller.js";
 import { protect } from "../middlewares/auth.middleware.js";
 import { authorize } from "../middlewares/role.middleware.js";
-import upload from "../middlewares/upload.middleware.js";
+import { upload } from "../middlewares/upload.middleware.js";
 
 const router = express.Router();
 

@@ -3,7 +3,7 @@ import User from "../models/User.model.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/token.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
-import mailService from "../services/mail.service.js";
+import { sendPasswordResetEmail } from "../services/mail.service.js";
 
 /**
  * Register new user
@@ -175,9 +175,7 @@ export const forgotPassword = async (req, res, next) => {
     const resetToken = user.generatePasswordResetToken();
     await user.save({ validateBeforeSave: false });
 
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
-
-    await mailService.sendPasswordResetEmail(user.email, resetUrl);
+    await sendPasswordResetEmail(user, resetToken);
 
     res
       .status(200)

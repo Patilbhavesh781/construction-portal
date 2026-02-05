@@ -47,6 +47,43 @@ export const getAllMessages = async (req, res, next) => {
 };
 
 /**
+ * Get logged-in user's messages
+ */
+export const getUserMessages = async (req, res, next) => {
+  try {
+    const messages = await Message.find({ user: req.user._id })
+      .sort({ createdAt: -1 });
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, "User messages fetched successfully", messages));
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Mark message as read
+ */
+export const markMessageAsRead = async (req, res, next) => {
+  try {
+    const message = await Message.findByIdAndUpdate(
+      req.params.id,
+      { isRead: true },
+      { new: true }
+    );
+
+    if (!message) throw new ApiError(404, "Message not found");
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, "Message marked as read", message));
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * Get message by ID (Admin only)
  */
 export const getMessageById = async (req, res, next) => {

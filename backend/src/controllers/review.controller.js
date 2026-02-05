@@ -38,7 +38,7 @@ export const getAllReviews = async (req, res, next) => {
 };
 
 /**
- * Get reviews by entity (Service/Project/Property)
+ * Generic entity review fetcher
  */
 export const getReviewsByEntity = async (req, res, next) => {
   try {
@@ -58,6 +58,27 @@ export const getReviewsByEntity = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+/**
+ * Wrapper routes for specific entities
+ */
+export const getReviewsByService = (req, res, next) => {
+  req.params.type = "service";
+  req.params.id = req.params.serviceId;
+  return getReviewsByEntity(req, res, next);
+};
+
+export const getReviewsByProject = (req, res, next) => {
+  req.params.type = "project";
+  req.params.id = req.params.projectId;
+  return getReviewsByEntity(req, res, next);
+};
+
+export const getReviewsByProperty = (req, res, next) => {
+  req.params.type = "property";
+  req.params.id = req.params.propertyId;
+  return getReviewsByEntity(req, res, next);
 };
 
 /**

@@ -5,7 +5,7 @@ import {
   logout,
   getProfile,
   updateProfile,
-  changePassword,
+  updatePassword,
   forgotPassword,
   resetPassword,
 } from "../controllers/auth.controller.js";
@@ -22,7 +22,7 @@ router.post("/reset-password/:token", resetPassword);
 // Protected routes
 router.get("/profile", protect, getProfile);
 router.put("/profile", protect, updateProfile);
-router.put("/change-password", protect, changePassword);
+router.put("/change-password", protect, updatePassword);
 router.post("/logout", protect, logout);
 
 export default router;
