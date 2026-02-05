@@ -1,0 +1,83 @@
+import Message from "../models/Message.model.js";
+import ApiError from "../utils/ApiError.js";
+import ApiResponse from "../utils/ApiResponse.js";
+
+/**
+ * Send a message (Public / Authenticated)
+ */
+export const sendMessage = async (req, res, next) => {
+  try {
+    const { name, email, subject, message } = req.body;
+
+    if (!name || !email || !subject || !message) {
+      throw new ApiError(400, "All fields are required");
+    }
+
+    const newMessage = await Message.create({
+      name,
+      email,
+      subject,
+      message,
+      user: req.user?._id || null,
+    });
+
+    res
+      .status(201)
+      .json(new ApiResponse(201, "Message sent successfully", newMessage));
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get all messages (Admin only)
+ */
+export const getAllMessages = async (req, res, next) => {
+  try {
+    const messages = await Message.find()
+      .populate("user", "name email")
+      .sort({ createdAt: -1 });
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, "Messages fetched successfully", messages));
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get message by ID (Admin only)
+ */
+export const getMessageById = async (req, res, next) => {
+  try {
+    const message = await Message.findById(req.params.id).populate(
+      "user",
+      "name email"
+    );
+
+    if (!message) throw new ApiError(404, "Message not found");
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, "Message fetched successfully", message));
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Delete message (Admin only)
+ */
+export const deleteMessage = async (req, res, next) => {
+  try {
+    const message = await Message.findByIdAndDelete(req.params.id);
+    if (!message) throw new ApiError(404, "Message not found");
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, "Message deleted successfully"));
+  } catch (error) {
+    next(error);
+  }
+};
