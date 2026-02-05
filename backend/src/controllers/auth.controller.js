@@ -17,28 +17,32 @@ export const register = async (req, res, next) => {
       throw new ApiError(400, "User already exists with this email");
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     const user = await User.create({
       name,
       email,
-      password: hashedPassword,
+      password,
       role: role || "user",
     });
 
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
+    const accessToken = generateAccessToken({ id: user._id, role: user.role });
+    const refreshToken = generateRefreshToken({ id: user._id, role: user.role });
+
 
     user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });
 
     res.status(201).json(
-      new ApiResponse(201, "User registered successfully", {
-        user: user.toJSON(),
-        accessToken,
-        refreshToken,
-      })
+      new ApiResponse(
+        201,
+        {
+          user: user.toJSON(),
+          token: accessToken,
+          refreshToken,
+        },
+        "User registered successfully"
+      )
     );
+
   } catch (error) {
     next(error);
   }
@@ -61,18 +65,22 @@ export const login = async (req, res, next) => {
       throw new ApiError(401, "Invalid email or password");
     }
 
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
+    const accessToken = generateAccessToken({ id: user._id, role: user.role });
+    const refreshToken = generateRefreshToken({ id: user._id, role: user.role });
 
     user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });
 
     res.status(200).json(
-      new ApiResponse(200, "Login successful", {
-        user: user.toJSON(),
-        accessToken,
-        refreshToken,
-      })
+      new ApiResponse(
+        200,
+        {
+          user: user.toJSON(),
+          token: accessToken,
+          refreshToken,
+        },
+        "Login successful"
+      )
     );
   } catch (error) {
     next(error);
@@ -92,7 +100,7 @@ export const logout = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Logged out successfully"));
+      .json(new ApiResponse(200, null, "Logged out successfully"));
   } catch (error) {
     next(error);
   }
@@ -107,7 +115,7 @@ export const getProfile = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Profile fetched successfully", user));
+      .json(new ApiResponse(200, user, "Profile fetched successfully"));
   } catch (error) {
     next(error);
   }
@@ -128,7 +136,7 @@ export const updateProfile = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Profile updated successfully", user));
+      .json(new ApiResponse(200, user, "Profile updated successfully"));
   } catch (error) {
     next(error);
   }
@@ -154,7 +162,7 @@ export const updatePassword = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Password updated successfully"));
+      .json(new ApiResponse(200, null, "Password updated successfully"));
   } catch (error) {
     next(error);
   }
@@ -172,14 +180,14 @@ export const forgotPassword = async (req, res, next) => {
       throw new ApiError(404, "No user found with this email");
     }
 
-    const resetToken = user.generatePasswordResetToken();
+    const resetToken = user.createPasswordResetToken();
     await user.save({ validateBeforeSave: false });
 
     await sendPasswordResetEmail(user, resetToken);
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Password reset email sent"));
+      .json(new ApiResponse(200, null, "Password reset email sent"));
   } catch (error) {
     next(error);
   }
@@ -209,7 +217,7 @@ export const resetPassword = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Password reset successful"));
+      .json(new ApiResponse(200, null, "Password reset successful"));
   } catch (error) {
     next(error);
   }

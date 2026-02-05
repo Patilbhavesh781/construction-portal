@@ -5,12 +5,11 @@ import { Eye, EyeOff } from "lucide-react";
 
 import Button from "../common/Button";
 import Loader from "../common/Loader";
-import registerUser from "../../services/auth.service";
 import useAuthStore from "../../store/authStore";
 
 const RegisterForm = () => {
   const navigate = useNavigate();
-  const { setAuth } = useAuthStore();
+  const { register: registerUser } = useAuthStore();
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -52,8 +51,6 @@ const RegisterForm = () => {
        * }
        */
       const response = await registerUser(payload);
-
-      setAuth(response.user, response.token);
 
       if (response.user.role === "admin") {
         navigate("/admin/dashboard");

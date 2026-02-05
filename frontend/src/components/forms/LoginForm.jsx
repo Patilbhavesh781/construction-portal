@@ -5,12 +5,11 @@ import { Eye, EyeOff } from "lucide-react";
 
 import Button from "../common/Button";
 import Loader from "../common/Loader";
-import loginUser from "../../services/auth.service";
 import useAuthStore from "../../store/authStore";
 
 const LoginForm = () => {
   const navigate = useNavigate();
-  const { setAuth } = useAuthStore();
+  const { login: loginUser } = useAuthStore();
 
   const [showPassword, setShowPassword] = useState(false);
   const [apiError, setApiError] = useState("");
@@ -32,7 +31,7 @@ const LoginForm = () => {
     setLoading(true);
 
     try {
-      const response = await loginUser(data);
+      const response = await loginUser(data.email, data.password);
 
       /**
        * Expected response shape:
@@ -41,8 +40,6 @@ const LoginForm = () => {
        *   token: "jwt-token"
        * }
        */
-      setAuth(response.user, response.token);
-
       if (response.user.role === "admin") {
         navigate("/admin/dashboard");
       } else {

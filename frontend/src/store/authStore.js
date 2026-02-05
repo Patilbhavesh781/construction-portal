@@ -57,7 +57,7 @@ const useAuthStore = create((set, get) => ({
     set({ isLoading: true });
     try {
       const data = await AuthService.getProfile();
-      set({ user: data.user, isAuthenticated: true });
+      set({ user: data.user || data, isAuthenticated: true });
       return data;
     } catch (error) {
       removeToken();
@@ -73,7 +73,7 @@ const useAuthStore = create((set, get) => ({
     set({ isLoading: true });
     try {
       const data = await AuthService.updateProfile(profileData);
-      set({ user: data.user });
+      set({ user: data.user || data });
       return data;
     } catch (error) {
       throw error;
