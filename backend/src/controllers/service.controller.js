@@ -7,7 +7,15 @@ import ApiResponse from "../utils/ApiResponse.js";
  */
 export const createService = async (req, res, next) => {
   try {
-    const service = await Service.create(req.body);
+    const createdBy = req.user?._id || req.user?.id;
+    if (!createdBy) {
+      throw new ApiError(401, "Not authorized");
+    }
+
+    const service = await Service.create({
+      ...req.body,
+      createdBy,
+    });
 
     res
       .status(201)
@@ -25,6 +33,21 @@ export const getAllServices = async (req, res, next) => {
     const services = await Service.find({ isActive: true }).sort({
       createdAt: -1,
     });
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, services, "Services fetched successfully"));
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get all services (Admin only, includes inactive)
+ */
+export const getAllServicesAdmin = async (req, res, next) => {
+  try {
+    const services = await Service.find().sort({ createdAt: -1 });
 
     res
       .status(200)

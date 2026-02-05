@@ -103,6 +103,11 @@ const userSchema = new mongoose.Schema(
 
 /* 🔐 Password hashing */
 userSchema.pre("save", async function (next) {
+  // Only allow verified users to be created when explicitly permitted (e.g., after OTP verify)
+  if (this.isNew && this.isVerified && !this.$locals?.allowVerified) {
+    this.isVerified = false;
+  }
+  if (this.$locals?.skipHash) return next();
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 12);
   next();

@@ -9,11 +9,12 @@ import useAuthStore from "../../store/authStore";
 
 const RegisterForm = () => {
   const navigate = useNavigate();
-  const { register: registerUser } = useAuthStore();
+  const { register: registerUser, logout } = useAuthStore();
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [apiError, setApiError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   const {
@@ -34,6 +35,7 @@ const RegisterForm = () => {
 
   const onSubmit = async (data) => {
     setApiError("");
+    setSuccessMessage("");
     setLoading(true);
 
     try {
@@ -51,12 +53,24 @@ const RegisterForm = () => {
        * }
        */
       const response = await registerUser(payload);
-
-      if (response.user.role === "admin") {
-        navigate("/admin/dashboard");
-      } else {
-        navigate("/user/dashboard");
+      if (response?.token && response?.user?.isVerified === true) {
+        if (response.user.role === "admin") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/user/dashboard");
+        }
+        return;
       }
+
+      if (response?.token) {
+        await logout();
+      }
+
+      setSuccessMessage(
+        response?.message ||
+          "Registration successful. Please check your email to verify your account."
+      );
+      navigate(`/verify-email?email=${encodeURIComponent(data.email)}`);
     } catch (error) {
       setApiError(
         error?.response?.data?.message ||
@@ -84,6 +98,12 @@ const RegisterForm = () => {
       {apiError && (
         <div className="bg-red-50 text-red-600 text-sm px-4 py-2 rounded-lg">
           {apiError}
+        </div>
+      )}
+      {/* Success */}
+      {successMessage && (
+        <div className="bg-green-50 text-green-700 text-sm px-4 py-2 rounded-lg">
+          {successMessage}
         </div>
       )}
 

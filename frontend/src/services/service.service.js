@@ -17,6 +17,12 @@ const ServiceService = {
     return data; // array of services
   },
 
+  // Fetch all services (admin)
+  getAdminServices: async () => {
+    const response = await api.get("/services/admin/all");
+    return response.data?.data || response.data || [];
+  },
+
   // Fetch single service by ID (public)
   getServiceById: async (serviceId) => {
     const response = await api.get(`/services/${serviceId}`);
