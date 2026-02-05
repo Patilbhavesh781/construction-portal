@@ -1,247 +1,168 @@
 import React from "react";
-import { Users, Target, ShieldCheck, Award } from "lucide-react";
+import { Users, Target, ShieldCheck, Award, Briefcase, Heart, Lightbulb, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import FadeIn from "../../components/animations/FadeIn";
 import SlideIn from "../../components/animations/SlideIn";
 import ScrollReveal from "../../components/animations/ScrollReveal";
-
 import Button from "../../components/common/Button";
 
 const About = () => {
   const navigate = useNavigate();
 
+  const stats = [
+    { label: "Years Experience", value: "15+", icon: Briefcase },
+    { label: "Projects Completed", value: "500+", icon: Award },
+    { label: "Happy Clients", value: "1.2k", icon: Heart },
+    { label: "Skilled Workers", value: "250+", icon: Users },
+  ];
+
   return (
-    <div className="w-full">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-orange-600 to-orange-500 text-white py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-black/10" />
-        <div className="relative max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+    <div className="w-full overflow-hidden">
+      {/* Hero Section - Enhanced with Abstract Shapes */}
+      <section className="relative bg-slate-900 text-white py-24 lg:py-32">
+        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-96 h-96 bg-orange-600/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl" />
+        
+        <div className="relative max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <FadeIn direction="left">
-            <div>
-              <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
-                About <span className="text-yellow-300">BuildPro</span>
+            <div className="space-y-6">
+              <span className="inline-block px-4 py-1 rounded-full bg-orange-600/20 text-orange-400 text-sm font-semibold tracking-wide uppercase border border-orange-600/30">
+                Building Excellence
+              </span>
+              <h1 className="text-5xl md:text-6xl font-extrabold leading-tight">
+                Crafting the <span className="text-orange-500">Future</span> of Infrastructure.
               </h1>
-              <p className="text-lg text-orange-100 mb-8">
-                We are a full-service construction and real estate company
-                delivering high-quality residential and commercial solutions
-                across India.
+              <p className="text-xl text-slate-300 max-w-xl leading-relaxed">
+                BuildPro is more than a construction company. We are a team of visionaries dedicated to reshaping the Indian landscape with integrity and innovation.
               </p>
-              <Button
-                size="lg"
-                onClick={() => navigate("/contact")}
-              >
-                Get in Touch
-              </Button>
+              <div className="flex flex-wrap gap-4 pt-4">
+                <Button size="lg" onClick={() => navigate("/contact")}>
+                  Start Your Project
+                </Button>
+                <Button variant="outline" size="lg" className="text-white border-white hover:bg-white hover:text-slate-900">
+                  Our Story
+                </Button>
+              </div>
             </div>
           </FadeIn>
 
-          <SlideIn direction="right">
-            <div className="relative">
+          <SlideIn direction="right" className="relative">
+            <div className="relative z-10 rounded-[2rem] overflow-hidden shadow-2xl border-8 border-slate-800">
               <img
                 src="https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=900&q=80"
                 alt="Construction Team"
-                className="rounded-3xl shadow-2xl"
+                className="w-full h-full object-cover transform hover:scale-105 transition duration-700"
               />
+            </div>
+            {/* Floating Experience Badge */}
+            <div className="absolute -bottom-6 -left-6 bg-orange-500 p-6 rounded-2xl shadow-xl z-20 hidden md:block">
+              <p className="text-4xl font-bold">15+</p>
+              <p className="text-sm font-medium opacity-90">Years of Quality</p>
             </div>
           </SlideIn>
         </div>
       </section>
 
-      {/* Company Overview */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <FadeIn direction="left">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-4">
-                Who We Are
-              </h2>
-              <p className="text-gray-600 mb-4">
-                BuildPro is a trusted name in the construction and real estate
-                industry, offering end-to-end solutions including architectural
-                planning, RCC work, interiors, renovations, waterproofing,
-                plumbing, electrical, and property buying & selling services.
-              </p>
-              <p className="text-gray-600 mb-6">
-                Our team consists of experienced engineers, architects,
-                designers, and skilled workers who are committed to delivering
-                projects on time, within budget, and with uncompromising
-                quality.
-              </p>
-              <Button
-                variant="outline"
-                onClick={() => navigate("/services")}
-              >
-                Explore Our Services
-              </Button>
-            </div>
-          </FadeIn>
-
-          <SlideIn direction="right">
-            <div>
-              <img
-                src="https://images.unsplash.com/photo-1600585154154-71a1c1f1a5a8?auto=format&fit=crop&w=900&q=80"
-                alt="Modern House"
-                className="rounded-3xl shadow-xl"
-              />
-            </div>
-          </SlideIn>
+      {/* Stats Ribbon */}
+      <section className="relative z-20 -mt-10 max-w-5xl mx-auto px-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {stats.map((stat, idx) => (
+            <ScrollReveal key={idx} delay={idx * 0.1}>
+              <div className="bg-white p-6 rounded-2xl shadow-xl text-center border border-gray-100">
+                <stat.icon className="w-8 h-8 text-orange-600 mx-auto mb-3" />
+                <h4 className="text-3xl font-bold text-gray-900">{stat.value}</h4>
+                <p className="text-gray-500 text-sm font-medium">{stat.label}</p>
+              </div>
+            </ScrollReveal>
+          ))}
         </div>
       </section>
 
-      {/* Mission & Vision */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <FadeIn>
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">
-                Our Mission & Vision
-              </h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Driving excellence in construction through innovation,
-                integrity, and customer satisfaction.
+      {/* Company Overview - Modernized Layout */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+          <div className="order-2 md:order-1">
+             <div className="grid grid-cols-2 gap-4">
+                <img src="https://images.unsplash.com/photo-1600585154154-71a1c1f1a5a8?auto=format&fit=crop&w=500&q=80" className="rounded-2xl mt-8 shadow-lg" alt="Project 1" />
+                <img src="https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&w=500&q=80" className="rounded-2xl shadow-lg" alt="Project 2" />
+             </div>
+          </div>
+          <FadeIn direction="right" className="order-1 md:order-2">
+            <h2 className="text-blue-600 font-bold uppercase tracking-widest text-sm mb-3">Company Overview</h2>
+            <h3 className="text-4xl font-bold text-gray-900 mb-6 leading-tight">
+              Leading the Way in Modern Construction
+            </h3>
+            <div className="space-y-4 text-gray-600 text-lg">
+              <p>
+                BuildPro stands at the intersection of traditional craftsmanship and modern technology. From architectural planning to the final coat of paint, we manage the complexities so you don't have to.
               </p>
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-base font-medium text-gray-800">
+                <li className="flex items-center gap-2"><div className="w-2 h-2 bg-orange-500 rounded-full"/> Certified Engineering</li>
+                <li className="flex items-center gap-2"><div className="w-2 h-2 bg-orange-500 rounded-full"/> Eco-Friendly Materials</li>
+                <li className="flex items-center gap-2"><div className="w-2 h-2 bg-orange-500 rounded-full"/> Real Estate Advisory</li>
+                <li className="flex items-center gap-2"><div className="w-2 h-2 bg-orange-500 rounded-full"/> Smart Home Integration</li>
+              </ul>
+              <div className="pt-6">
+                <Button variant="primary" onClick={() => navigate("/services")}>
+                  Explore Full Capabilities
+                </Button>
+              </div>
             </div>
           </FadeIn>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <ScrollReveal>
-              <div className="bg-white rounded-2xl shadow-lg p-8">
-                <div className="flex items-center gap-4 mb-4">
-                  <Target className="w-8 h-8 text-orange-600" />
-                  <h3 className="text-xl font-semibold text-gray-800">
-                    Our Mission
-                  </h3>
-                </div>
-                <p className="text-gray-600">
-                  To provide reliable, high-quality, and affordable
-                  construction and property solutions while building long-term
-                  relationships with our clients based on trust and
-                  transparency.
-                </p>
-              </div>
-            </ScrollReveal>
+      {/* Values Section - Glassmorphism Cards */}
+      <section className="py-24 bg-gray-50 overflow-hidden relative">
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Values that Build Trust</h2>
+            <div className="w-24 h-1 bg-orange-500 mx-auto rounded-full"/>
+          </div>
 
-            <ScrollReveal>
-              <div className="bg-white rounded-2xl shadow-lg p-8">
-                <div className="flex items-center gap-4 mb-4">
-                  <Award className="w-8 h-8 text-orange-600" />
-                  <h3 className="text-xl font-semibold text-gray-800">
-                    Our Vision
-                  </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { title: "Innovation", text: "We adopt the latest construction technologies and BIM modeling to ensure precision.", icon: Lightbulb },
+              { title: "Integrity", text: "Transparent pricing and honest timelines are the bedrock of our client relationships.", icon: ShieldCheck },
+              { title: "Growth", text: "We don't just build structures; we help communities grow and thrive.", icon: TrendingUp },
+            ].map((value, i) => (
+              <ScrollReveal key={i} delay={i * 0.2}>
+                <div className="group p-8 bg-white border border-gray-100 rounded-3xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                  <div className="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-orange-600 transition-colors">
+                    <value.icon className="w-7 h-7 text-orange-600 group-hover:text-white" />
+                  </div>
+                  <h4 className="text-xl font-bold mb-3">{value.title}</h4>
+                  <p className="text-gray-600 leading-relaxed">{value.text}</p>
                 </div>
-                <p className="text-gray-600">
-                  To become a leading construction and real estate service
-                  provider, known for innovation, quality craftsmanship, and
-                  customer-first approach.
-                </p>
-              </div>
-            </ScrollReveal>
+              </ScrollReveal>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Why Choose Us */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <FadeIn>
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">
-                Why Choose BuildPro?
-              </h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                We go beyond construction — we deliver peace of mind.
-              </p>
-            </div>
-          </FadeIn>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            <ScrollReveal>
-              <div className="bg-gray-50 rounded-2xl shadow-md p-6 text-center hover:shadow-lg transition">
-                <ShieldCheck className="w-10 h-10 text-orange-600 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                  Trusted Quality
-                </h3>
-                <p className="text-gray-600 text-sm">
-                  We follow strict quality standards and use premium materials
-                  in every project.
+      {/* CTA Section - Impactful Dark Design */}
+      <section className="py-20 bg-slate-900 relative">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+            <FadeIn>
+                <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Ready to bring your vision to life?</h2>
+                <p className="text-slate-400 text-lg mb-10">
+                    Join hundreds of satisfied homeowners and developers who trusted BuildPro. 
+                    Let’s start a conversation about your next project today.
                 </p>
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal>
-              <div className="bg-gray-50 rounded-2xl shadow-md p-6 text-center hover:shadow-lg transition">
-                <Users className="w-10 h-10 text-orange-600 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                  Expert Team
-                </h3>
-                <p className="text-gray-600 text-sm">
-                  Our professionals bring years of experience in construction,
-                  design, and project management.
-                </p>
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal>
-              <div className="bg-gray-50 rounded-2xl shadow-md p-6 text-center hover:shadow-lg transition">
-                <Award className="w-10 h-10 text-orange-600 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                  On-Time Delivery
-                </h3>
-                <p className="text-gray-600 text-sm">
-                  We respect your time and ensure timely completion without
-                  compromising quality.
-                </p>
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal>
-              <div className="bg-gray-50 rounded-2xl shadow-md p-6 text-center hover:shadow-lg transition">
-                <Target className="w-10 h-10 text-orange-600 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                  Customer First
-                </h3>
-                <p className="text-gray-600 text-sm">
-                  Your satisfaction is our top priority — we build with your
-                  vision in mind.
-                </p>
-              </div>
-            </ScrollReveal>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-orange-600 to-orange-500 text-white">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Let’s Build Something Amazing Together
-            </h2>
-            <p className="text-lg text-orange-100 mb-8 max-w-2xl mx-auto">
-              Whether you’re planning a new home, renovation, or property
-              investment — BuildPro is here to help.
-            </p>
-            <div className="flex justify-center gap-4 flex-wrap">
-              <Button
-                size="lg"
-                onClick={() => navigate("/contact")}
-              >
-                Contact Us
-              </Button>
-              <Button
-                variant="secondary"
-                size="lg"
-                onClick={() => navigate("/services")}
-              >
-                View Services
-              </Button>
-            </div>
-          </FadeIn>
+                <div className="flex flex-col sm:flex-row justify-center gap-4">
+                    <Button size="lg" className="px-12 bg-orange-600 hover:bg-orange-700" onClick={() => navigate("/contact")}>
+                        Get a Free Quote
+                    </Button>
+                    <Button variant="outline" size="lg" className="text-white border-slate-700 hover:bg-slate-800" onClick={() => navigate("/portfolio")}>
+                        View Our Work
+                    </Button>
+                </div>
+            </FadeIn>
         </div>
       </section>
     </div>
   );
 };
 
-export default About;
+export default About
