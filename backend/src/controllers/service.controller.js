@@ -11,7 +11,7 @@ export const createService = async (req, res, next) => {
 
     res
       .status(201)
-      .json(new ApiResponse(201, "Service created successfully", service));
+      .json(new ApiResponse(201, service, "Service created successfully"));
   } catch (error) {
     next(error);
   }
@@ -28,7 +28,7 @@ export const getAllServices = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Services fetched successfully", services));
+      .json(new ApiResponse(200, services, "Services fetched successfully"));
   } catch (error) {
     next(error);
   }
@@ -44,7 +44,7 @@ export const getServiceById = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Service fetched successfully", service));
+      .json(new ApiResponse(200, service, "Service fetched successfully"));
   } catch (error) {
     next(error);
   }
@@ -65,7 +65,7 @@ export const updateService = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Service updated successfully", service));
+      .json(new ApiResponse(200, service, "Service updated successfully"));
   } catch (error) {
     next(error);
   }
@@ -81,7 +81,7 @@ export const deleteService = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Service deleted successfully"));
+      .json(new ApiResponse(200, null, "Service deleted successfully"));
   } catch (error) {
     next(error);
   }

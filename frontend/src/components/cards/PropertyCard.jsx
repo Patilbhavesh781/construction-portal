@@ -23,19 +23,21 @@ const PropertyCard = ({ property, className = "" }) => {
   const {
     _id,
     title,
-    type = "sale", // sale | rent
+    purpose = "sale", // sale | rent
     status = "available", // available | sold | pending
     location,
     price,
     area,
     bedrooms,
     bathrooms,
-    parking,
+    parkingSpots,
     images = [],
     description,
+    type,
   } = property;
 
   const imageUrl =
+    images?.[0]?.url ||
     images?.[0] ||
     "https://via.placeholder.com/400x250?text=Property+Image";
 
@@ -68,7 +70,7 @@ const PropertyCard = ({ property, className = "" }) => {
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
           <span className="absolute top-3 left-3 bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow">
-            {type === "rent" ? "For Rent" : "For Sale"}
+            {purpose === "rent" ? "For Rent" : "For Sale"}
           </span>
           <span
             className={clsx(
@@ -86,10 +88,10 @@ const PropertyCard = ({ property, className = "" }) => {
             {title}
           </h3>
 
-          {location && (
+          {(location?.city || location?.address) && (
             <div className="flex items-center gap-1 text-sm text-gray-600 mb-2">
               <MapPin className="w-4 h-4 text-gray-500" />
-              <span>{location}</span>
+              <span>{location?.city || location?.address}</span>
             </div>
           )}
 
@@ -111,10 +113,10 @@ const PropertyCard = ({ property, className = "" }) => {
                 <span>{bathrooms} Baths</span>
               </div>
             )}
-            {parking !== undefined && (
+            {parkingSpots !== undefined && (
               <div className="flex items-center gap-1">
                 <Car className="w-4 h-4 text-gray-500" />
-                <span>{parking} Parking</span>
+                <span>{parkingSpots} Parking</span>
               </div>
             )}
           </div>
@@ -125,10 +127,12 @@ const PropertyCard = ({ property, className = "" }) => {
               <IndianRupee className="w-4 h-4" />
               <span>{price?.toLocaleString()}</span>
             </div>
-            {area && (
+            {area?.size && (
               <div className="flex items-center gap-1 text-sm text-gray-600">
                 <Home className="w-4 h-4" />
-                <span>{area} sq.ft</span>
+                <span>
+                  {area.size} {area.unit || "sqft"}
+                </span>
               </div>
             )}
           </div>

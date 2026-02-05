@@ -10,8 +10,7 @@ import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 import ServiceCard from "../../components/cards/ServiceCard";
 
-import getServiceById from "../../services/service.service";
-import getServices from "../../services/service.service";
+import ServiceService from "../../services/service.service";
 
 const ServiceDetails = ({ servicesPathBase = "/services" }) => {
   const { id } = useParams();
@@ -27,16 +26,15 @@ const ServiceDetails = ({ servicesPathBase = "/services" }) => {
       setLoading(true);
       setError(null);
       try {
-        const serviceRes = await getServiceById(id);
-        const serviceData = serviceRes?.data;
+        const serviceData = await ServiceService.getServiceById(id);
         setService(serviceData);
 
         if (serviceData?.category) {
-          const relatedRes = await getServices({
+          const relatedRes = await ServiceService.getAllServices({
             category: serviceData.category,
             limit: 3,
           });
-          const filtered = (relatedRes?.data || []).filter(
+          const filtered = (relatedRes || []).filter(
             (s) => s._id !== serviceData._id
           );
           setRelatedServices(filtered);
@@ -107,7 +105,7 @@ const ServiceDetails = ({ servicesPathBase = "/services" }) => {
               <div className="mb-8">
                 <img
                   src={
-                    service.image ||
+                    service.images?.[0]?.url ||
                     "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=1200&q=80"
                   }
                   alt={service.title}
@@ -188,13 +186,13 @@ const ServiceDetails = ({ servicesPathBase = "/services" }) => {
                     Pricing
                   </h3>
                   <p className="text-3xl font-bold text-orange-600 mb-2">
-                    {service.price
+                    {service.price != null
                       ? `₹${service.price.toLocaleString()}`
                       : "Custom Quote"}
                   </p>
                   <p className="text-sm text-gray-600 mb-6">
-                    {service.priceUnit
-                      ? `Price per ${service.priceUnit}`
+                    {service.priceType
+                      ? `Pricing: ${service.priceType.replace("_", " ")}`
                       : "Pricing varies based on project scope"}
                   </p>
 

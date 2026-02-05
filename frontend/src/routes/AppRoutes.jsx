@@ -15,6 +15,8 @@ import Services from "../pages/public/Services";
 import ServiceDetails from "../pages/public/ServiceDetails";
 import Projects from "../pages/public/Projects";
 import Properties from "../pages/public/Properties";
+import ProjectDetails from "../pages/public/ProjectDetails";
+import PropertyDetails from "../pages/public/PropertyDetails";
 import Contact from "../pages/public/Contact";
 import NotFound from "../pages/public/NotFound";
 
@@ -39,6 +41,8 @@ import ManageBookings from "../pages/admin/ManageBookings";
 import ManageProjects from "../pages/admin/ManageProjects";
 import ManageProperties from "../pages/admin/ManageProperties";
 import Reports from "../pages/admin/Reports";
+import ManageMessages from "../pages/admin/ManageMessages";
+import ManageReviews from "../pages/admin/ManageReviews";
 
 const AppRoutes = () => {
   return (
@@ -50,7 +54,9 @@ const AppRoutes = () => {
         <Route path="/services" element={<Services />} />
         <Route path="/services/:id" element={<ServiceDetails />} />
         <Route path="/projects" element={<Projects />} />
+        <Route path="/projects/:id" element={<ProjectDetails />} />
         <Route path="/properties" element={<Properties />} />
+        <Route path="/properties/:id" element={<PropertyDetails />} />
         <Route path="/contact" element={<Contact />} />
       </Route>
 
@@ -94,6 +100,8 @@ const AppRoutes = () => {
         <Route path="manage-projects" element={<ManageProjects />} />
         <Route path="manage-properties" element={<ManageProperties />} />
         <Route path="reports" element={<Reports />} />
+        <Route path="manage-messages" element={<ManageMessages />} />
+        <Route path="manage-reviews" element={<ManageReviews />} />
       </Route>
 
       {/* Catch All */}

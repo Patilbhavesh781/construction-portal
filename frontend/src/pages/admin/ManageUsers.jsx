@@ -6,6 +6,7 @@ import SlideIn from "../../components/animations/SlideIn";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 import Modal from "../../components/common/Modal";
+import UserService from "../../services/user.service";
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
@@ -16,40 +17,12 @@ const ManageUsers = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
-    // TODO: Replace with real API call
     const fetchUsers = async () => {
       setLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1200));
-        const mockUsers = [
-          {
-            id: 1,
-            name: "Rahul Sharma",
-            email: "rahul@example.com",
-            role: "user",
-            status: "active",
-            createdAt: "2025-12-10",
-          },
-          {
-            id: 2,
-            name: "Amit Verma",
-            email: "amit@example.com",
-            role: "admin",
-            status: "active",
-            createdAt: "2025-11-22",
-          },
-          {
-            id: 3,
-            name: "Neha Singh",
-            email: "neha@example.com",
-            role: "user",
-            status: "blocked",
-            createdAt: "2026-01-05",
-          },
-        ];
-
-        setUsers(mockUsers);
-        setFilteredUsers(mockUsers);
+        const data = await UserService.getAllUsers();
+        setUsers(data || []);
+        setFilteredUsers(data || []);
       } catch (error) {
         console.error("Failed to fetch users", error);
       } finally {
@@ -64,9 +37,9 @@ const ManageUsers = () => {
     const lower = search.toLowerCase();
     const filtered = users.filter(
       (user) =>
-        user.name.toLowerCase().includes(lower) ||
-        user.email.toLowerCase().includes(lower) ||
-        user.role.toLowerCase().includes(lower)
+        user.name?.toLowerCase().includes(lower) ||
+        user.email?.toLowerCase().includes(lower) ||
+        user.role?.toLowerCase().includes(lower)
     );
     setFilteredUsers(filtered);
   }, [search, users]);
@@ -78,11 +51,10 @@ const ManageUsers = () => {
 
   const confirmDelete = async () => {
     try {
-      // TODO: Replace with real API call
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      setUsers((prev) => prev.filter((u) => u.id !== selectedUser.id));
+      await UserService.deleteUser(selectedUser._id);
+      setUsers((prev) => prev.filter((u) => u._id !== selectedUser._id));
       setFilteredUsers((prev) =>
-        prev.filter((u) => u.id !== selectedUser.id)
+        prev.filter((u) => u._id !== selectedUser._id)
       );
       setShowDeleteModal(false);
       setSelectedUser(null);
@@ -93,16 +65,14 @@ const ManageUsers = () => {
 
   const toggleRole = async (user) => {
     try {
-      // TODO: Replace with real API call
-      const updatedUser = {
-        ...user,
+      const updatedUser = await UserService.updateUser(user._id, {
         role: user.role === "admin" ? "user" : "admin",
-      };
+      });
       setUsers((prev) =>
-        prev.map((u) => (u.id === user.id ? updatedUser : u))
+        prev.map((u) => (u._id === user._id ? updatedUser : u))
       );
       setFilteredUsers((prev) =>
-        prev.map((u) => (u.id === user.id ? updatedUser : u))
+        prev.map((u) => (u._id === user._id ? updatedUser : u))
       );
     } catch (error) {
       console.error("Failed to update user role", error);
@@ -180,7 +150,7 @@ const ManageUsers = () => {
               ) : (
                 filteredUsers.map((user) => (
                   <tr
-                    key={user.id}
+                    key={user._id}
                     className="border-b last:border-none hover:bg-gray-50 transition"
                   >
                     <td className="py-3 px-4 font-medium text-gray-800">
@@ -203,16 +173,18 @@ const ManageUsers = () => {
                     <td className="py-3 px-4">
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          user.status === "active"
+                          user.isActive
                             ? "bg-green-100 text-green-700"
                             : "bg-red-100 text-red-700"
                         }`}
                       >
-                        {user.status}
+                        {user.isActive ? "active" : "inactive"}
                       </span>
                     </td>
                     <td className="py-3 px-4 text-gray-600">
-                      {new Date(user.createdAt).toLocaleDateString()}
+                      {user.createdAt
+                        ? new Date(user.createdAt).toLocaleDateString()
+                        : "-"}
                     </td>
                     <td className="py-3 px-4 text-right space-x-2">
                       <Button
@@ -270,3 +242,4 @@ const ManageUsers = () => {
 };
 
 export default ManageUsers;
+

@@ -11,7 +11,7 @@ export const getAllUsers = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Users fetched successfully", users));
+      .json(new ApiResponse(200, users, "Users fetched successfully"));
   } catch (error) {
     next(error);
   }
@@ -27,7 +27,7 @@ export const getUserById = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "User fetched successfully", user));
+      .json(new ApiResponse(200, user, "User fetched successfully"));
   } catch (error) {
     next(error);
   }
@@ -50,7 +50,7 @@ export const updateUser = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "User updated successfully", user));
+      .json(new ApiResponse(200, user, "User updated successfully"));
   } catch (error) {
     next(error);
   }
@@ -66,7 +66,7 @@ export const deleteUser = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "User deleted successfully"));
+      .json(new ApiResponse(200, null, "User deleted successfully"));
   } catch (error) {
     next(error);
   }
@@ -81,7 +81,7 @@ export const getMyProfile = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Profile fetched successfully", user));
+      .json(new ApiResponse(200, user, "Profile fetched successfully"));
   } catch (error) {
     next(error);
   }
@@ -104,7 +104,7 @@ export const updateMyProfile = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Profile updated successfully", user));
+      .json(new ApiResponse(200, user, "Profile updated successfully"));
   } catch (error) {
     next(error);
   }

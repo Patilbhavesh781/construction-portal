@@ -9,7 +9,7 @@ import PropertyCard from "../../components/cards/PropertyCard";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 
-import getProperties from "../../services/property.service";
+import PropertyService from "../../services/property.service";
 
 const Properties = () => {
   const navigate = useNavigate();
@@ -26,8 +26,8 @@ const Properties = () => {
     const fetchProperties = async () => {
       setLoading(true);
       try {
-        const res = await getProperties();
-        setProperties(res?.data || []);
+        const res = await PropertyService.getAllProperties();
+        setProperties(res || []);
       } catch (error) {
         console.error("Failed to fetch properties:", error);
       } finally {
@@ -42,13 +42,18 @@ const Properties = () => {
     return properties.filter((property) => {
       const matchesSearch =
         property.title?.toLowerCase().includes(search.toLowerCase()) ||
-        property.location?.toLowerCase().includes(search.toLowerCase());
+        property.location?.city
+          ?.toLowerCase()
+          .includes(search.toLowerCase()) ||
+        property.location?.address
+          ?.toLowerCase()
+          .includes(search.toLowerCase());
 
       const matchesType =
-        type === "all" || property.type === type;
+        type === "all" || property.purpose === type;
 
       const matchesCategory =
-        category === "all" || property.category === category;
+        category === "all" || property.type === category;
 
       const matchesPrice =
         priceRange === "all" ||
@@ -146,14 +151,34 @@ const Properties = () => {
               All Categories
             </button>
             <button
-              onClick={() => setCategory("residential")}
+              onClick={() => setCategory("apartment")}
               className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                category === "residential"
+                category === "apartment"
                   ? "bg-orange-600 text-white"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              Residential
+              Apartment
+            </button>
+            <button
+              onClick={() => setCategory("house")}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                category === "house"
+                  ? "bg-orange-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              House
+            </button>
+            <button
+              onClick={() => setCategory("villa")}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                category === "villa"
+                  ? "bg-orange-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              Villa
             </button>
             <button
               onClick={() => setCategory("commercial")}
@@ -164,6 +189,26 @@ const Properties = () => {
               }`}
             >
               Commercial
+            </button>
+            <button
+              onClick={() => setCategory("land")}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                category === "land"
+                  ? "bg-orange-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              Land
+            </button>
+            <button
+              onClick={() => setCategory("office")}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                category === "office"
+                  ? "bg-orange-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              Office
             </button>
           </div>
 

@@ -14,7 +14,7 @@ import TestimonialCard from "../../components/cards/TestimonialCard";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 
-import getServices from "../../services/service.service";
+import ServiceService from "../../services/service.service";
 import getProjects from "../../services/project.service";
 import getProperties from "../../services/property.service";
 
@@ -31,12 +31,12 @@ const Home = () => {
       setLoading(true);
       try {
         const [servicesRes, projectsRes, propertiesRes] = await Promise.all([
-          getServices({ limit: 6 }),
+          ServiceService.getAllServices({ limit: 6 }),
           getProjects({ limit: 6 }),
           getProperties({ limit: 6 }),
         ]);
 
-        setServices(servicesRes?.data || []);
+        setServices(servicesRes || []);
         setProjects(projectsRes?.data || []);
         setProperties(propertiesRes?.data || []);
       } catch (error) {

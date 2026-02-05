@@ -14,6 +14,7 @@ import SlideIn from "../../components/animations/SlideIn";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 import Modal from "../../components/common/Modal";
+import ServiceService from "../../services/service.service";
 
 const ManageServices = () => {
   const [services, setServices] = useState([]);
@@ -25,63 +26,23 @@ const ManageServices = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const categories = [
-    "All",
-    "Bricks & Plaster",
-    "Plumbing",
-    "Waterproofing",
-    "Gypsum Work",
-    "Painting",
-    "Electrical",
-    "Fabrication",
-    "Tile Work",
-    "Doors & Windows",
-    "Lock & Key",
-    "Renovation",
-    "Interior Design",
-    "Architecture & RCC",
-    "Property Buying/Selling",
+    { label: "All", value: "all" },
+    { label: "Construction", value: "construction" },
+    { label: "Renovation", value: "renovation" },
+    { label: "Interior", value: "interior" },
+    { label: "Architecture", value: "architecture" },
+    { label: "Real Estate", value: "real-estate" },
+    { label: "Consultation", value: "consultation" },
+    { label: "Other", value: "other" },
   ];
 
   useEffect(() => {
-    // TODO: Replace with real API call
     const fetchServices = async () => {
       setLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1200));
-        const mockServices = [
-          {
-            id: 1,
-            title: "Bricks & Plaster Work",
-            category: "Bricks & Plaster",
-            description: "High-quality brick masonry and plastering services.",
-            price: "₹500/sqft",
-            status: "active",
-            createdAt: "2025-12-15",
-          },
-          {
-            id: 2,
-            title: "Plumbing Services",
-            category: "Plumbing",
-            description:
-              "Complete plumbing solutions for residential and commercial.",
-            price: "₹300/sqft",
-            status: "inactive",
-            createdAt: "2025-11-20",
-          },
-          {
-            id: 3,
-            title: "Interior Design",
-            category: "Interior Design",
-            description:
-              "Modern and luxurious interior design services for homes.",
-            price: "₹800/sqft",
-            status: "active",
-            createdAt: "2026-01-10",
-          },
-        ];
-
-        setServices(mockServices);
-        setFilteredServices(mockServices);
+        const data = await ServiceService.getAllServices();
+        setServices(data || []);
+        setFilteredServices(data || []);
       } catch (error) {
         console.error("Failed to fetch services", error);
       } finally {
@@ -98,7 +59,7 @@ const ManageServices = () => {
     if (categoryFilter !== "all") {
       filtered = filtered.filter(
         (service) =>
-          service.category.toLowerCase() === categoryFilter.toLowerCase()
+          service.category?.toLowerCase() === categoryFilter.toLowerCase()
       );
     }
 
@@ -108,7 +69,7 @@ const ManageServices = () => {
         (service) =>
           service.title.toLowerCase().includes(lower) ||
           service.description.toLowerCase().includes(lower) ||
-          service.category.toLowerCase().includes(lower)
+          service.category?.toLowerCase().includes(lower)
       );
     }
 
@@ -122,13 +83,12 @@ const ManageServices = () => {
 
   const confirmDelete = async () => {
     try {
-      // TODO: Replace with real API call
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      await ServiceService.deleteService(selectedService._id);
       setServices((prev) =>
-        prev.filter((service) => service.id !== selectedService.id)
+        prev.filter((service) => service._id !== selectedService._id)
       );
       setFilteredServices((prev) =>
-        prev.filter((service) => service.id !== selectedService.id)
+        prev.filter((service) => service._id !== selectedService._id)
       );
       setShowDeleteModal(false);
       setSelectedService(null);
@@ -139,16 +99,15 @@ const ManageServices = () => {
 
   const toggleStatus = async (service) => {
     try {
-      // TODO: Replace with real API call
-      const updatedService = {
-        ...service,
-        status: service.status === "active" ? "inactive" : "active",
-      };
+      const updatedService = await ServiceService.updateService(
+        service._id,
+        { isActive: !service.isActive }
+      );
       setServices((prev) =>
-        prev.map((s) => (s.id === service.id ? updatedService : s))
+        prev.map((s) => (s._id === service._id ? updatedService : s))
       );
       setFilteredServices((prev) =>
-        prev.map((s) => (s.id === service.id ? updatedService : s))
+        prev.map((s) => (s._id === service._id ? updatedService : s))
       );
     } catch (error) {
       console.error("Failed to update service status", error);
@@ -204,8 +163,8 @@ const ManageServices = () => {
               className="w-full md:w-64 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
             >
               {categories.map((cat) => (
-                <option key={cat} value={cat.toLowerCase()}>
-                  {cat}
+                <option key={cat.value} value={cat.value}>
+                  {cat.label}
                 </option>
               ))}
             </select>
@@ -240,7 +199,7 @@ const ManageServices = () => {
               ) : (
                 filteredServices.map((service) => (
                   <tr
-                    key={service.id}
+                    key={service._id}
                     className="border-b last:border-none hover:bg-gray-50 transition"
                   >
                     <td className="py-3 px-4 font-medium text-gray-800">
@@ -250,21 +209,25 @@ const ManageServices = () => {
                       {service.category}
                     </td>
                     <td className="py-3 px-4 text-gray-600">
-                      {service.price}
+                      {service.price != null
+                        ? `INR ${service.price.toLocaleString()}`
+                        : "-"}
                     </td>
                     <td className="py-3 px-4">
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          service.status === "active"
+                          service.isActive
                             ? "bg-green-100 text-green-700"
                             : "bg-gray-200 text-gray-700"
                         }`}
                       >
-                        {service.status}
+                        {service.isActive ? "active" : "inactive"}
                       </span>
                     </td>
                     <td className="py-3 px-4 text-gray-600">
-                      {new Date(service.createdAt).toLocaleDateString()}
+                      {service.createdAt
+                        ? new Date(service.createdAt).toLocaleDateString()
+                        : "-"}
                     </td>
                     <td className="py-3 px-4 text-right space-x-2">
                       <Button size="sm" variant="ghost">
@@ -278,7 +241,7 @@ const ManageServices = () => {
                         variant="ghost"
                         onClick={() => toggleStatus(service)}
                       >
-                        {service.status === "active" ? (
+                        {service.isActive ? (
                           <ToggleRight className="w-4 h-4 text-green-600" />
                         ) : (
                           <ToggleLeft className="w-4 h-4 text-gray-500" />
@@ -330,3 +293,7 @@ const ManageServices = () => {
 };
 
 export default ManageServices;
+
+
+
+
