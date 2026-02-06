@@ -1,5 +1,20 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import {
+  Search,
+  Hammer,
+  Droplet,
+  ShieldCheck,
+  Brush,
+  Zap,
+  Wrench,
+  Square,
+  DoorOpen,
+  Key,
+  Home,
+  Sofa,
+  Ruler,
+  Building2,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import FadeIn from "../../components/animations/FadeIn";
@@ -19,6 +34,23 @@ const Services = ({ detailsPathBase = "/services" }) => {
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
+
+  const serviceTypes = [
+    { title: "Bricks & Plaster Work", icon: Hammer, category: "construction" },
+    { title: "Plumbing Work", icon: Droplet, category: "construction" },
+    { title: "Waterproofing Work", icon: ShieldCheck, category: "construction" },
+    { title: "Gypsum Work", icon: Square, category: "interior" },
+    { title: "Painting Work", icon: Brush, category: "construction" },
+    { title: "Electrical Work", icon: Zap, category: "construction" },
+    { title: "Fabrication Work", icon: Wrench, category: "construction" },
+    { title: "Tile Work", icon: Square, category: "construction" },
+    { title: "Door & Window Work", icon: DoorOpen, category: "construction" },
+    { title: "Lock & Key Work", icon: Key, category: "construction" },
+    { title: "Renovation Work", icon: Home, category: "renovation" },
+    { title: "Interior Design Work", icon: Sofa, category: "interior" },
+    { title: "Architecture Planning & RCC Work", icon: Ruler, category: "architecture" },
+    { title: "Property Buying & Selling", icon: Building2, category: "real-estate" },
+  ];
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -63,6 +95,42 @@ const Services = ({ detailsPathBase = "/services" }) => {
               renovation, interior, and property solutions under one roof.
             </p>
           </FadeIn>
+        </div>
+      </section>
+
+      {/* Service Types */}
+      <section className="py-16 bg-white border-b">
+        <div className="max-w-7xl mx-auto px-6">
+          <FadeIn>
+            <div className="text-center mb-10">
+              <h2 className="text-2xl md:text-3xl font-semibold text-gray-800">
+                Our Service Types
+              </h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Browse all core construction and specialty services we offer.
+              </p>
+            </div>
+          </FadeIn>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {serviceTypes.map((type) => {
+              const Icon = type.icon;
+              return (
+                <button
+                  key={type.title}
+                  onClick={() => setCategory(type.category)}
+                  className="flex items-center gap-3 bg-gray-50 border rounded-xl p-4 text-left hover:border-orange-400 hover:bg-orange-50 transition"
+                >
+                  <span className="w-10 h-10 rounded-lg bg-white flex items-center justify-center border">
+                    <Icon className="w-5 h-5 text-orange-600" />
+                  </span>
+                  <span className="text-sm font-medium text-gray-800">
+                    {type.title}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </section>
 

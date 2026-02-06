@@ -38,11 +38,11 @@ const ServiceCard = ({
   const displayMax = priceMax ?? price;
 
   return (
-    <FadeIn direction="up" className={clsx("h-full", className)}>
+    <FadeIn direction="up" className={clsx(className)}>
       <motion.div
         whileHover={{ y: -6 }}
         transition={{ type: "spring", stiffness: 300 }}
-        className="group h-full bg-white rounded-2xl shadow-md hover:shadow-xl overflow-hidden border border-gray-100"
+        className="group bg-white rounded-2xl shadow-md hover:shadow-xl overflow-hidden border border-gray-100"
       >
         {/* Image */}
         <div className="relative h-48 w-full overflow-hidden">
@@ -59,7 +59,7 @@ const ServiceCard = ({
         </div>
 
         {/* Content */}
-        <div className="p-5 flex flex-col h-full">
+        <div className="p-5 flex flex-col">
           <h3 className="text-lg font-semibold text-gray-800 mb-1 line-clamp-1">
             {title}
           </h3>
@@ -94,7 +94,7 @@ const ServiceCard = ({
           )}
 
           {/* Action */}
-          <div className="mt-auto">
+          <div className="mt-4">
             <Button
               fullWidth
               onClick={() => navigate(`${detailsPathBase}/${_id}`)}
