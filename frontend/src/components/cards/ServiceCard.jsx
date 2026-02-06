@@ -21,15 +21,21 @@ const ServiceCard = ({
     category,
     description,
     images = [],
+    price,
     priceMin,
     priceMax,
+    priceType,
     duration,
     rating = 0,
   } = service;
 
   const imageUrl =
+    images?.[0]?.url ||
     images?.[0] ||
     "https://via.placeholder.com/400x250?text=Service+Image";
+
+  const displayMin = priceMin ?? price;
+  const displayMax = priceMax ?? price;
 
   return (
     <FadeIn direction="up" className={clsx("h-full", className)}>
@@ -77,12 +83,12 @@ const ServiceCard = ({
           </div>
 
           {/* Price */}
-          {(priceMin || priceMax) && (
+          {(price != null || priceMin || priceMax) && (
             <div className="flex items-center gap-1 text-gray-800 font-semibold mb-4">
               <IndianRupee className="w-4 h-4" />
               <span>
-                {priceMin?.toLocaleString() || "0"} –{" "}
-                {priceMax?.toLocaleString() || "On Request"}
+                {displayMin?.toLocaleString() || "0"} –{" "}
+                {displayMax?.toLocaleString() || "On Request"}
               </span>
             </div>
           )}
@@ -104,3 +110,4 @@ const ServiceCard = ({
 };
 
 export default ServiceCard;
+

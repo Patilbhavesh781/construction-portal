@@ -1,9 +1,11 @@
 import bcrypt from "bcryptjs";
 import User from "../models/User.model.js";
+import PendingUser from "../models/PendingUser.model.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/token.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
-import { sendPasswordResetEmail } from "../services/mail.service.js";
+import { sendPasswordResetEmail, sendEmailVerificationEmail } from "../services/mail.service.js";
+import crypto from "crypto";
 
 /**
  * Register new user
@@ -17,29 +19,38 @@ export const register = async (req, res, next) => {
       throw new ApiError(400, "User already exists with this email");
     }
 
-    const user = await User.create({
-      name,
-      email,
-      password,
-      role: role || "user",
-    });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const verificationCode = String(
+      Math.floor(100000 + Math.random() * 900000)
+    );
+    const verificationCodeHash = crypto
+      .createHash("sha256")
+      .update(verificationCode)
+      .digest("hex");
+    const verificationExpires = Date.now() + 24 * 60 * 60 * 1000;
 
-    const accessToken = generateAccessToken({ id: user._id, role: user.role });
-    const refreshToken = generateRefreshToken({ id: user._id, role: user.role });
+    await PendingUser.findOneAndUpdate(
+      { email },
+      {
+        name,
+        email,
+        password: hashedPassword,
+        role: role || "user",
+        verificationCodeHash,
+        verificationExpires,
+      },
+      { upsert: true, new: true }
+    );
 
-
-    user.refreshToken = refreshToken;
-    await user.save({ validateBeforeSave: false });
+    await sendEmailVerificationEmail({ name, email }, verificationCode);
 
     res.status(201).json(
       new ApiResponse(
         201,
         {
-          user: user.toJSON(),
-          token: accessToken,
-          refreshToken,
+          email,
         },
-        "User registered successfully"
+        "OTP sent to your email. Please verify to complete registration."
       )
     );
 
@@ -58,6 +69,9 @@ export const login = async (req, res, next) => {
     const user = await User.findOne({ email }).select("+password");
     if (!user) {
       throw new ApiError(401, "Invalid email or password");
+    }
+    if (!user.isVerified) {
+      throw new ApiError(403, "Please verify your email before logging in");
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -82,6 +96,51 @@ export const login = async (req, res, next) => {
         "Login successful"
       )
     );
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Verify email using token
+ */
+export const verifyEmail = async (req, res, next) => {
+  try {
+    const { email, code } = req.body;
+    if (!email || !code) {
+      throw new ApiError(400, "Email and code are required");
+    }
+
+    const codeHash = crypto
+      .createHash("sha256")
+      .update(code)
+      .digest("hex");
+
+    const pending = await PendingUser.findOne({
+      email,
+      verificationCodeHash: codeHash,
+      verificationExpires: { $gt: Date.now() },
+    });
+
+    if (!pending) {
+      throw new ApiError(400, "Invalid or expired verification code");
+    }
+
+    const user = new User({
+      name: pending.name,
+      email: pending.email,
+      password: pending.password,
+      role: pending.role,
+      isVerified: true,
+    });
+    user.$locals = { skipHash: true, allowVerified: true };
+    await user.save();
+
+    await PendingUser.deleteOne({ email });
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, null, "Email verified successfully"));
   } catch (error) {
     next(error);
   }
@@ -180,14 +239,72 @@ export const forgotPassword = async (req, res, next) => {
       throw new ApiError(404, "No user found with this email");
     }
 
-    const resetToken = user.createPasswordResetToken();
+    const resetCode = String(
+      Math.floor(100000 + Math.random() * 900000)
+    );
+    const resetCodeHash = crypto
+      .createHash("sha256")
+      .update(resetCode)
+      .digest("hex");
+
+    user.passwordResetCodeHash = resetCodeHash;
+    user.passwordResetCodeExpires = Date.now() + 10 * 60 * 1000;
     await user.save({ validateBeforeSave: false });
 
-    await sendPasswordResetEmail(user, resetToken);
+    await sendPasswordResetEmail(user, resetCode);
 
     res
       .status(200)
-      .json(new ApiResponse(200, null, "Password reset email sent"));
+      .json(new ApiResponse(200, null, "Reset code sent to your email"));
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Verify reset code and issue reset token
+ */
+export const verifyResetCode = async (req, res, next) => {
+  try {
+    const { email, code } = req.body;
+    if (!email || !code) {
+      throw new ApiError(400, "Email and code are required");
+    }
+
+    const user = await User.findOne({ email }).select(
+      "+passwordResetCodeHash +passwordResetCodeExpires"
+    );
+    if (!user) {
+      throw new ApiError(404, "No user found with this email");
+    }
+
+    const codeHash = crypto
+      .createHash("sha256")
+      .update(code)
+      .digest("hex");
+
+    if (
+      !user.passwordResetCodeHash ||
+      user.passwordResetCodeHash !== codeHash ||
+      !user.passwordResetCodeExpires ||
+      user.passwordResetCodeExpires < Date.now()
+    ) {
+      throw new ApiError(400, "Invalid or expired reset code");
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    user.passwordResetToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+    user.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+    user.passwordResetCodeHash = undefined;
+    user.passwordResetCodeExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, { resetToken }, "Reset code verified"));
   } catch (error) {
     next(error);
   }
@@ -198,8 +315,12 @@ export const forgotPassword = async (req, res, next) => {
  */
 export const resetPassword = async (req, res, next) => {
   try {
-    const { token } = req.params;
+    const token = req.params.token || req.body.token;
     const { newPassword } = req.body;
+
+    if (!token) {
+      throw new ApiError(400, "Reset token is required");
+    }
 
     const user = await User.findOne({
       passwordResetToken: token,

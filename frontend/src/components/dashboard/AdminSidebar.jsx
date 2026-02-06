@@ -9,6 +9,8 @@ import {
   Building2,
   BarChart3,
   LogOut,
+  MessageSquare,
+  Star,
 } from "lucide-react";
 import clsx from "clsx";
 import useAuthStore from "../../store/authStore";
@@ -26,33 +28,43 @@ const AdminSidebar = ({ isOpen = true, onClose }) => {
     },
     {
       name: "Users",
-      path: "/admin/users",
+      path: "/admin/manage-users",
       icon: <Users className="w-5 h-5" />,
     },
     {
       name: "Services",
-      path: "/admin/services",
+      path: "/admin/manage-services",
       icon: <Wrench className="w-5 h-5" />,
     },
     {
       name: "Bookings",
-      path: "/admin/bookings",
+      path: "/admin/manage-bookings",
       icon: <CalendarCheck className="w-5 h-5" />,
     },
     {
       name: "Projects",
-      path: "/admin/projects",
+      path: "/admin/manage-projects",
       icon: <FolderKanban className="w-5 h-5" />,
     },
     {
       name: "Properties",
-      path: "/admin/properties",
+      path: "/admin/manage-properties",
       icon: <Building2 className="w-5 h-5" />,
     },
     {
       name: "Reports",
       path: "/admin/reports",
       icon: <BarChart3 className="w-5 h-5" />,
+    },
+    {
+      name: "Messages",
+      path: "/admin/manage-messages",
+      icon: <MessageSquare className="w-5 h-5" />,
+    },
+    {
+      name: "Reviews",
+      path: "/admin/manage-reviews",
+      icon: <Star className="w-5 h-5" />,
     },
   ];
 

@@ -13,6 +13,7 @@ import SlideIn from "../../components/animations/SlideIn";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 import Modal from "../../components/common/Modal";
+import BookingService from "../../services/booking.service";
 
 const ManageBookings = () => {
   const [bookings, setBookings] = useState([]);
@@ -24,55 +25,22 @@ const ManageBookings = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
-  const statuses = ["All", "Pending", "Approved", "Completed", "Cancelled"];
+  const statuses = [
+    "All",
+    "Pending",
+    "Confirmed",
+    "Completed",
+    "Cancelled",
+    "Rejected",
+  ];
 
   useEffect(() => {
-    // TODO: Replace with real API call
     const fetchBookings = async () => {
       setLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1200));
-        const mockBookings = [
-          {
-            id: 1,
-            user: "Rahul Sharma",
-            service: "Interior Design",
-            date: "2026-02-01",
-            time: "10:30 AM",
-            status: "pending",
-            address: "Mumbai, Maharashtra",
-            phone: "+91 9876543210",
-            createdAt: "2026-01-25",
-            notes: "Need modern kitchen design.",
-          },
-          {
-            id: 2,
-            user: "Neha Singh",
-            service: "Plumbing",
-            date: "2026-01-30",
-            time: "2:00 PM",
-            status: "approved",
-            address: "Delhi, India",
-            phone: "+91 9123456780",
-            createdAt: "2026-01-20",
-            notes: "Fix leaking pipes in bathroom.",
-          },
-          {
-            id: 3,
-            user: "Amit Verma",
-            service: "Painting",
-            date: "2026-01-28",
-            time: "11:00 AM",
-            status: "completed",
-            address: "Pune, Maharashtra",
-            phone: "+91 9988776655",
-            createdAt: "2026-01-15",
-            notes: "Full house repainting.",
-          },
-        ];
-
-        setBookings(mockBookings);
-        setFilteredBookings(mockBookings);
+        const data = await BookingService.getAllBookings();
+        setBookings(data || []);
+        setFilteredBookings(data || []);
       } catch (error) {
         console.error("Failed to fetch bookings", error);
       } finally {
@@ -97,9 +65,11 @@ const ManageBookings = () => {
       const lower = search.toLowerCase();
       filtered = filtered.filter(
         (booking) =>
-          booking.user.toLowerCase().includes(lower) ||
-          booking.service.toLowerCase().includes(lower) ||
-          booking.address.toLowerCase().includes(lower)
+          booking.user?.name?.toLowerCase().includes(lower) ||
+          booking.user?.email?.toLowerCase().includes(lower) ||
+          booking.service?.title?.toLowerCase().includes(lower) ||
+          booking.address?.fullAddress?.toLowerCase().includes(lower) ||
+          booking.address?.city?.toLowerCase().includes(lower)
       );
     }
 
@@ -113,13 +83,12 @@ const ManageBookings = () => {
 
   const confirmDelete = async () => {
     try {
-      // TODO: Replace with real API call
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      await BookingService.deleteBooking(selectedBooking._id);
       setBookings((prev) =>
-        prev.filter((booking) => booking.id !== selectedBooking.id)
+        prev.filter((booking) => booking._id !== selectedBooking._id)
       );
       setFilteredBookings((prev) =>
-        prev.filter((booking) => booking.id !== selectedBooking.id)
+        prev.filter((booking) => booking._id !== selectedBooking._id)
       );
       setShowDeleteModal(false);
       setSelectedBooking(null);
@@ -130,13 +99,15 @@ const ManageBookings = () => {
 
   const updateStatus = async (booking, newStatus) => {
     try {
-      // TODO: Replace with real API call
-      const updatedBooking = { ...booking, status: newStatus };
+      const updatedBooking = await BookingService.updateBooking(
+        booking._id,
+        { status: newStatus }
+      );
       setBookings((prev) =>
-        prev.map((b) => (b.id === booking.id ? updatedBooking : b))
+        prev.map((b) => (b._id === booking._id ? updatedBooking : b))
       );
       setFilteredBookings((prev) =>
-        prev.map((b) => (b.id === booking.id ? updatedBooking : b))
+        prev.map((b) => (b._id === booking._id ? updatedBooking : b))
       );
     } catch (error) {
       console.error("Failed to update booking status", error);
@@ -230,25 +201,27 @@ const ManageBookings = () => {
               ) : (
                 filteredBookings.map((booking) => (
                   <tr
-                    key={booking.id}
+                    key={booking._id}
                     className="border-b last:border-none hover:bg-gray-50 transition"
                   >
                     <td className="py-3 px-4 font-medium text-gray-800">
-                      {booking.user}
+                      {booking.user?.name || "-"}
                     </td>
                     <td className="py-3 px-4 text-gray-600">
-                      {booking.service}
+                      {booking.service?.title || booking.bookingType}
                     </td>
                     <td className="py-3 px-4 text-gray-600">
-                      {new Date(booking.date).toLocaleDateString()}
+                      {booking.bookingDate
+                        ? new Date(booking.bookingDate).toLocaleDateString()
+                        : "-"}
                     </td>
                     <td className="py-3 px-4 text-gray-600">
-                      {booking.time}
+                      {booking.timeSlot || "-"}
                     </td>
                     <td className="py-3 px-4">
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          booking.status === "approved"
+                          booking.status === "confirmed"
                             ? "bg-green-100 text-green-700"
                             : booking.status === "pending"
                             ? "bg-yellow-100 text-yellow-700"
@@ -261,7 +234,9 @@ const ManageBookings = () => {
                       </span>
                     </td>
                     <td className="py-3 px-4 text-gray-600">
-                      {new Date(booking.createdAt).toLocaleDateString()}
+                      {booking.createdAt
+                        ? new Date(booking.createdAt).toLocaleDateString()
+                        : "-"}
                     </td>
                     <td className="py-3 px-4 text-right space-x-2">
                       <Button
@@ -278,7 +253,7 @@ const ManageBookings = () => {
                             size="sm"
                             variant="ghost"
                             onClick={() =>
-                              updateStatus(booking, "approved")
+                              updateStatus(booking, "confirmed")
                             }
                           >
                             <CheckCircle className="w-4 h-4 text-green-600" />
@@ -287,7 +262,7 @@ const ManageBookings = () => {
                             size="sm"
                             variant="ghost"
                             onClick={() =>
-                              updateStatus(booking, "cancelled")
+                              updateStatus(booking, "rejected")
                             }
                           >
                             <XCircle className="w-4 h-4 text-red-600" />
@@ -295,7 +270,7 @@ const ManageBookings = () => {
                         </>
                       )}
 
-                      {booking.status === "approved" && (
+                      {booking.status === "confirmed" && (
                         <Button
                           size="sm"
                           variant="ghost"
@@ -332,29 +307,36 @@ const ManageBookings = () => {
         {selectedBooking && (
           <div className="space-y-3 text-sm text-gray-700">
             <p>
-              <strong>User:</strong> {selectedBooking.user}
+              <strong>User:</strong> {selectedBooking.user?.name || "-"}
             </p>
             <p>
-              <strong>Service:</strong> {selectedBooking.service}
+              <strong>Service:</strong>{" "}
+              {selectedBooking.service?.title || selectedBooking.bookingType}
             </p>
             <p>
               <strong>Date:</strong>{" "}
-              {new Date(selectedBooking.date).toLocaleDateString()}
+              {selectedBooking.bookingDate
+                ? new Date(selectedBooking.bookingDate).toLocaleDateString()
+                : "-"}
             </p>
             <p>
-              <strong>Time:</strong> {selectedBooking.time}
+              <strong>Time:</strong> {selectedBooking.timeSlot || "-"}
             </p>
             <p>
               <strong>Status:</strong> {selectedBooking.status}
             </p>
             <p>
-              <strong>Phone:</strong> {selectedBooking.phone}
+              <strong>Phone:</strong>{" "}
+              {selectedBooking.contactDetails?.phone || "-"}
             </p>
             <p>
-              <strong>Address:</strong> {selectedBooking.address}
+              <strong>Address:</strong>{" "}
+              {selectedBooking.address?.fullAddress ||
+                selectedBooking.address?.city ||
+                "-"}
             </p>
             <p>
-              <strong>Notes:</strong> {selectedBooking.notes}
+              <strong>Notes:</strong> {selectedBooking.notes || "-"}
             </p>
           </div>
         )}
@@ -369,7 +351,7 @@ const ManageBookings = () => {
         <p className="text-gray-700 mb-6">
           Are you sure you want to delete this booking for{" "}
           <span className="font-semibold">
-            {selectedBooking?.user}
+            {selectedBooking?.user?.name || "this user"}
           </span>
           ? This action cannot be undone.
         </p>

@@ -6,6 +6,7 @@ import FadeIn from "../../components/animations/FadeIn";
 import SlideIn from "../../components/animations/SlideIn";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
+import AuthService from "../../services/auth.service";
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
@@ -21,11 +22,13 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      // TODO: Replace with real API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await AuthService.forgotPassword(email);
       setSuccess(true);
     } catch (err) {
-      setError("Something went wrong. Please try again.");
+      setError(
+        err?.response?.data?.message ||
+          "Something went wrong. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -42,18 +45,23 @@ const ForgotPassword = () => {
 
         <FadeIn delay={0.1}>
           <p className="text-center text-gray-600 mb-8">
-            Enter your registered email address and we’ll send you a password
-            reset link.
+            Enter your registered email address and we'll send you a reset
+            code.
           </p>
         </FadeIn>
 
         {success ? (
           <FadeIn>
             <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-4 text-center mb-6">
-              Password reset link sent! Please check your email.
+              Reset code sent! Please check your email.
             </div>
-            <Button fullWidth onClick={() => navigate("/login")}>
-              Go to Login
+            <Button
+              fullWidth
+              onClick={() =>
+                navigate(`/reset-password?email=${encodeURIComponent(email)}`)
+              }
+            >
+              Verify & Reset Password
             </Button>
           </FadeIn>
         ) : (
@@ -76,12 +84,10 @@ const ForgotPassword = () => {
                 </div>
               </div>
 
-              {error && (
-                <p className="text-sm text-red-600">{error}</p>
-              )}
+              {error && <p className="text-sm text-red-600">{error}</p>}
 
               <Button type="submit" fullWidth disabled={loading}>
-                {loading ? <Loader size="sm" /> : "Send Reset Link"}
+                {loading ? <Loader size="sm" /> : "Send Reset Code"}
               </Button>
             </form>
           </FadeIn>
@@ -93,7 +99,7 @@ const ForgotPassword = () => {
               to="/login"
               className="text-sm text-orange-600 hover:underline"
             >
-              ← Back to Login
+              Back to Login
             </Link>
           </div>
         </FadeIn>

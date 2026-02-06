@@ -11,7 +11,7 @@ export const createProject = async (req, res, next) => {
 
     res
       .status(201)
-      .json(new ApiResponse(201, "Project created successfully", project));
+      .json(new ApiResponse(201, project, "Project created successfully"));
   } catch (error) {
     next(error);
   }
@@ -28,7 +28,7 @@ export const getAllProjects = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Projects fetched successfully", projects));
+      .json(new ApiResponse(200, projects, "Projects fetched successfully"));
   } catch (error) {
     next(error);
   }
@@ -44,7 +44,7 @@ export const getProjectById = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Project fetched successfully", project));
+      .json(new ApiResponse(200, project, "Project fetched successfully"));
   } catch (error) {
     next(error);
   }
@@ -65,7 +65,7 @@ export const updateProject = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Project updated successfully", project));
+      .json(new ApiResponse(200, project, "Project updated successfully"));
   } catch (error) {
     next(error);
   }
@@ -81,7 +81,7 @@ export const deleteProject = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Project deleted successfully"));
+      .json(new ApiResponse(200, null, "Project deleted successfully"));
   } catch (error) {
     next(error);
   }

@@ -23,7 +23,7 @@ export const sendMessage = async (req, res, next) => {
 
     res
       .status(201)
-      .json(new ApiResponse(201, "Message sent successfully", newMessage));
+      .json(new ApiResponse(201, newMessage, "Message sent successfully"));
   } catch (error) {
     next(error);
   }
@@ -40,7 +40,7 @@ export const getAllMessages = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Messages fetched successfully", messages));
+      .json(new ApiResponse(200, messages, "Messages fetched successfully"));
   } catch (error) {
     next(error);
   }
@@ -56,7 +56,7 @@ export const getUserMessages = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "User messages fetched successfully", messages));
+      .json(new ApiResponse(200, messages, "User messages fetched successfully"));
   } catch (error) {
     next(error);
   }
@@ -77,7 +77,7 @@ export const markMessageAsRead = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Message marked as read", message));
+      .json(new ApiResponse(200, message, "Message marked as read"));
   } catch (error) {
     next(error);
   }
@@ -97,7 +97,7 @@ export const getMessageById = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Message fetched successfully", message));
+      .json(new ApiResponse(200, message, "Message fetched successfully"));
   } catch (error) {
     next(error);
   }
@@ -113,7 +113,7 @@ export const deleteMessage = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Message deleted successfully"));
+      .json(new ApiResponse(200, null, "Message deleted successfully"));
   } catch (error) {
     next(error);
   }

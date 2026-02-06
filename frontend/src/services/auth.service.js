@@ -20,6 +20,7 @@ const AuthService = {
       user: data?.user,
       token: data?.token || data?.accessToken,
       refreshToken: data?.refreshToken,
+      message: response.data?.message,
     };
   },
 
@@ -45,6 +46,12 @@ const AuthService = {
     return response.data?.data || response.data; // message
   },
 
+  // Verify reset code
+  verifyResetCode: async (email, code) => {
+    const response = await api.post("/auth/verify-reset-code", { email, code });
+    return response.data?.data || response.data; // { resetToken }
+  },
+
   // Get Current User Profile
   getProfile: async () => {
     const response = await api.get("/auth/profile");
@@ -61,6 +68,12 @@ const AuthService = {
   updatePassword: async (currentPassword, newPassword) => {
     const response = await api.put("/auth/update-password", { currentPassword, newPassword });
     return response.data?.data || response.data; // message
+  },
+
+  // Verify Email
+  verifyEmail: async (email, code) => {
+    const response = await api.post(`/auth/verify-email`, { email, code });
+    return response.data?.message || "Email verified";
   },
 };
 

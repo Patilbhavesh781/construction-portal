@@ -28,8 +28,14 @@ const useAuthStore = create((set, get) => ({
     set({ isLoading: true });
     try {
       const data = await AuthService.register(userData);
-      setToken(data.token);
-      set({ user: data.user, token: data.token, isAuthenticated: true });
+      if (data.token) {
+        setToken(data.token);
+        set({ user: data.user, token: data.token, isAuthenticated: true });
+      } else {
+        // Ensure no stale session keeps user logged in
+        removeToken();
+        set({ user: null, token: null, isAuthenticated: false });
+      }
       return data;
     } catch (error) {
       throw error;
