@@ -11,6 +11,7 @@ import projectRoutes from "./routes/project.routes.js";
 import propertyRoutes from "./routes/property.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
 import messageRoutes from "./routes/message.routes.js";
+import chatRoutes from "./routes/chat.routes.js";
 
 import errorHandler from "./middlewares/error.middleware.js";
 
@@ -40,6 +41,7 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/properties", propertyRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/chat", chatRoutes);
 
 /* ------------------------ 404 Handler ------------------------ */
 app.use((req, res, next) => {

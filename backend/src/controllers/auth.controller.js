@@ -239,14 +239,72 @@ export const forgotPassword = async (req, res, next) => {
       throw new ApiError(404, "No user found with this email");
     }
 
-    const resetToken = user.createPasswordResetToken();
+    const resetCode = String(
+      Math.floor(100000 + Math.random() * 900000)
+    );
+    const resetCodeHash = crypto
+      .createHash("sha256")
+      .update(resetCode)
+      .digest("hex");
+
+    user.passwordResetCodeHash = resetCodeHash;
+    user.passwordResetCodeExpires = Date.now() + 10 * 60 * 1000;
     await user.save({ validateBeforeSave: false });
 
-    await sendPasswordResetEmail(user, resetToken);
+    await sendPasswordResetEmail(user, resetCode);
 
     res
       .status(200)
-      .json(new ApiResponse(200, null, "Password reset email sent"));
+      .json(new ApiResponse(200, null, "Reset code sent to your email"));
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Verify reset code and issue reset token
+ */
+export const verifyResetCode = async (req, res, next) => {
+  try {
+    const { email, code } = req.body;
+    if (!email || !code) {
+      throw new ApiError(400, "Email and code are required");
+    }
+
+    const user = await User.findOne({ email }).select(
+      "+passwordResetCodeHash +passwordResetCodeExpires"
+    );
+    if (!user) {
+      throw new ApiError(404, "No user found with this email");
+    }
+
+    const codeHash = crypto
+      .createHash("sha256")
+      .update(code)
+      .digest("hex");
+
+    if (
+      !user.passwordResetCodeHash ||
+      user.passwordResetCodeHash !== codeHash ||
+      !user.passwordResetCodeExpires ||
+      user.passwordResetCodeExpires < Date.now()
+    ) {
+      throw new ApiError(400, "Invalid or expired reset code");
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    user.passwordResetToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+    user.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+    user.passwordResetCodeHash = undefined;
+    user.passwordResetCodeExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, { resetToken }, "Reset code verified"));
   } catch (error) {
     next(error);
   }
@@ -257,8 +315,12 @@ export const forgotPassword = async (req, res, next) => {
  */
 export const resetPassword = async (req, res, next) => {
   try {
-    const { token } = req.params;
+    const token = req.params.token || req.body.token;
     const { newPassword } = req.body;
+
+    if (!token) {
+      throw new ApiError(400, "Reset token is required");
+    }
 
     const user = await User.findOne({
       passwordResetToken: token,

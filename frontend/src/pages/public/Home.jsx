@@ -15,8 +15,8 @@ import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 
 import ServiceService from "../../services/service.service";
-import getProjects from "../../services/project.service";
-import getProperties from "../../services/property.service";
+import ProjectService from "../../services/project.service";
+import PropertyService from "../../services/property.service";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -32,13 +32,13 @@ const Home = () => {
       try {
         const [servicesRes, projectsRes, propertiesRes] = await Promise.all([
           ServiceService.getAllServices({ limit: 6 }),
-          getProjects({ limit: 6 }),
-          getProperties({ limit: 6 }),
+          ProjectService.getAllProjects(),
+          PropertyService.getAllProperties(),
         ]);
 
         setServices(servicesRes || []);
-        setProjects(projectsRes?.data || []);
-        setProperties(propertiesRes?.data || []);
+        setProjects((projectsRes || []).slice(0, 6));
+        setProperties((propertiesRes || []).slice(0, 6));
       } catch (error) {
         console.error("Failed to load home data:", error);
       } finally {

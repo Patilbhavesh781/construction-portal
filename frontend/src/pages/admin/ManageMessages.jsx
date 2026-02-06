@@ -1,87 +1,137 @@
-import React, { useEffect, useState } from "react";
-import { Search, Eye, Trash2, CheckCircle } from "lucide-react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Send, UserCircle } from "lucide-react";
+import { io } from "socket.io-client";
 
 import FadeIn from "../../components/animations/FadeIn";
 import SlideIn from "../../components/animations/SlideIn";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
-import Modal from "../../components/common/Modal";
-import MessageService from "../../services/message.service";
+import ChatService from "../../services/chat.service";
+import { useAuth } from "../../hooks/useAuth";
 
 const ManageMessages = () => {
-  const [messages, setMessages] = useState([]);
-  const [filteredMessages, setFilteredMessages] = useState([]);
-  const [search, setSearch] = useState("");
+  const { user, isLoading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [selectedMessage, setSelectedMessage] = useState(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [threads, setThreads] = useState([]);
+  const [activeUser, setActiveUser] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState("");
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    const fetchMessages = async () => {
+    const fetchThreads = async () => {
       setLoading(true);
       try {
-        const data = await MessageService.getAllMessages();
-        setMessages(data || []);
-        setFilteredMessages(data || []);
+        const data = await ChatService.getThreads();
+        setThreads(data || []);
+        if (data?.length) {
+          setActiveUser(data[0].user);
+        }
       } catch (error) {
-        console.error("Failed to fetch messages", error);
+        console.error("Failed to load threads", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMessages();
-  }, []);
+    if (!authLoading) {
+      fetchThreads();
+    }
+  }, [authLoading]);
 
   useEffect(() => {
-    const lower = search.toLowerCase();
-    const filtered = messages.filter(
-      (msg) =>
-        msg.name?.toLowerCase().includes(lower) ||
-        msg.email?.toLowerCase().includes(lower) ||
-        msg.subject?.toLowerCase().includes(lower) ||
-        msg.message?.toLowerCase().includes(lower)
-    );
-    setFilteredMessages(filtered);
-  }, [search, messages]);
+    const fetchMessages = async () => {
+      if (!activeUser?._id) return;
+      try {
+        const data = await ChatService.getMessages(activeUser._id);
+        setMessages(data || []);
+      } catch (error) {
+        console.error("Failed to load messages", error);
+      }
+    };
 
-  const openDetailsModal = (msg) => {
-    setSelectedMessage(msg);
-    setShowDetailsModal(true);
-  };
+    fetchMessages();
+  }, [activeUser?._id]);
 
-  const confirmDelete = async () => {
-    try {
-      await MessageService.deleteMessage(selectedMessage._id);
+  useEffect(() => {
+    if (!user?._id) return;
+    const apiBase =
+      import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+    const socketUrl = apiBase.replace(/\/api\/?$/, "");
+    const socket = io(socketUrl, { withCredentials: true });
+
+    socket.on("connect", () => {
+      socket.emit("join", { room: "admin" });
+      if (activeUser?._id) {
+        socket.emit("join", { room: `user:${activeUser._id}` });
+      }
+    });
+
+    const appendMessage = (msg) => {
       setMessages((prev) =>
-        prev.filter((m) => m._id !== selectedMessage._id)
+        prev.some((m) => m._id && m._id === msg._id)
+          ? prev
+          : [...prev, msg]
       );
-      setFilteredMessages((prev) =>
-        prev.filter((m) => m._id !== selectedMessage._id)
+    };
+
+    socket.on("chat:message", (msg) => {
+      if (!msg) return;
+      const otherUserId =
+        msg.sender?.role === "admin" ? msg.recipient : msg.sender?._id;
+      if (!otherUserId) return;
+
+      setThreads((prev) => {
+        const existing = prev.find((t) => t.user?._id === otherUserId);
+        const next = [
+          {
+            user: existing?.user || { _id: otherUserId, name: "User" },
+            lastMessageAt: msg.createdAt,
+            lastText: msg.text,
+          },
+          ...prev.filter((t) => t.user?._id !== otherUserId),
+        ];
+        return next;
+      });
+
+      if (activeUser?._id === otherUserId) {
+        appendMessage(msg);
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [user?._id, activeUser?._id]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const lastMessage = useMemo(() => {
+    if (messages.length === 0) return "No messages yet.";
+    return messages[messages.length - 1]?.text || "No messages yet.";
+  }, [messages]);
+
+  const handleSend = async () => {
+    if (!message.trim() || !activeUser?._id) return;
+    try {
+      const sent = await ChatService.sendMessage({
+        text: message,
+        userId: activeUser._id,
+      });
+      setMessages((prev) =>
+        prev.some((m) => m._id && m._id === sent._id)
+          ? prev
+          : [...prev, sent]
       );
-      setShowDeleteModal(false);
-      setSelectedMessage(null);
+      setMessage("");
     } catch (error) {
-      console.error("Failed to delete message", error);
+      console.error("Failed to send message", error);
     }
   };
 
-  const markAsRead = async (msg) => {
-    try {
-      const updated = await MessageService.markAsRead(msg._id);
-      setMessages((prev) =>
-        prev.map((m) => (m._id === msg._id ? updated : m))
-      );
-      setFilteredMessages((prev) =>
-        prev.map((m) => (m._id === msg._id ? updated : m))
-      );
-    } catch (error) {
-      console.error("Failed to mark message as read", error);
-    }
-  };
-
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
         <Loader size="lg" />
@@ -98,165 +148,113 @@ const ManageMessages = () => {
             Manage Messages
           </h1>
           <p className="text-gray-600">
-            View and manage user contact messages.
+            Real-time chat between users and admin.
           </p>
         </div>
       </SlideIn>
 
-      {/* Search */}
+      {/* Messages Layout */}
       <FadeIn>
-        <div className="bg-white rounded-2xl shadow-md border p-5">
-          <div className="relative w-full md:max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search by name, email, subject, message..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
-            />
+        <div className="bg-white rounded-2xl shadow-md border grid grid-cols-1 md:grid-cols-3 min-h-[500px] overflow-hidden">
+          {/* Threads List */}
+          <div className="border-r p-4 overflow-y-auto">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Conversations
+            </h2>
+            <div className="space-y-2">
+              {threads.length === 0 && (
+                <p className="text-sm text-gray-500">No conversations yet.</p>
+              )}
+              {threads.map((thread) => (
+                <button
+                  key={thread.user?._id}
+                  onClick={() => setActiveUser(thread.user)}
+                  className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition ${
+                    activeUser?._id === thread.user?._id
+                      ? "bg-orange-100 text-orange-700"
+                      : "hover:bg-gray-100"
+                  }`}
+                >
+                  <UserCircle className="w-8 h-8 text-gray-500" />
+                  <div className="flex-1">
+                    <p className="font-medium">{thread.user?.name}</p>
+                    <p className="text-sm text-gray-500 truncate">
+                      {thread.lastText || "No messages"}
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      </FadeIn>
 
-      {/* Messages Table */}
-      <FadeIn delay={0.1}>
-        <div className="bg-white rounded-2xl shadow-md border overflow-x-auto">
-          <table className="min-w-full text-sm text-left">
-            <thead>
-              <tr className="border-b bg-gray-50 text-gray-600">
-                <th className="py-3 px-4">Name</th>
-                <th className="py-3 px-4">Email</th>
-                <th className="py-3 px-4">Subject</th>
-                <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4">Created</th>
-                <th className="py-3 px-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredMessages.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan="6"
-                    className="py-6 text-center text-gray-600"
-                  >
-                    No messages found.
-                  </td>
-                </tr>
-              ) : (
-                filteredMessages.map((msg) => (
-                  <tr
-                    key={msg._id}
-                    className="border-b last:border-none hover:bg-gray-50 transition"
-                  >
-                    <td className="py-3 px-4 font-medium text-gray-800">
-                      {msg.name || "Unknown"}
-                    </td>
-                    <td className="py-3 px-4 text-gray-600">{msg.email}</td>
-                    <td className="py-3 px-4 text-gray-600">
-                      {msg.subject || "-"}
-                    </td>
-                    <td className="py-3 px-4">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          msg.isRead
-                            ? "bg-green-100 text-green-700"
-                            : "bg-yellow-100 text-yellow-700"
+          {/* Chat Window */}
+          <div className="md:col-span-2 flex flex-col">
+            {activeUser ? (
+              <>
+                {/* Chat Header */}
+                <div className="border-b p-4">
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    {activeUser.name || "User"}
+                  </h3>
+                  <p className="text-sm text-gray-500">{lastMessage}</p>
+                </div>
+
+                {/* Messages */}
+                <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-gray-50">
+                  {messages.map((msg) => (
+                    <div
+                      key={msg._id || msg.id}
+                      className={`flex ${
+                        msg.sender?.role === "admin"
+                          ? "justify-end"
+                          : "justify-start"
+                      }`}
+                    >
+                      <div
+                        className={`max-w-[75%] px-4 py-2 rounded-2xl text-sm shadow ${
+                          msg.sender?.role === "admin"
+                            ? "bg-orange-600 text-white rounded-br-none"
+                            : "bg-white text-gray-800 rounded-bl-none"
                         }`}
                       >
-                        {msg.isRead ? "read" : "unread"}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-gray-600">
-                      {msg.createdAt
-                        ? new Date(msg.createdAt).toLocaleDateString()
-                        : "-"}
-                    </td>
-                    <td className="py-3 px-4 text-right space-x-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => openDetailsModal(msg)}
-                      >
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                      {!msg.isRead && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => markAsRead(msg)}
-                        >
-                          <CheckCircle className="w-4 h-4 text-green-600" />
-                        </Button>
-                      )}
-                      <Button
-                        size="sm"
-                        variant="danger"
-                        onClick={() => {
-                          setSelectedMessage(msg);
-                          setShowDeleteModal(true);
-                        }}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                        <p>{msg.text || msg.message}</p>
+                        <p className="text-xs mt-1 opacity-70 text-right">
+                          {msg.createdAt
+                            ? new Date(msg.createdAt).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })
+                            : ""}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* Message Input */}
+                <div className="border-t p-4 flex items-center gap-3">
+                  <input
+                    type="text"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Type your message..."
+                    className="flex-1 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                    onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                  />
+                  <Button onClick={handleSend}>
+                    <Send className="w-4 h-4" />
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 flex items-center justify-center text-gray-500">
+                Select a conversation to start chatting.
+              </div>
+            )}
+          </div>
         </div>
       </FadeIn>
-
-      {/* Details Modal */}
-      <Modal
-        isOpen={showDetailsModal}
-        onClose={() => setShowDetailsModal(false)}
-        title="Message Details"
-      >
-        {selectedMessage && (
-          <div className="space-y-3 text-sm text-gray-700">
-            <p>
-              <strong>Name:</strong> {selectedMessage.name || "-"}
-            </p>
-            <p>
-              <strong>Email:</strong> {selectedMessage.email || "-"}
-            </p>
-            <p>
-              <strong>Subject:</strong> {selectedMessage.subject || "-"}
-            </p>
-            <p>
-              <strong>Message:</strong> {selectedMessage.message || "-"}
-            </p>
-          </div>
-        )}
-      </Modal>
-
-      {/* Delete Modal */}
-      <Modal
-        isOpen={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        title="Delete Message"
-      >
-        <p className="text-gray-700 mb-6">
-          Are you sure you want to delete this message from{" "}
-          <span className="font-semibold">
-            {selectedMessage?.name || "unknown user"}
-          </span>
-          ?
-        </p>
-        <div className="flex justify-end gap-3">
-          <Button
-            variant="outline"
-            onClick={() => setShowDeleteModal(false)}
-          >
-            Cancel
-          </Button>
-          <Button variant="danger" onClick={confirmDelete}>
-            Delete
-          </Button>
-        </div>
-      </Modal>
     </div>
   );
 };

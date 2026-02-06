@@ -46,6 +46,12 @@ const AuthService = {
     return response.data?.data || response.data; // message
   },
 
+  // Verify reset code
+  verifyResetCode: async (email, code) => {
+    const response = await api.post("/auth/verify-reset-code", { email, code });
+    return response.data?.data || response.data; // { resetToken }
+  },
+
   // Get Current User Profile
   getProfile: async () => {
     const response = await api.get("/auth/profile");

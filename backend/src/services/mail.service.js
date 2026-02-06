@@ -40,11 +40,15 @@ export const sendWelcomeEmail = async (user) => {
  * Send password reset email
  */
 export const sendPasswordResetEmail = async (user, resetToken) => {
-  const resetUrl = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}`;
+  const resetUrl = `${process.env.CLIENT_URL}/reset-password?email=${encodeURIComponent(
+    user.email
+  )}`;
   const subject = "Password Reset Request";
   const html = `
     <p>You requested a password reset.</p>
-    <p>Click the link below to reset your password:</p>
+    <p>Your reset code:</p>
+    <h2>${resetToken}</h2>
+    <p>Or open the reset page:</p>
     <a href="${resetUrl}">${resetUrl}</a>
     <p>If you did not request this, please ignore this email.</p>
   `;

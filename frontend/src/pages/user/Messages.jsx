@@ -1,45 +1,28 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Send, UserCircle } from "lucide-react";
+import { io } from "socket.io-client";
 
 import FadeIn from "../../components/animations/FadeIn";
 import SlideIn from "../../components/animations/SlideIn";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
+import ChatService from "../../services/chat.service";
+import { useAuth } from "../../hooks/useAuth";
 
 const Messages = () => {
+  const { user, isLoading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [conversations, setConversations] = useState([]);
-  const [activeChat, setActiveChat] = useState(null);
+  const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    // TODO: Replace with real API calls
     const fetchMessages = async () => {
       setLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setConversations([
-          {
-            id: 1,
-            name: "Support Team",
-            lastMessage: "Your booking has been confirmed.",
-            messages: [
-              { id: 1, sender: "support", text: "Hello! How can we help you?", time: "10:00 AM" },
-              { id: 2, sender: "user", text: "I want to confirm my booking status.", time: "10:02 AM" },
-              { id: 3, sender: "support", text: "Your booking has been confirmed.", time: "10:05 AM" },
-            ],
-          },
-          {
-            id: 2,
-            name: "Project Manager",
-            lastMessage: "We’ll start work tomorrow.",
-            messages: [
-              { id: 1, sender: "support", text: "We’ll start work tomorrow.", time: "09:30 AM" },
-            ],
-          },
-        ]);
-        setActiveChat(1);
+        if (!user?._id) return;
+        const data = await ChatService.getMessages();
+        setMessages(data || []);
       } catch (error) {
         console.error("Failed to load messages", error);
       } finally {
@@ -47,44 +30,68 @@ const Messages = () => {
       }
     };
 
-    fetchMessages();
-  }, []);
+    if (!authLoading) {
+      fetchMessages();
+    }
+  }, [authLoading, user?._id]);
+
+  useEffect(() => {
+    if (!user?._id) return;
+    const apiBase =
+      import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+    const socketUrl = apiBase.replace(/\/api\/?$/, "");
+    const socket = io(socketUrl, { withCredentials: true });
+
+    socket.on("connect", () => {
+      socket.emit("join", { room: `user:${user._id}` });
+    });
+
+    const appendMessage = (msg) => {
+      setMessages((prev) =>
+        prev.some((m) => m._id && m._id === msg._id)
+          ? prev
+          : [...prev, msg]
+      );
+    };
+
+    socket.on("chat:message", (msg) => {
+      if (!msg) return;
+      const isMine =
+        msg.sender?._id === user._id || msg.recipient === user._id;
+      if (!isMine) return;
+      appendMessage(msg);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [user?._id]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [activeChat, conversations]);
+  }, [messages]);
 
-  const activeConversation = conversations.find((c) => c.id === activeChat);
+  const lastMessage = useMemo(() => {
+    if (messages.length === 0) return "No messages yet.";
+    return messages[messages.length - 1]?.text || "No messages yet.";
+  }, [messages]);
 
-  const handleSend = () => {
-    if (!message.trim() || !activeConversation) return;
-
-    setConversations((prev) =>
-      prev.map((conv) =>
-        conv.id === activeChat
-          ? {
-              ...conv,
-              lastMessage: message,
-              messages: [
-                ...conv.messages,
-                {
-                  id: Date.now(),
-                  sender: "user",
-                  text: message,
-                  time: new Date().toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }),
-                },
-              ],
-            }
-          : conv
-      )
-    );
-    setMessage("");
+  const handleSend = async () => {
+    if (!message.trim()) return;
+    try {
+      const sent = await ChatService.sendMessage({ text: message });
+      setMessages((prev) =>
+        prev.some((m) => m._id && m._id === sent._id)
+          ? prev
+          : [...prev, sent]
+      );
+      setMessage("");
+    } catch (error) {
+      console.error("Failed to send message", error);
+    }
   };
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
         <Loader size="lg" />
@@ -99,7 +106,7 @@ const Messages = () => {
         <div>
           <h1 className="text-3xl font-bold text-gray-800">Messages</h1>
           <p className="text-gray-600">
-            Chat with our support team and project managers.
+            Chat with our support team in real time.
           </p>
         </div>
       </SlideIn>
@@ -113,60 +120,55 @@ const Messages = () => {
               Conversations
             </h2>
             <div className="space-y-2">
-              {conversations.map((conv) => (
-                <button
-                  key={conv.id}
-                  onClick={() => setActiveChat(conv.id)}
-                  className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition ${
-                    activeChat === conv.id
-                      ? "bg-orange-100 text-orange-700"
-                      : "hover:bg-gray-100"
-                  }`}
-                >
-                  <UserCircle className="w-8 h-8 text-gray-500" />
-                  <div className="flex-1">
-                    <p className="font-medium">{conv.name}</p>
-                    <p className="text-sm text-gray-500 truncate">
-                      {conv.lastMessage}
-                    </p>
-                  </div>
-                </button>
-              ))}
+              <div className="w-full flex items-center gap-3 p-3 rounded-lg text-left bg-orange-100 text-orange-700">
+                <UserCircle className="w-8 h-8 text-gray-500" />
+                <div className="flex-1">
+                  <p className="font-medium">Admin Support</p>
+                  <p className="text-sm text-gray-500 truncate">
+                    {lastMessage}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Chat Window */}
           <div className="md:col-span-2 flex flex-col">
-            {activeConversation ? (
+            {user ? (
               <>
                 {/* Chat Header */}
                 <div className="border-b p-4">
                   <h3 className="text-lg font-semibold text-gray-800">
-                    {activeConversation.name}
+                    Admin Support
                   </h3>
                 </div>
 
                 {/* Messages */}
                 <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-gray-50">
-                  {activeConversation.messages.map((msg) => (
+                  {messages.map((msg) => (
                     <div
-                      key={msg.id}
+                      key={msg._id || msg.id}
                       className={`flex ${
-                        msg.sender === "user"
+                        msg.sender?.role !== "admin"
                           ? "justify-end"
                           : "justify-start"
                       }`}
                     >
                       <div
                         className={`max-w-[75%] px-4 py-2 rounded-2xl text-sm shadow ${
-                          msg.sender === "user"
+                          msg.sender?.role !== "admin"
                             ? "bg-orange-600 text-white rounded-br-none"
                             : "bg-white text-gray-800 rounded-bl-none"
                         }`}
                       >
-                        <p>{msg.text}</p>
+                        <p>{msg.text || msg.message}</p>
                         <p className="text-xs mt-1 opacity-70 text-right">
-                          {msg.time}
+                          {msg.createdAt
+                            ? new Date(msg.createdAt).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })
+                            : ""}
                         </p>
                       </div>
                     </div>
@@ -191,7 +193,7 @@ const Messages = () => {
               </>
             ) : (
               <div className="flex-1 flex items-center justify-center text-gray-500">
-                Select a conversation to start chatting.
+                Please log in to view messages.
               </div>
             )}
           </div>

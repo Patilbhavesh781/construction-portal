@@ -6,7 +6,7 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
+    "dev": "nodemon",
     "lint": "eslint .",
     "create-admin": "node scripts/createAdmin.js"
   },
@@ -24,6 +24,7 @@
     "morgan": "^1.10.0",
     "multer": "^2.0.2",
     "nodemailer": "^8.0.0",
+    "socket.io": "^4.7.5",
     "winston": "^3.14.2"
   },
   "devDependencies": {

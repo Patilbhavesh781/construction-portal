@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Search, ShieldCheck, ShieldAlert, Trash2, UserPlus } from "lucide-react";
+import { Search, Trash2, UserPlus } from "lucide-react";
 
 import FadeIn from "../../components/animations/FadeIn";
 import SlideIn from "../../components/animations/SlideIn";
@@ -60,22 +60,6 @@ const ManageUsers = () => {
       setSelectedUser(null);
     } catch (error) {
       console.error("Failed to delete user", error);
-    }
-  };
-
-  const toggleRole = async (user) => {
-    try {
-      const updatedUser = await UserService.updateUser(user._id, {
-        role: user.role === "admin" ? "user" : "admin",
-      });
-      setUsers((prev) =>
-        prev.map((u) => (u._id === user._id ? updatedUser : u))
-      );
-      setFilteredUsers((prev) =>
-        prev.map((u) => (u._id === user._id ? updatedUser : u))
-      );
-    } catch (error) {
-      console.error("Failed to update user role", error);
     }
   };
 
@@ -187,17 +171,6 @@ const ManageUsers = () => {
                         : "-"}
                     </td>
                     <td className="py-3 px-4 text-right space-x-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => toggleRole(user)}
-                      >
-                        {user.role === "admin" ? (
-                          <ShieldAlert className="w-4 h-4" />
-                        ) : (
-                          <ShieldCheck className="w-4 h-4" />
-                        )}
-                      </Button>
                       <Button
                         size="sm"
                         variant="danger"
