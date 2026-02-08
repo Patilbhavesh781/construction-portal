@@ -9,31 +9,49 @@ import Loader from "../../components/common/Loader";
 import ChatService from "../../services/chat.service";
 import { useAuth } from "../../hooks/useAuth";
 
-const Messages = () => {
+const ManageMessages = () => {
   const { user, isLoading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [threads, setThreads] = useState([]);
+  const [activeUser, setActiveUser] = useState(null);
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    const fetchMessages = async () => {
+    const fetchThreads = async () => {
       setLoading(true);
       try {
-        if (!user?._id) return;
-        const data = await ChatService.getMessages();
-        setMessages(data || []);
+        const data = await ChatService.getThreads();
+        setThreads(data || []);
+        if (data?.length) {
+          setActiveUser(data[0].user);
+        }
       } catch (error) {
-        console.error("Failed to load messages", error);
+        console.error("Failed to load threads", error);
       } finally {
         setLoading(false);
       }
     };
 
     if (!authLoading) {
-      fetchMessages();
+      fetchThreads();
     }
-  }, [authLoading, user?._id]);
+  }, [authLoading]);
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      if (!activeUser?._id) return;
+      try {
+        const data = await ChatService.getMessages(activeUser._id);
+        setMessages(data || []);
+      } catch (error) {
+        console.error("Failed to load messages", error);
+      }
+    };
+
+    fetchMessages();
+  }, [activeUser?._id]);
 
   useEffect(() => {
     if (!user?._id) return;
@@ -43,7 +61,10 @@ const Messages = () => {
     const socket = io(socketUrl, { withCredentials: true });
 
     socket.on("connect", () => {
-      socket.emit("join", { room: `user:${user._id}` });
+      socket.emit("join", { room: "admin" });
+      if (activeUser?._id) {
+        socket.emit("join", { room: `user:${activeUser._id}` });
+      }
     });
 
     const appendMessage = (msg) => {
@@ -56,16 +77,32 @@ const Messages = () => {
 
     socket.on("chat:message", (msg) => {
       if (!msg) return;
-      const isMine =
-        msg.sender?._id === user._id || msg.recipient === user._id;
-      if (!isMine) return;
-      appendMessage(msg);
+      const otherUserId =
+        msg.sender?.role === "admin" ? msg.recipient : msg.sender?._id;
+      if (!otherUserId) return;
+
+      setThreads((prev) => {
+        const existing = prev.find((t) => t.user?._id === otherUserId);
+        const next = [
+          {
+            user: existing?.user || { _id: otherUserId, name: "User" },
+            lastMessageAt: msg.createdAt,
+            lastText: msg.text,
+          },
+          ...prev.filter((t) => t.user?._id !== otherUserId),
+        ];
+        return next;
+      });
+
+      if (activeUser?._id === otherUserId) {
+        appendMessage(msg);
+      }
     });
 
     return () => {
       socket.disconnect();
     };
-  }, [user?._id]);
+  }, [user?._id, activeUser?._id]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -77,9 +114,12 @@ const Messages = () => {
   }, [messages]);
 
   const handleSend = async () => {
-    if (!message.trim()) return;
+    if (!message.trim() || !activeUser?._id) return;
     try {
-      const sent = await ChatService.sendMessage({ text: message });
+      const sent = await ChatService.sendMessage({
+        text: message,
+        userId: activeUser._id,
+      });
       setMessages((prev) =>
         prev.some((m) => m._id && m._id === sent._id)
           ? prev
@@ -104,9 +144,11 @@ const Messages = () => {
       {/* Header */}
       <SlideIn direction="down">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Messages</h1>
+          <h1 className="text-3xl font-bold text-gray-800">
+            Manage Messages
+          </h1>
           <p className="text-gray-600">
-            Chat with our support team in real time.
+            Real-time chat between users and admin.
           </p>
         </div>
       </SlideIn>
@@ -114,33 +156,47 @@ const Messages = () => {
       {/* Messages Layout */}
       <FadeIn>
         <div className="bg-white rounded-2xl shadow-md border grid grid-cols-1 md:grid-cols-3 min-h-[500px] overflow-hidden">
-          {/* Conversations List */}
+          {/* Threads List */}
           <div className="border-r p-4 overflow-y-auto">
             <h2 className="text-lg font-semibold text-gray-800 mb-4">
               Conversations
             </h2>
             <div className="space-y-2">
-              <div className="w-full flex items-center gap-3 p-3 rounded-lg text-left bg-orange-100 text-orange-700">
-                <UserCircle className="w-8 h-8 text-gray-500" />
-                <div className="flex-1">
-                  <p className="font-medium">Admin Support</p>
-                  <p className="text-sm text-gray-500 truncate">
-                    {lastMessage}
-                  </p>
-                </div>
-              </div>
+              {threads.length === 0 && (
+                <p className="text-sm text-gray-500">No conversations yet.</p>
+              )}
+              {threads.map((thread) => (
+                <button
+                  key={thread.user?._id}
+                  onClick={() => setActiveUser(thread.user)}
+                  className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition ${
+                    activeUser?._id === thread.user?._id
+                      ? "bg-orange-100 text-orange-700"
+                      : "hover:bg-gray-100"
+                  }`}
+                >
+                  <UserCircle className="w-8 h-8 text-gray-500" />
+                  <div className="flex-1">
+                    <p className="font-medium">{thread.user?.name}</p>
+                    <p className="text-sm text-gray-500 truncate">
+                      {thread.lastText || "No messages"}
+                    </p>
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
 
           {/* Chat Window */}
           <div className="md:col-span-2 flex flex-col">
-            {user ? (
+            {activeUser ? (
               <>
                 {/* Chat Header */}
                 <div className="border-b p-4">
                   <h3 className="text-lg font-semibold text-gray-800">
-                    Admin Support
+                    {activeUser.name || "User"}
                   </h3>
+                  <p className="text-sm text-gray-500">{lastMessage}</p>
                 </div>
 
                 {/* Messages */}
@@ -149,14 +205,14 @@ const Messages = () => {
                     <div
                       key={msg._id || msg.id}
                       className={`flex ${
-                        msg.sender?.role !== "admin"
+                        msg.sender?.role === "admin"
                           ? "justify-end"
                           : "justify-start"
                       }`}
                     >
                       <div
                         className={`max-w-[75%] px-4 py-2 rounded-2xl text-sm shadow ${
-                          msg.sender?.role !== "admin"
+                          msg.sender?.role === "admin"
                             ? "bg-orange-600 text-white rounded-br-none"
                             : "bg-white text-gray-800 rounded-bl-none"
                         }`}
@@ -193,7 +249,7 @@ const Messages = () => {
               </>
             ) : (
               <div className="flex-1 flex items-center justify-center text-gray-500">
-                Please log in to view messages.
+                Select a conversation to start chatting.
               </div>
             )}
           </div>
@@ -203,4 +259,4 @@ const Messages = () => {
   );
 };
 
-export default Messages;
+export default ManageMessages;

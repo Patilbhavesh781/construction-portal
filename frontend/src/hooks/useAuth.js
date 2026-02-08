@@ -23,7 +23,7 @@ export const useAuth = () => {
 
   useEffect(() => {
     const initializeAuth = async () => {
-      if (!isAuthenticated && token) {
+      if (token && !user) {
         try {
           await fetchProfile();
         } catch (err) {
@@ -34,7 +34,7 @@ export const useAuth = () => {
     };
 
     initializeAuth();
-  }, [isAuthenticated, token, fetchProfile]);
+  }, [token, user, fetchProfile]);
 
   return {
     user,

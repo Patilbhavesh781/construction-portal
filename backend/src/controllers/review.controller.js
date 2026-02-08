@@ -14,7 +14,7 @@ export const createReview = async (req, res, next) => {
 
     res
       .status(201)
-      .json(new ApiResponse(201, "Review created successfully", review));
+      .json(new ApiResponse(201, review, "Review created successfully"));
   } catch (error) {
     next(error);
   }
@@ -31,7 +31,7 @@ export const getAllReviews = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Reviews fetched successfully", reviews));
+      .json(new ApiResponse(200, reviews, "Reviews fetched successfully"));
   } catch (error) {
     next(error);
   }
@@ -45,8 +45,8 @@ export const getReviewsByEntity = async (req, res, next) => {
     const { type, id } = req.params;
 
     const reviews = await Review.find({
-      entityType: type,
-      entityId: id,
+      targetType: type,
+      targetId: id,
       isApproved: true,
     })
       .populate("user", "name avatar")
@@ -54,7 +54,7 @@ export const getReviewsByEntity = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Entity reviews fetched successfully", reviews));
+      .json(new ApiResponse(200, reviews, "Entity reviews fetched successfully"));
   } catch (error) {
     next(error);
   }
@@ -98,7 +98,7 @@ export const updateReviewStatus = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Review status updated successfully", review));
+      .json(new ApiResponse(200, review, "Review status updated successfully"));
   } catch (error) {
     next(error);
   }
@@ -114,7 +114,24 @@ export const deleteReview = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Review deleted successfully"));
+      .json(new ApiResponse(200, null, "Review deleted successfully"));
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get all reviews (Admin only)
+ */
+export const getAllReviewsAdmin = async (req, res, next) => {
+  try {
+    const reviews = await Review.find()
+      .populate("user", "name avatar email")
+      .sort({ createdAt: -1 });
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, reviews, "All reviews fetched successfully"));
   } catch (error) {
     next(error);
   }

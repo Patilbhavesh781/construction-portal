@@ -1,15 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { User, Mail, Phone, MapPin, Lock } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import { User, Lock } from "lucide-react";
 
 import FadeIn from "../../components/animations/FadeIn";
 import SlideIn from "../../components/animations/SlideIn";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
+import { useAuth } from "../../hooks/useAuth";
 
 const Profile = () => {
+  const { user, fetchProfile, updateProfile, isLoading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState(null);
+  const [error, setError] = useState("");
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -17,29 +20,47 @@ const Profile = () => {
     address: "",
   });
 
+  const addressText = useMemo(() => {
+    const addr = user?.address;
+    if (!addr) return "";
+    if (typeof addr === "string") return addr;
+    const parts = [
+      addr.street,
+      addr.city,
+      addr.state,
+      addr.country,
+      addr.zipCode,
+    ].filter(Boolean);
+    return parts.join(", ");
+  }, [user?.address]);
+
   useEffect(() => {
-    // TODO: Replace with real API call
-    const fetchProfile = async () => {
+    const fetchProfileData = async () => {
       setLoading(true);
+      setError("");
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        const data = {
-          name: "Rahul Sharma",
-          email: "rahul@example.com",
-          phone: "+91 98765 43210",
-          address: "Mumbai, India",
-        };
-        setProfile(data);
-        setForm(data);
-      } catch (error) {
-        console.error("Failed to load profile", error);
+        const data = user || (await fetchProfile());
+        if (data) {
+          setProfile(data);
+          setForm({
+            name: data.name || "",
+            email: data.email || "",
+            phone: data.phone || "",
+            address: addressText,
+          });
+        }
+      } catch (err) {
+        console.error("Failed to load profile", err);
+        setError("Failed to load profile. Please try again.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProfile();
-  }, []);
+    if (!authLoading) {
+      fetchProfileData();
+    }
+  }, [authLoading, fetchProfile, user, addressText]);
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -47,19 +68,25 @@ const Profile = () => {
 
   const handleSave = async () => {
     setLoading(true);
+    setError("");
     try {
-      // TODO: Replace with real API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setProfile(form);
+      const updated = await updateProfile({
+        name: form.name,
+        phone: form.phone,
+        address: form.address ? { street: form.address } : undefined,
+      });
+      const updatedUser = updated?.user || updated;
+      setProfile(updatedUser);
       setIsEditing(false);
-    } catch (error) {
-      console.error("Failed to update profile", error);
+    } catch (err) {
+      console.error("Failed to update profile", err);
+      setError("Failed to update profile. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading && !profile) {
+  if ((loading || authLoading) && !profile) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
         <Loader size="lg" />
@@ -89,11 +116,17 @@ const Profile = () => {
             </div>
             <div>
               <h2 className="text-xl font-semibold text-gray-800">
-                {profile.name}
+                {profile?.name || "-"}
               </h2>
-              <p className="text-gray-600">{profile.email}</p>
+              <p className="text-gray-600">{profile?.email || "-"}</p>
             </div>
           </div>
+
+          {error && (
+            <div className="mb-4 bg-red-50 text-red-600 text-sm px-4 py-2 rounded-lg">
+              {error}
+            </div>
+          )}
 
           {/* Form */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -176,7 +209,12 @@ const Profile = () => {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    setForm(profile);
+                    setForm({
+                      name: profile?.name || "",
+                      email: profile?.email || "",
+                      phone: profile?.phone || "",
+                      address: addressText,
+                    });
                     setIsEditing(false);
                   }}
                 >
@@ -185,11 +223,7 @@ const Profile = () => {
               </>
             )}
 
-            <Button
-              variant="ghost"
-              className="ml-auto"
-              to="/forgot-password"
-            >
+            <Button variant="ghost" className="ml-auto" to="/forgot-password">
               <Lock className="w-4 h-4 mr-2" />
               Change Password
             </Button>

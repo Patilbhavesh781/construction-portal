@@ -7,11 +7,13 @@ import ApiResponse from "../utils/ApiResponse.js";
  */
 export const getAllUsers = async (req, res, next) => {
   try {
-    const users = await User.find().sort({ createdAt: -1 });
+    const users = await User.find({ role: { $ne: "admin" } }).sort({
+      createdAt: -1,
+    });
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Users fetched successfully", users));
+      .json(new ApiResponse(200, users, "Users fetched successfully"));
   } catch (error) {
     next(error);
   }
@@ -27,7 +29,7 @@ export const getUserById = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "User fetched successfully", user));
+      .json(new ApiResponse(200, user, "User fetched successfully"));
   } catch (error) {
     next(error);
   }
@@ -40,6 +42,12 @@ export const updateUser = async (req, res, next) => {
   try {
     const updates = req.body;
 
+    const existingUser = await User.findById(req.params.id);
+    if (!existingUser) throw new ApiError(404, "User not found");
+    if (existingUser.role === "admin") {
+      throw new ApiError(403, "Admin user cannot be modified");
+    }
+
     const user = await User.findByIdAndUpdate(
       req.params.id,
       updates,
@@ -50,7 +58,7 @@ export const updateUser = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "User updated successfully", user));
+      .json(new ApiResponse(200, user, "User updated successfully"));
   } catch (error) {
     next(error);
   }
@@ -61,12 +69,17 @@ export const updateUser = async (req, res, next) => {
  */
 export const deleteUser = async (req, res, next) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
+    const user = await User.findById(req.params.id);
     if (!user) throw new ApiError(404, "User not found");
+    if (user.role === "admin") {
+      throw new ApiError(403, "Admin user cannot be deleted");
+    }
+
+    await user.deleteOne();
 
     res
       .status(200)
-      .json(new ApiResponse(200, "User deleted successfully"));
+      .json(new ApiResponse(200, null, "User deleted successfully"));
   } catch (error) {
     next(error);
   }
@@ -81,7 +94,7 @@ export const getMyProfile = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Profile fetched successfully", user));
+      .json(new ApiResponse(200, user, "Profile fetched successfully"));
   } catch (error) {
     next(error);
   }
@@ -104,7 +117,7 @@ export const updateMyProfile = async (req, res, next) => {
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Profile updated successfully", user));
+      .json(new ApiResponse(200, user, "Profile updated successfully"));
   } catch (error) {
     next(error);
   }

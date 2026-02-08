@@ -6,8 +6,10 @@ import ApiError from "../utils/ApiError.js";
  */
 export const sendMail = async ({ to, subject, html, text }) => {
   try {
+    const fromEmail = process.env.MAIL_FROM_EMAIL || process.env.MAIL_USER;
+    const fromName = process.env.MAIL_FROM_NAME || "BuildPro Support";
     const mailOptions = {
-      from: process.env.MAIL_FROM_EMAIL,
+      from: fromEmail ? `${fromName} <${fromEmail}>` : fromName,
       to,
       subject,
       text,
@@ -38,13 +40,36 @@ export const sendWelcomeEmail = async (user) => {
  * Send password reset email
  */
 export const sendPasswordResetEmail = async (user, resetToken) => {
-  const resetUrl = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}`;
+  const resetUrl = `${process.env.CLIENT_URL}/reset-password?email=${encodeURIComponent(
+    user.email
+  )}`;
   const subject = "Password Reset Request";
   const html = `
     <p>You requested a password reset.</p>
-    <p>Click the link below to reset your password:</p>
+    <p>Your reset code:</p>
+    <h2>${resetToken}</h2>
+    <p>Or open the reset page:</p>
     <a href="${resetUrl}">${resetUrl}</a>
     <p>If you did not request this, please ignore this email.</p>
+  `;
+  return sendMail({ to: user.email, subject, html });
+};
+
+/**
+ * Send email verification
+ */
+export const sendEmailVerificationEmail = async (user, token) => {
+  const verifyUrl = `${process.env.CLIENT_URL}/verify-email?email=${encodeURIComponent(
+    user.email
+  )}`;
+  const subject = "Verify Your Email";
+  const html = `
+    <p>Hi ${user.name},</p>
+    <p>Your verification code:</p>
+    <h2>${token}</h2>
+    <p>Or click the link below to verify:</p>
+    <a href="${verifyUrl}">${verifyUrl}</a>
+    <p>This code expires in 24 hours.</p>
   `;
   return sendMail({ to: user.email, subject, html });
 };
