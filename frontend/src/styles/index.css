@@ -11,7 +11,7 @@
 html, body {
   font-family: 'Inter', sans-serif;
   font-size: 16px;
-  background-color: #f9f9f9;
+  background-color: purple;
   color: #333;
   scroll-behavior: smooth;
 }
@@ -174,3 +174,8 @@ label {
 .text-secondary { color: #6b7280; }
 .bg-primary { background-color: #4f46e5; }
 .bg-secondary { background-color: #e5e7eb; }
+
+
+body{
+  background-color: blue;
+}

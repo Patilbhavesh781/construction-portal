@@ -91,7 +91,7 @@ const Home = () => {
           <FadeIn direction="left">
             <div>
               <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
-                Build Your Dream Home With{" "}
+                Build Your Dream Home With sbdvhwdhghhw{" "}
                 <span className="text-yellow-300">BuildPro</span>
               </h1>
               <p className="text-lg text-orange-100 mb-8">
