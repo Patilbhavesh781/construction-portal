@@ -11,15 +11,23 @@ import Loader from "../../components/common/Loader";
 import ServiceCard from "../../components/cards/ServiceCard";
 
 import ServiceService from "../../services/service.service";
+import BookingService from "../../services/booking.service";
+import { useAuth } from "../../hooks/useAuth";
 
-const ServiceDetails = ({ servicesPathBase = "/services" }) => {
+const ServiceDetails = ({
+  servicesPathBase = "/services",
+  showBooking = false,
+}) => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   const [service, setService] = useState(null);
   const [relatedServices, setRelatedServices] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [bookingLoading, setBookingLoading] = useState(false);
+  const [activeImage, setActiveImage] = useState(0);
 
   useEffect(() => {
     const fetchServiceDetails = async () => {
@@ -28,6 +36,7 @@ const ServiceDetails = ({ servicesPathBase = "/services" }) => {
       try {
         const serviceData = await ServiceService.getServiceById(id);
         setService(serviceData);
+        setActiveImage(0);
 
         if (serviceData?.category) {
           const relatedRes = await ServiceService.getAllServices({
@@ -73,6 +82,29 @@ const ServiceDetails = ({ servicesPathBase = "/services" }) => {
     return null;
   }
 
+  const handleBookService = async () => {
+    if (!isAuthenticated) {
+      navigate("/login", {
+        state: { from: `/user/services/${service._id}` },
+      });
+      return;
+    }
+
+    setBookingLoading(true);
+    try {
+      await BookingService.createBooking({
+        service: service._id,
+        bookingType: "service",
+        bookingDate: new Date().toISOString(),
+      });
+      navigate("/user/bookings");
+    } catch (err) {
+      console.error("Failed to book service:", err);
+    } finally {
+      setBookingLoading(false);
+    }
+  };
+
   return (
     <div className="w-full">
       {/* Header Section */}
@@ -103,14 +135,41 @@ const ServiceDetails = ({ servicesPathBase = "/services" }) => {
           <div className="lg:col-span-2">
             <FadeIn direction="left">
               <div className="mb-8">
-                <img
-                  src={
-                    service.images?.[0]?.url ||
-                    "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=1200&q=80"
-                  }
-                  alt={service.title}
-                  className="w-full h-[350px] object-cover rounded-3xl shadow-lg"
-                />
+                <div className="space-y-4">
+                  <div className="relative">
+                    <img
+                      src={
+                        service.images?.[activeImage]?.url ||
+                        service.images?.[activeImage] ||
+                        "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=1200&q=80"
+                      }
+                      alt={service.title}
+                      className="w-full h-[350px] object-cover rounded-3xl shadow-lg"
+                    />
+                  </div>
+                  {service.images?.length > 1 && (
+                    <div className="grid grid-cols-5 gap-3">
+                      {service.images.slice(0, 5).map((img, idx) => (
+                        <button
+                          key={img.public_id || img.url || idx}
+                          type="button"
+                          onClick={() => setActiveImage(idx)}
+                          className={`rounded-xl overflow-hidden border-2 transition ${
+                            activeImage === idx
+                              ? "border-orange-500"
+                              : "border-transparent"
+                          }`}
+                        >
+                          <img
+                            src={img.url || img}
+                            alt={`${service.title} ${idx + 1}`}
+                            className="w-full h-20 object-cover"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </FadeIn>
 
@@ -197,20 +256,23 @@ const ServiceDetails = ({ servicesPathBase = "/services" }) => {
                   </p>
 
                   <div className="space-y-3">
+                    {showBooking && (
+                      <Button
+                        className="w-full"
+                        onClick={handleBookService}
+                        icon={<Calendar className="w-5 h-5" />}
+                        loading={bookingLoading}
+                        disabled={bookingLoading}
+                      >
+                        Book This Service
+                      </Button>
+                    )}
                     <Button
                       className="w-full"
                       onClick={() => navigate(`/contact?service=${service._id}`)}
                       icon={<PhoneCall className="w-5 h-5" />}
                     >
                       Request Callback
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => navigate(`/user/bookings/new?service=${service._id}`)}
-                      icon={<Calendar className="w-5 h-5" />}
-                    >
-                      Book This Service
                     </Button>
                   </div>
                 </div>

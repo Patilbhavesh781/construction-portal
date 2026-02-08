@@ -21,7 +21,7 @@ router.post(
   "/",
   protect,
   authorize("admin"),
-  upload.array("images", 10),
+  upload.array("images", 6),
   createProperty
 );
 
@@ -29,7 +29,7 @@ router.put(
   "/:id",
   protect,
   authorize("admin"),
-  upload.array("images", 10),
+  upload.array("images", 6),
   updateProperty
 );
 

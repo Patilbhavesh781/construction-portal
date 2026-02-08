@@ -12,6 +12,12 @@ export const createBooking = async (req, res, next) => {
       user: req.user._id,
     });
 
+    const io = req.app.get("io");
+    if (io) {
+      io.to(`user:${req.user._id}`).emit("booking:created", booking);
+      io.to("admin").emit("booking:created", booking);
+    }
+
     res
       .status(201)
       .json(new ApiResponse(201, booking, "Booking created successfully"));
@@ -96,6 +102,12 @@ export const updateBookingStatus = async (req, res, next) => {
 
     if (!booking) throw new ApiError(404, "Booking not found");
 
+    const io = req.app.get("io");
+    if (io) {
+      io.to(`user:${booking.user}`).emit("booking:updated", booking);
+      io.to("admin").emit("booking:updated", booking);
+    }
+
     res
       .status(200)
       .json(
@@ -121,6 +133,12 @@ export const cancelBooking = async (req, res, next) => {
 
     booking.status = "cancelled";
     await booking.save();
+
+    const io = req.app.get("io");
+    if (io) {
+      io.to(`user:${booking.user}`).emit("booking:updated", booking);
+      io.to("admin").emit("booking:updated", booking);
+    }
 
     res
       .status(200)

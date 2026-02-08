@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Filter, CalendarCheck } from "lucide-react";
+import { io } from "socket.io-client";
 
 import FadeIn from "../../components/animations/FadeIn";
 import SlideIn from "../../components/animations/SlideIn";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 import BookingService from "../../services/booking.service";
+import { useAuth } from "../../hooks/useAuth";
 
 const MyBookings = () => {
+  const { user, isLoading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [bookings, setBookings] = useState([]);
   const [filter, setFilter] = useState("all");
@@ -25,15 +28,51 @@ const MyBookings = () => {
       }
     };
 
-    fetchBookings();
-  }, []);
+    if (!authLoading) {
+      fetchBookings();
+    }
+  }, [authLoading]);
+
+  useEffect(() => {
+    if (!user?._id) return;
+    const apiBase =
+      import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+    const socketUrl = apiBase.replace(/\/api\/?$/, "");
+    const socket = io(socketUrl, { withCredentials: true });
+
+    socket.on("connect", () => {
+      socket.emit("join", { room: `user:${user._id}` });
+    });
+
+    socket.on("booking:created", (booking) => {
+      if (!booking) return;
+      if (String(booking.user) !== String(user._id)) return;
+      setBookings((prev) =>
+        prev.some((b) => b._id === booking._id)
+          ? prev
+          : [booking, ...prev]
+      );
+    });
+
+    socket.on("booking:updated", (booking) => {
+      if (!booking) return;
+      if (String(booking.user) !== String(user._id)) return;
+      setBookings((prev) =>
+        prev.map((b) => (b._id === booking._id ? booking : b))
+      );
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [user?._id]);
 
   const filteredBookings =
     filter === "all"
       ? bookings
       : bookings.filter((b) => b.status?.toLowerCase() === filter);
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
         <Loader size="lg" />

@@ -31,6 +31,9 @@ const ManageServices = () => {
   const [createError, setCreateError] = useState("");
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState("");
+  const [createImages, setCreateImages] = useState([]);
+  const [editImages, setEditImages] = useState([]);
+  const [editKeepImages, setEditKeepImages] = useState([]);
   const [createForm, setCreateForm] = useState({
     title: "",
     shortDescription: "",
@@ -124,6 +127,8 @@ const ManageServices = () => {
 
   const openEditModal = (service) => {
     setEditError("");
+    setEditImages([]);
+    setEditKeepImages(service.images || []);
     setEditForm({
       id: service._id,
       title: service.title || "",
@@ -158,6 +163,7 @@ const ManageServices = () => {
       exclusions: "",
     });
     setCreateError("");
+    setCreateImages([]);
   };
 
   const handleCreateChange = (e) => {
@@ -202,7 +208,11 @@ const ManageServices = () => {
         exclusions: toList(createForm.exclusions),
       };
 
-      const created = await ServiceService.createService(payload);
+      const formData = new FormData();
+      formData.append("data", JSON.stringify(payload));
+      createImages.forEach((file) => formData.append("images", file));
+
+      const created = await ServiceService.createService(formData);
       setServices((prev) => [created, ...prev]);
       setFilteredServices((prev) => [created, ...prev]);
       setShowCreateModal(false);
@@ -235,11 +245,16 @@ const ManageServices = () => {
         features: toList(editForm.features),
         inclusions: toList(editForm.inclusions),
         exclusions: toList(editForm.exclusions),
+        keepImages: editKeepImages,
       };
+
+      const formData = new FormData();
+      formData.append("data", JSON.stringify(payload));
+      editImages.forEach((file) => formData.append("images", file));
 
       const updated = await ServiceService.updateService(
         editForm.id,
-        payload
+        formData
       );
       setServices((prev) =>
         prev.map((s) => (s._id === updated._id ? updated : s))
@@ -670,6 +685,46 @@ const ManageServices = () => {
             </label>
           </div>
 
+          <div>
+            <label className="text-sm font-medium text-gray-700">
+              Service Images (max 5)
+            </label>
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={(e) => {
+                const files = Array.from(e.target.files || []).slice(0, 5);
+                setCreateImages(files);
+              }}
+              className="w-full mt-2"
+            />
+            {createImages.length > 0 && (
+              <div className="mt-3 grid grid-cols-3 gap-3">
+                {createImages.map((file, idx) => (
+                  <div key={`${file.name}-${idx}`} className="relative">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={file.name}
+                      className="w-full h-24 object-cover rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCreateImages((prev) =>
+                          prev.filter((_, i) => i !== idx)
+                        )
+                      }
+                      className="absolute top-1 right-1 bg-black/60 text-white text-xs px-2 py-1 rounded"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div className="flex justify-end gap-3 pt-2">
             <Button
               type="button"
@@ -816,6 +871,82 @@ const ManageServices = () => {
               />
               Featured
             </label>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">
+              Existing Images
+            </label>
+            {editKeepImages.length === 0 ? (
+              <p className="text-sm text-gray-500">No existing images.</p>
+            ) : (
+              <div className="grid grid-cols-3 gap-3">
+                {editKeepImages.map((img) => (
+                  <div key={img.public_id || img.url} className="relative">
+                    <img
+                      src={img.url || img}
+                      alt="Service"
+                      className="w-full h-24 object-cover rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setEditKeepImages((prev) =>
+                          prev.filter((i) =>
+                            (i.public_id || i.url) !==
+                            (img.public_id || img.url)
+                          )
+                        )
+                      }
+                      className="absolute top-1 right-1 bg-black/60 text-white text-xs px-2 py-1 rounded"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-gray-700">
+              Add/Replace Images (max 5 total)
+            </label>
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={(e) => {
+                const limit = Math.max(5 - editKeepImages.length, 0);
+                const files = Array.from(e.target.files || []).slice(0, limit);
+                setEditImages(files);
+              }}
+              className="w-full mt-2"
+            />
+            {editImages.length > 0 && (
+              <div className="mt-3 grid grid-cols-3 gap-3">
+                {editImages.map((file, idx) => (
+                  <div key={`${file.name}-${idx}`} className="relative">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={file.name}
+                      className="w-full h-24 object-cover rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setEditImages((prev) =>
+                          prev.filter((_, i) => i !== idx)
+                        )
+                      }
+                      className="absolute top-1 right-1 bg-black/60 text-white text-xs px-2 py-1 rounded"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="flex justify-end gap-3 pt-2">
