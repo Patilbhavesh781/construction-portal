@@ -19,10 +19,11 @@ const ProjectCard = ({ project, className = "" }) => {
     description,
     images = [],
     status = "completed",
-    completedAt,
+    endDate,
   } = project;
 
   const imageUrl =
+    images?.[0]?.url ||
     images?.[0] ||
     "https://via.placeholder.com/400x250?text=Project+Image";
 
@@ -65,10 +66,10 @@ const ProjectCard = ({ project, className = "" }) => {
             {title}
           </h3>
 
-          {location && (
+          {(location?.city || location?.address) && (
             <div className="flex items-center gap-1 text-sm text-gray-600 mb-2">
               <MapPin className="w-4 h-4 text-gray-500" />
-              <span>{location}</span>
+              <span>{location?.city || location?.address}</span>
             </div>
           )}
 
@@ -89,9 +90,9 @@ const ProjectCard = ({ project, className = "" }) => {
                 <span>In Progress</span>
               </div>
             )}
-            {completedAt && isCompleted && (
+            {endDate && isCompleted && (
               <span className="text-xs text-gray-500">
-                {new Date(completedAt).toLocaleDateString()}
+                {new Date(endDate).toLocaleDateString()}
               </span>
             )}
           </div>

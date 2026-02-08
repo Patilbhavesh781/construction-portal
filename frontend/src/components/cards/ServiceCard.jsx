@@ -21,22 +21,28 @@ const ServiceCard = ({
     category,
     description,
     images = [],
+    price,
     priceMin,
     priceMax,
+    priceType,
     duration,
     rating = 0,
   } = service;
 
   const imageUrl =
+    images?.[0]?.url ||
     images?.[0] ||
     "https://via.placeholder.com/400x250?text=Service+Image";
 
+  const displayMin = priceMin ?? price;
+  const displayMax = priceMax ?? price;
+
   return (
-    <FadeIn direction="up" className={clsx("h-full", className)}>
+    <FadeIn direction="up" className={clsx(className)}>
       <motion.div
         whileHover={{ y: -6 }}
         transition={{ type: "spring", stiffness: 300 }}
-        className="group h-full bg-white rounded-2xl shadow-md hover:shadow-xl overflow-hidden border border-gray-100"
+        className="group bg-white rounded-2xl shadow-md hover:shadow-xl overflow-hidden border border-gray-100"
       >
         {/* Image */}
         <div className="relative h-48 w-full overflow-hidden">
@@ -53,7 +59,7 @@ const ServiceCard = ({
         </div>
 
         {/* Content */}
-        <div className="p-5 flex flex-col h-full">
+        <div className="p-5 flex flex-col">
           <h3 className="text-lg font-semibold text-gray-800 mb-1 line-clamp-1">
             {title}
           </h3>
@@ -77,18 +83,18 @@ const ServiceCard = ({
           </div>
 
           {/* Price */}
-          {(priceMin || priceMax) && (
+          {(price != null || priceMin || priceMax) && (
             <div className="flex items-center gap-1 text-gray-800 font-semibold mb-4">
               <IndianRupee className="w-4 h-4" />
               <span>
-                {priceMin?.toLocaleString() || "0"} –{" "}
-                {priceMax?.toLocaleString() || "On Request"}
+                {displayMin?.toLocaleString() || "0"} –{" "}
+                {displayMax?.toLocaleString() || "On Request"}
               </span>
             </div>
           )}
 
           {/* Action */}
-          <div className="mt-auto">
+          <div className="mt-4">
             <Button
               fullWidth
               onClick={() => navigate(`${detailsPathBase}/${_id}`)}
@@ -104,3 +110,4 @@ const ServiceCard = ({
 };
 
 export default ServiceCard;
+

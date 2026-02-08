@@ -9,7 +9,7 @@ import ProjectCard from "../../components/cards/ProjectCard";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 
-import getProjects from "../../services/project.service";
+import ProjectService from "../../services/project.service";
 
 const Projects = () => {
   const navigate = useNavigate();
@@ -24,8 +24,8 @@ const Projects = () => {
     const fetchProjects = async () => {
       setLoading(true);
       try {
-        const res = await getProjects();
-        setProjects(res?.data || []);
+        const res = await ProjectService.getAllProjects();
+        setProjects(res || []);
       } catch (error) {
         console.error("Failed to fetch projects:", error);
       } finally {
@@ -40,10 +40,15 @@ const Projects = () => {
     return projects.filter((project) => {
       const matchesSearch =
         project.title?.toLowerCase().includes(search.toLowerCase()) ||
-        project.location?.toLowerCase().includes(search.toLowerCase());
+        project.location?.city
+          ?.toLowerCase()
+          .includes(search.toLowerCase()) ||
+        project.location?.address
+          ?.toLowerCase()
+          .includes(search.toLowerCase());
 
       const matchesType =
-        type === "all" || project.type === type;
+        type === "all" || project.category === type;
 
       const matchesStatus =
         status === "all" || project.status === status;
@@ -97,24 +102,24 @@ const Projects = () => {
               All Types
             </button>
             <button
-              onClick={() => setType("residential")}
+              onClick={() => setType("construction")}
               className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                type === "residential"
+                type === "construction"
                   ? "bg-orange-600 text-white"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              Residential
+              Construction
             </button>
             <button
-              onClick={() => setType("commercial")}
+              onClick={() => setType("renovation")}
               className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                type === "commercial"
+                type === "renovation"
                   ? "bg-orange-600 text-white"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              Commercial
+              Renovation
             </button>
             <button
               onClick={() => setType("interior")}
@@ -127,14 +132,14 @@ const Projects = () => {
               Interior
             </button>
             <button
-              onClick={() => setType("renovation")}
+              onClick={() => setType("architecture")}
               className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                type === "renovation"
+                type === "architecture"
                   ? "bg-orange-600 text-white"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              Renovation
+              Architecture
             </button>
           </div>
 
@@ -171,14 +176,14 @@ const Projects = () => {
               Ongoing
             </button>
             <button
-              onClick={() => setStatus("upcoming")}
+              onClick={() => setStatus("planning")}
               className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                status === "upcoming"
+                status === "planning"
                   ? "bg-orange-600 text-white"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              Upcoming
+              Planning
             </button>
           </div>
         </div>

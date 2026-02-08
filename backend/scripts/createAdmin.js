@@ -22,13 +22,15 @@ const createOrUpdateAdmin = async () => {
   const existingUser = await User.findOne({ email: ADMIN_EMAIL });
 
   if (!existingUser) {
-    const user = await User.create({
+    const user = new User({
       name: ADMIN_NAME || "Admin User",
       email: ADMIN_EMAIL,
       password: ADMIN_PASSWORD,
       role: "admin",
       isVerified: true,
     });
+    user.$locals = { allowVerified: true };
+    await user.save();
 
     console.log("Admin created:", user.email);
     return;
@@ -36,6 +38,7 @@ const createOrUpdateAdmin = async () => {
 
   existingUser.role = "admin";
   existingUser.isVerified = true;
+  existingUser.$locals = { allowVerified: true };
 
   if (ADMIN_NAME) existingUser.name = ADMIN_NAME;
   if (ADMIN_PASSWORD) existingUser.password = ADMIN_PASSWORD;

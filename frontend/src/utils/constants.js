@@ -15,16 +15,13 @@ export const USER_ROLES = {
 // Construction Services Categories
 // ========================
 export const SERVICE_CATEGORIES = [
-  "Bricks & Plaster Work",
-  "Plumbing",
-  "Waterproof Work",
-  "Gypsum Work",
-  "Painting Work",
-  "Electric Work",
-  "Fabrication Work",
-  "Tile Work",
-  "Door & Window Work",
-  "Lock & Key Work",
+  { label: "Construction", value: "construction" },
+  { label: "Renovation", value: "renovation" },
+  { label: "Interior", value: "interior" },
+  { label: "Architecture", value: "architecture" },
+  { label: "Real Estate", value: "real-estate" },
+  { label: "Consultation", value: "consultation" },
+  { label: "Other", value: "other" },
 ];
 
 // ========================

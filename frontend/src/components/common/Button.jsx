@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import clsx from "clsx";
@@ -25,6 +26,8 @@ const sizeStyles = {
   lg: "px-6 py-3 text-base",
 };
 
+const MotionLink = motion(Link);
+
 const Button = ({
   children,
   type = "button",
@@ -35,21 +38,41 @@ const Button = ({
   fullWidth = false,
   onClick,
   className = "",
+  to,
   ...props
 }) => {
+  const classes = clsx(
+    baseStyles,
+    variantStyles[variant],
+    sizeStyles[size],
+    fullWidth && "w-full",
+    className,
+    (disabled || loading) && "pointer-events-none"
+  );
+
+  if (to) {
+    return (
+      <MotionLink
+        whileTap={{ scale: 0.97 }}
+        to={to}
+        onClick={onClick}
+        aria-disabled={disabled || loading}
+        className={classes}
+        {...props}
+      >
+        {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+        {children}
+      </MotionLink>
+    );
+  }
+
   return (
     <motion.button
       whileTap={{ scale: 0.97 }}
       type={type}
       disabled={disabled || loading}
       onClick={onClick}
-      className={clsx(
-        baseStyles,
-        variantStyles[variant],
-        sizeStyles[size],
-        fullWidth && "w-full",
-        className
-      )}
+      className={classes}
       {...props}
     >
       {loading && <Loader2 className="w-4 h-4 animate-spin" />}

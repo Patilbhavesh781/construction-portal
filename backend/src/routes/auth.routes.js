@@ -8,6 +8,8 @@ import {
   updatePassword,
   forgotPassword,
   resetPassword,
+  verifyEmail,
+  verifyResetCode,
 } from "../controllers/auth.controller.js";
 import { protect } from "../middlewares/auth.middleware.js";
 
@@ -17,7 +19,10 @@ const router = express.Router();
 router.post("/register", register);
 router.post("/login", login);
 router.post("/forgot-password", forgotPassword);
+router.post("/verify-reset-code", verifyResetCode);
+router.post("/reset-password", resetPassword);
 router.post("/reset-password/:token", resetPassword);
+router.post("/verify-email", verifyEmail);
 
 // Protected routes
 router.get("/profile", protect, getProfile);

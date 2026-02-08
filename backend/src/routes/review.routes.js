@@ -4,6 +4,8 @@ import {
   getReviewsByService,
   getReviewsByProject,
   getReviewsByProperty,
+  getAllReviewsAdmin,
+  updateReviewStatus,
   deleteReview,
 } from "../controllers/review.controller.js";
 import { protect } from "../middlewares/auth.middleware.js";
@@ -20,6 +22,8 @@ router.get("/property/:propertyId", getReviewsByProperty);
 router.post("/", protect, createReview);
 
 // Admin only
+router.get("/", protect, authorize("admin"), getAllReviewsAdmin);
+router.patch("/:id/status", protect, authorize("admin"), updateReviewStatus);
 router.delete("/:id", protect, authorize("admin"), deleteReview);
 
 export default router;

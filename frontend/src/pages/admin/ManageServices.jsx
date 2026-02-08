@@ -14,6 +14,7 @@ import SlideIn from "../../components/animations/SlideIn";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 import Modal from "../../components/common/Modal";
+import ServiceService from "../../services/service.service";
 
 const ManageServices = () => {
   const [services, setServices] = useState([]);
@@ -23,65 +24,64 @@ const ManageServices = () => {
   const [loading, setLoading] = useState(true);
   const [selectedService, setSelectedService] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [createLoading, setCreateLoading] = useState(false);
+  const [createError, setCreateError] = useState("");
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState("");
+  const [createImages, setCreateImages] = useState([]);
+  const [editImages, setEditImages] = useState([]);
+  const [editKeepImages, setEditKeepImages] = useState([]);
+  const [createForm, setCreateForm] = useState({
+    title: "",
+    shortDescription: "",
+    description: "",
+    category: "construction",
+    price: "",
+    priceType: "fixed",
+    duration: "",
+    isActive: true,
+    isFeatured: false,
+    features: "",
+    inclusions: "",
+    exclusions: "",
+  });
+  const [editForm, setEditForm] = useState({
+    id: "",
+    title: "",
+    shortDescription: "",
+    description: "",
+    category: "construction",
+    price: "",
+    priceType: "fixed",
+    duration: "",
+    isActive: true,
+    isFeatured: false,
+    features: "",
+    inclusions: "",
+    exclusions: "",
+  });
 
   const categories = [
-    "All",
-    "Bricks & Plaster",
-    "Plumbing",
-    "Waterproofing",
-    "Gypsum Work",
-    "Painting",
-    "Electrical",
-    "Fabrication",
-    "Tile Work",
-    "Doors & Windows",
-    "Lock & Key",
-    "Renovation",
-    "Interior Design",
-    "Architecture & RCC",
-    "Property Buying/Selling",
+    { label: "All", value: "all" },
+    { label: "Construction", value: "construction" },
+    { label: "Renovation", value: "renovation" },
+    { label: "Interior", value: "interior" },
+    { label: "Architecture", value: "architecture" },
+    { label: "Real Estate", value: "real-estate" },
+    { label: "Consultation", value: "consultation" },
+    { label: "Other", value: "other" },
   ];
 
   useEffect(() => {
-    // TODO: Replace with real API call
     const fetchServices = async () => {
       setLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1200));
-        const mockServices = [
-          {
-            id: 1,
-            title: "Bricks & Plaster Work",
-            category: "Bricks & Plaster",
-            description: "High-quality brick masonry and plastering services.",
-            price: "₹500/sqft",
-            status: "active",
-            createdAt: "2025-12-15",
-          },
-          {
-            id: 2,
-            title: "Plumbing Services",
-            category: "Plumbing",
-            description:
-              "Complete plumbing solutions for residential and commercial.",
-            price: "₹300/sqft",
-            status: "inactive",
-            createdAt: "2025-11-20",
-          },
-          {
-            id: 3,
-            title: "Interior Design",
-            category: "Interior Design",
-            description:
-              "Modern and luxurious interior design services for homes.",
-            price: "₹800/sqft",
-            status: "active",
-            createdAt: "2026-01-10",
-          },
-        ];
-
-        setServices(mockServices);
-        setFilteredServices(mockServices);
+        const data = await ServiceService.getAdminServices();
+        setServices(data || []);
+        setFilteredServices(data || []);
       } catch (error) {
         console.error("Failed to fetch services", error);
       } finally {
@@ -98,7 +98,7 @@ const ManageServices = () => {
     if (categoryFilter !== "all") {
       filtered = filtered.filter(
         (service) =>
-          service.category.toLowerCase() === categoryFilter.toLowerCase()
+          service.category?.toLowerCase() === categoryFilter.toLowerCase()
       );
     }
 
@@ -108,7 +108,7 @@ const ManageServices = () => {
         (service) =>
           service.title.toLowerCase().includes(lower) ||
           service.description.toLowerCase().includes(lower) ||
-          service.category.toLowerCase().includes(lower)
+          service.category?.toLowerCase().includes(lower)
       );
     }
 
@@ -120,15 +120,167 @@ const ManageServices = () => {
     setShowDeleteModal(true);
   };
 
-  const confirmDelete = async () => {
+  const openDetailsModal = (service) => {
+    setSelectedService(service);
+    setShowDetailsModal(true);
+  };
+
+  const openEditModal = (service) => {
+    setEditError("");
+    setEditImages([]);
+    setEditKeepImages(service.images || []);
+    setEditForm({
+      id: service._id,
+      title: service.title || "",
+      shortDescription: service.shortDescription || "",
+      description: service.description || "",
+      category: service.category || "construction",
+      price: service.price != null ? String(service.price) : "",
+      priceType: service.priceType || "fixed",
+      duration: service.duration || "",
+      isActive: service.isActive ?? true,
+      isFeatured: service.isFeatured ?? false,
+      features: service.features?.join(", ") || "",
+      inclusions: service.inclusions?.join(", ") || "",
+      exclusions: service.exclusions?.join(", ") || "",
+    });
+    setShowEditModal(true);
+  };
+
+  const resetCreateForm = () => {
+    setCreateForm({
+      title: "",
+      shortDescription: "",
+      description: "",
+      category: "construction",
+      price: "",
+      priceType: "fixed",
+      duration: "",
+      isActive: true,
+      isFeatured: false,
+      features: "",
+      inclusions: "",
+      exclusions: "",
+    });
+    setCreateError("");
+    setCreateImages([]);
+  };
+
+  const handleCreateChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setCreateForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setEditForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const toList = (value) =>
+    value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+  const handleCreateSubmit = async (e) => {
+    e.preventDefault();
+    setCreateError("");
+    setCreateLoading(true);
     try {
-      // TODO: Replace with real API call
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      const payload = {
+        title: createForm.title,
+        shortDescription: createForm.shortDescription || undefined,
+        description: createForm.description,
+        category: createForm.category,
+        price: Number(createForm.price),
+        priceType: createForm.priceType,
+        duration: createForm.duration || undefined,
+        isActive: createForm.isActive,
+        isFeatured: createForm.isFeatured,
+        features: toList(createForm.features),
+        inclusions: toList(createForm.inclusions),
+        exclusions: toList(createForm.exclusions),
+      };
+
+      const formData = new FormData();
+      formData.append("data", JSON.stringify(payload));
+      createImages.forEach((file) => formData.append("images", file));
+
+      const created = await ServiceService.createService(formData);
+      setServices((prev) => [created, ...prev]);
+      setFilteredServices((prev) => [created, ...prev]);
+      setShowCreateModal(false);
+      resetCreateForm();
+    } catch (error) {
+      setCreateError(
+        error?.response?.data?.message ||
+          "Failed to create service. Please try again."
+      );
+    } finally {
+      setCreateLoading(false);
+    }
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    setEditError("");
+    setEditLoading(true);
+    try {
+      const payload = {
+        title: editForm.title,
+        shortDescription: editForm.shortDescription || undefined,
+        description: editForm.description,
+        category: editForm.category,
+        price: Number(editForm.price),
+        priceType: editForm.priceType,
+        duration: editForm.duration || undefined,
+        isActive: editForm.isActive,
+        isFeatured: editForm.isFeatured,
+        features: toList(editForm.features),
+        inclusions: toList(editForm.inclusions),
+        exclusions: toList(editForm.exclusions),
+        keepImages: editKeepImages,
+      };
+
+      const formData = new FormData();
+      formData.append("data", JSON.stringify(payload));
+      editImages.forEach((file) => formData.append("images", file));
+
+      const updated = await ServiceService.updateService(
+        editForm.id,
+        formData
+      );
       setServices((prev) =>
-        prev.filter((service) => service.id !== selectedService.id)
+        prev.map((s) => (s._id === updated._id ? updated : s))
       );
       setFilteredServices((prev) =>
-        prev.filter((service) => service.id !== selectedService.id)
+        prev.map((s) => (s._id === updated._id ? updated : s))
+      );
+      setShowEditModal(false);
+    } catch (error) {
+      setEditError(
+        error?.response?.data?.message ||
+          "Failed to update service. Please try again."
+      );
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await ServiceService.deleteService(selectedService._id);
+      setServices((prev) =>
+        prev.filter((service) => service._id !== selectedService._id)
+      );
+      setFilteredServices((prev) =>
+        prev.filter((service) => service._id !== selectedService._id)
       );
       setShowDeleteModal(false);
       setSelectedService(null);
@@ -139,16 +291,15 @@ const ManageServices = () => {
 
   const toggleStatus = async (service) => {
     try {
-      // TODO: Replace with real API call
-      const updatedService = {
-        ...service,
-        status: service.status === "active" ? "inactive" : "active",
-      };
+      const updatedService = await ServiceService.updateService(
+        service._id,
+        { isActive: !service.isActive }
+      );
       setServices((prev) =>
-        prev.map((s) => (s.id === service.id ? updatedService : s))
+        prev.map((s) => (s._id === service._id ? updatedService : s))
       );
       setFilteredServices((prev) =>
-        prev.map((s) => (s.id === service.id ? updatedService : s))
+        prev.map((s) => (s._id === service._id ? updatedService : s))
       );
     } catch (error) {
       console.error("Failed to update service status", error);
@@ -176,7 +327,7 @@ const ManageServices = () => {
               Create, edit, and manage all construction services.
             </p>
           </div>
-          <Button to="/admin/manage-services/create">
+          <Button onClick={() => setShowCreateModal(true)}>
             <PlusCircle className="w-5 h-5 mr-2" />
             Add Service
           </Button>
@@ -204,8 +355,8 @@ const ManageServices = () => {
               className="w-full md:w-64 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
             >
               {categories.map((cat) => (
-                <option key={cat} value={cat.toLowerCase()}>
-                  {cat}
+                <option key={cat.value} value={cat.value}>
+                  {cat.label}
                 </option>
               ))}
             </select>
@@ -240,7 +391,7 @@ const ManageServices = () => {
               ) : (
                 filteredServices.map((service) => (
                   <tr
-                    key={service.id}
+                    key={service._id}
                     className="border-b last:border-none hover:bg-gray-50 transition"
                   >
                     <td className="py-3 px-4 font-medium text-gray-800">
@@ -250,27 +401,39 @@ const ManageServices = () => {
                       {service.category}
                     </td>
                     <td className="py-3 px-4 text-gray-600">
-                      {service.price}
+                      {service.price != null
+                        ? `INR ${service.price.toLocaleString()}`
+                        : "-"}
                     </td>
                     <td className="py-3 px-4">
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          service.status === "active"
+                          service.isActive
                             ? "bg-green-100 text-green-700"
                             : "bg-gray-200 text-gray-700"
                         }`}
                       >
-                        {service.status}
+                        {service.isActive ? "active" : "inactive"}
                       </span>
                     </td>
                     <td className="py-3 px-4 text-gray-600">
-                      {new Date(service.createdAt).toLocaleDateString()}
+                      {service.createdAt
+                        ? new Date(service.createdAt).toLocaleDateString()
+                        : "-"}
                     </td>
                     <td className="py-3 px-4 text-right space-x-2">
-                      <Button size="sm" variant="ghost">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => openDetailsModal(service)}
+                      >
                         <Eye className="w-4 h-4" />
                       </Button>
-                      <Button size="sm" variant="ghost">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => openEditModal(service)}
+                      >
                         <Edit className="w-4 h-4" />
                       </Button>
                       <Button
@@ -278,7 +441,7 @@ const ManageServices = () => {
                         variant="ghost"
                         onClick={() => toggleStatus(service)}
                       >
-                        {service.status === "active" ? (
+                        {service.isActive ? (
                           <ToggleRight className="w-4 h-4 text-green-600" />
                         ) : (
                           <ToggleLeft className="w-4 h-4 text-gray-500" />
@@ -325,8 +488,487 @@ const ManageServices = () => {
           </Button>
         </div>
       </Modal>
+
+      {/* Service Details Modal */}
+      <Modal
+        isOpen={showDetailsModal}
+        onClose={() => setShowDetailsModal(false)}
+        title="Service Details"
+      >
+        {selectedService && (
+          <div className="space-y-3 text-sm text-gray-700">
+            <p>
+              <strong>Title:</strong> {selectedService.title}
+            </p>
+            <p>
+              <strong>Category:</strong> {selectedService.category}
+            </p>
+            <p>
+              <strong>Price:</strong>{" "}
+              {selectedService.price != null
+                ? `INR ${selectedService.price.toLocaleString()}`
+                : "-"}{" "}
+              ({selectedService.priceType || "fixed"})
+            </p>
+            <p>
+              <strong>Duration:</strong>{" "}
+              {selectedService.duration || "-"}
+            </p>
+            <p>
+              <strong>Status:</strong>{" "}
+              {selectedService.isActive ? "Active" : "Inactive"}
+            </p>
+            <p>
+              <strong>Featured:</strong>{" "}
+              {selectedService.isFeatured ? "Yes" : "No"}
+            </p>
+            <p>
+              <strong>Short Description:</strong>{" "}
+              {selectedService.shortDescription || "-"}
+            </p>
+            <p>
+              <strong>Description:</strong>{" "}
+              {selectedService.description}
+            </p>
+            {selectedService.features?.length > 0 && (
+              <div>
+                <strong>Features:</strong>
+                <p>{selectedService.features.join(", ")}</p>
+              </div>
+            )}
+            {selectedService.inclusions?.length > 0 && (
+              <div>
+                <strong>Inclusions:</strong>
+                <p>{selectedService.inclusions.join(", ")}</p>
+              </div>
+            )}
+            {selectedService.exclusions?.length > 0 && (
+              <div>
+                <strong>Exclusions:</strong>
+                <p>{selectedService.exclusions.join(", ")}</p>
+              </div>
+            )}
+          </div>
+        )}
+      </Modal>
+
+      {/* Create Service Modal */}
+      <Modal
+        isOpen={showCreateModal}
+        onClose={() => {
+          setShowCreateModal(false);
+          resetCreateForm();
+        }}
+        title="Add Service"
+      >
+        <form className="space-y-4" onSubmit={handleCreateSubmit}>
+          {createError && (
+            <div className="bg-red-50 text-red-600 text-sm px-4 py-2 rounded-lg">
+              {createError}
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              name="title"
+              value={createForm.title}
+              onChange={handleCreateChange}
+              placeholder="Title"
+              required
+              className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-orange-500 focus:outline-none"
+            />
+            <select
+              name="category"
+              value={createForm.category}
+              onChange={handleCreateChange}
+              className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-orange-500 focus:outline-none"
+            >
+              {categories
+                .filter((cat) => cat.value !== "all")
+                .map((cat) => (
+                  <option key={cat.value} value={cat.value}>
+                    {cat.label}
+                  </option>
+                ))}
+            </select>
+            <input
+              name="price"
+              type="number"
+              min="0"
+              value={createForm.price}
+              onChange={handleCreateChange}
+              placeholder="Price"
+              required
+              className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-orange-500 focus:outline-none"
+            />
+            <select
+              name="priceType"
+              value={createForm.priceType}
+              onChange={handleCreateChange}
+              className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-orange-500 focus:outline-none"
+            >
+              <option value="fixed">Fixed</option>
+              <option value="hourly">Hourly</option>
+              <option value="per_sqft">Per Sqft</option>
+              <option value="custom">Custom</option>
+            </select>
+            <input
+              name="duration"
+              value={createForm.duration}
+              onChange={handleCreateChange}
+              placeholder="Duration (optional)"
+              className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-orange-500 focus:outline-none"
+            />
+          </div>
+
+          <textarea
+            name="shortDescription"
+            value={createForm.shortDescription}
+            onChange={handleCreateChange}
+            placeholder="Short description (optional)"
+            className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-orange-500 focus:outline-none"
+          />
+          <textarea
+            name="description"
+            value={createForm.description}
+            onChange={handleCreateChange}
+            placeholder="Description"
+            required
+            rows="4"
+            className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-orange-500 focus:outline-none"
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              name="features"
+              value={createForm.features}
+              onChange={handleCreateChange}
+              placeholder="Features (comma separated)"
+              className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-orange-500 focus:outline-none"
+            />
+            <input
+              name="inclusions"
+              value={createForm.inclusions}
+              onChange={handleCreateChange}
+              placeholder="Inclusions (comma separated)"
+              className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-orange-500 focus:outline-none"
+            />
+            <input
+              name="exclusions"
+              value={createForm.exclusions}
+              onChange={handleCreateChange}
+              placeholder="Exclusions (comma separated)"
+              className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-orange-500 focus:outline-none"
+            />
+          </div>
+
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                name="isActive"
+                checked={createForm.isActive}
+                onChange={handleCreateChange}
+                className="h-4 w-4"
+              />
+              Active
+            </label>
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                name="isFeatured"
+                checked={createForm.isFeatured}
+                onChange={handleCreateChange}
+                className="h-4 w-4"
+              />
+              Featured
+            </label>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-gray-700">
+              Service Images (max 5)
+            </label>
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={(e) => {
+                const files = Array.from(e.target.files || []).slice(0, 5);
+                setCreateImages(files);
+              }}
+              className="w-full mt-2"
+            />
+            {createImages.length > 0 && (
+              <div className="mt-3 grid grid-cols-3 gap-3">
+                {createImages.map((file, idx) => (
+                  <div key={`${file.name}-${idx}`} className="relative">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={file.name}
+                      className="w-full h-24 object-cover rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCreateImages((prev) =>
+                          prev.filter((_, i) => i !== idx)
+                        )
+                      }
+                      className="absolute top-1 right-1 bg-black/60 text-white text-xs px-2 py-1 rounded"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-end gap-3 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setShowCreateModal(false);
+                resetCreateForm();
+              }}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" loading={createLoading} disabled={createLoading}>
+              Create Service
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Edit Service Modal */}
+      <Modal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        title="Edit Service"
+      >
+        <form className="space-y-4" onSubmit={handleEditSubmit}>
+          {editError && (
+            <div className="bg-red-50 text-red-600 text-sm px-4 py-2 rounded-lg">
+              {editError}
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              name="title"
+              value={editForm.title}
+              onChange={handleEditChange}
+              placeholder="Title"
+              required
+              className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-orange-500 focus:outline-none"
+            />
+            <select
+              name="category"
+              value={editForm.category}
+              onChange={handleEditChange}
+              className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-orange-500 focus:outline-none"
+            >
+              {categories
+                .filter((cat) => cat.value !== "all")
+                .map((cat) => (
+                  <option key={cat.value} value={cat.value}>
+                    {cat.label}
+                  </option>
+                ))}
+            </select>
+            <input
+              name="price"
+              type="number"
+              min="0"
+              value={editForm.price}
+              onChange={handleEditChange}
+              placeholder="Price"
+              required
+              className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-orange-500 focus:outline-none"
+            />
+            <select
+              name="priceType"
+              value={editForm.priceType}
+              onChange={handleEditChange}
+              className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-orange-500 focus:outline-none"
+            >
+              <option value="fixed">Fixed</option>
+              <option value="hourly">Hourly</option>
+              <option value="per_sqft">Per Sqft</option>
+              <option value="custom">Custom</option>
+            </select>
+            <input
+              name="duration"
+              value={editForm.duration}
+              onChange={handleEditChange}
+              placeholder="Duration (optional)"
+              className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-orange-500 focus:outline-none"
+            />
+          </div>
+
+          <textarea
+            name="shortDescription"
+            value={editForm.shortDescription}
+            onChange={handleEditChange}
+            placeholder="Short description (optional)"
+            className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-orange-500 focus:outline-none"
+          />
+          <textarea
+            name="description"
+            value={editForm.description}
+            onChange={handleEditChange}
+            placeholder="Description"
+            required
+            rows="4"
+            className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-orange-500 focus:outline-none"
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              name="features"
+              value={editForm.features}
+              onChange={handleEditChange}
+              placeholder="Features (comma separated)"
+              className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-orange-500 focus:outline-none"
+            />
+            <input
+              name="inclusions"
+              value={editForm.inclusions}
+              onChange={handleEditChange}
+              placeholder="Inclusions (comma separated)"
+              className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-orange-500 focus:outline-none"
+            />
+            <input
+              name="exclusions"
+              value={editForm.exclusions}
+              onChange={handleEditChange}
+              placeholder="Exclusions (comma separated)"
+              className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-orange-500 focus:outline-none"
+            />
+          </div>
+
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                name="isActive"
+                checked={editForm.isActive}
+                onChange={handleEditChange}
+                className="h-4 w-4"
+              />
+              Active
+            </label>
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                name="isFeatured"
+                checked={editForm.isFeatured}
+                onChange={handleEditChange}
+                className="h-4 w-4"
+              />
+              Featured
+            </label>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">
+              Existing Images
+            </label>
+            {editKeepImages.length === 0 ? (
+              <p className="text-sm text-gray-500">No existing images.</p>
+            ) : (
+              <div className="grid grid-cols-3 gap-3">
+                {editKeepImages.map((img) => (
+                  <div key={img.public_id || img.url} className="relative">
+                    <img
+                      src={img.url || img}
+                      alt="Service"
+                      className="w-full h-24 object-cover rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setEditKeepImages((prev) =>
+                          prev.filter((i) =>
+                            (i.public_id || i.url) !==
+                            (img.public_id || img.url)
+                          )
+                        )
+                      }
+                      className="absolute top-1 right-1 bg-black/60 text-white text-xs px-2 py-1 rounded"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-gray-700">
+              Add/Replace Images (max 5 total)
+            </label>
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={(e) => {
+                const limit = Math.max(5 - editKeepImages.length, 0);
+                const files = Array.from(e.target.files || []).slice(0, limit);
+                setEditImages(files);
+              }}
+              className="w-full mt-2"
+            />
+            {editImages.length > 0 && (
+              <div className="mt-3 grid grid-cols-3 gap-3">
+                {editImages.map((file, idx) => (
+                  <div key={`${file.name}-${idx}`} className="relative">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={file.name}
+                      className="w-full h-24 object-cover rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setEditImages((prev) =>
+                          prev.filter((_, i) => i !== idx)
+                        )
+                      }
+                      className="absolute top-1 right-1 bg-black/60 text-white text-xs px-2 py-1 rounded"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-end gap-3 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowEditModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" loading={editLoading} disabled={editLoading}>
+              Update Service
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };
 
 export default ManageServices;
+
+
+
+

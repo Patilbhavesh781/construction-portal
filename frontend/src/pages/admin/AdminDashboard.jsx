@@ -13,6 +13,11 @@ import SlideIn from "../../components/animations/SlideIn";
 import DashboardStats from "../../components/dashboard/DashboardStats";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
+import UserService from "../../services/user.service";
+import BookingService from "../../services/booking.service";
+import ProjectService from "../../services/project.service";
+import PropertyService from "../../services/property.service";
+import MessageService from "../../services/message.service";
 
 const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
@@ -21,45 +26,63 @@ const AdminDashboard = () => {
   const [recentUsers, setRecentUsers] = useState([]);
 
   useEffect(() => {
-    // TODO: Replace with real API calls
     const fetchAdminDashboardData = async () => {
       setLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1200));
+        const [
+          users,
+          bookings,
+          projects,
+          properties,
+          messages,
+        ] = await Promise.all([
+          UserService.getAllUsers(),
+          BookingService.getAllBookings(),
+          ProjectService.getAllProjects(),
+          PropertyService.getAllProperties(),
+          MessageService.getAllMessages(),
+        ]);
+
+        const nonAdminUsers = (users || []).filter(
+          (u) => u.role !== "admin"
+        );
+        const unreadMessages = (messages || []).filter((m) => !m.isRead);
 
         setStats([
           {
             key: "users",
             label: "Total Users",
-            value: 124,
+            value: nonAdminUsers.length,
             icon: <Users className="w-6 h-6 text-blue-600" />,
             bg: "bg-blue-50",
           },
           {
             key: "bookings",
             label: "Total Bookings",
-            value: 342,
+            value: bookings?.length || 0,
             icon: <CalendarCheck className="w-6 h-6 text-green-600" />,
             bg: "bg-green-50",
           },
           {
             key: "projects",
             label: "Active Projects",
-            value: 28,
+            value: (projects || []).filter(
+              (p) => p.status === "ongoing"
+            ).length,
             icon: <FolderKanban className="w-6 h-6 text-purple-600" />,
             bg: "bg-purple-50",
           },
           {
             key: "properties",
             label: "Properties Listed",
-            value: 64,
+            value: properties?.length || 0,
             icon: <Building2 className="w-6 h-6 text-orange-600" />,
             bg: "bg-orange-50",
           },
           {
             key: "revenue",
             label: "Total Revenue",
-            value: 1250000,
+            value: 0,
             icon: <IndianRupee className="w-6 h-6 text-yellow-600" />,
             bg: "bg-yellow-50",
             isCurrency: true,
@@ -67,41 +90,29 @@ const AdminDashboard = () => {
           {
             key: "messages",
             label: "New Messages",
-            value: 18,
+            value: unreadMessages.length,
             icon: <MessageSquare className="w-6 h-6 text-pink-600" />,
             bg: "bg-pink-50",
           },
         ]);
 
-        setRecentBookings([
-          {
-            id: 1,
-            user: "Rahul Sharma",
-            service: "Interior Design",
-            date: "2026-02-02",
-            status: "Pending",
-          },
-          {
-            id: 2,
-            user: "Amit Verma",
-            service: "Renovation Work",
-            date: "2026-02-01",
-            status: "In Progress",
-          },
-          {
-            id: 3,
-            user: "Neha Singh",
-            service: "Plumbing Service",
-            date: "2026-01-31",
-            status: "Completed",
-          },
-        ]);
+        const recentBookingsData = [...(bookings || [])]
+          .sort(
+            (a, b) =>
+              new Date(b.bookingDate || b.createdAt) -
+              new Date(a.bookingDate || a.createdAt)
+          )
+          .slice(0, 5);
 
-        setRecentUsers([
-          { id: 1, name: "Rahul Sharma", email: "rahul@example.com" },
-          { id: 2, name: "Amit Verma", email: "amit@example.com" },
-          { id: 3, name: "Neha Singh", email: "neha@example.com" },
-        ]);
+        const recentUsersData = [...nonAdminUsers]
+          .sort(
+            (a, b) =>
+              new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+          )
+          .slice(0, 5);
+
+        setRecentBookings(recentBookingsData);
+        setRecentUsers(recentUsersData);
       } catch (error) {
         console.error("Failed to load admin dashboard data", error);
       } finally {
@@ -171,23 +182,32 @@ const AdminDashboard = () => {
                   </thead>
                   <tbody>
                     {recentBookings.map((booking) => (
-                      <tr key={booking.id} className="border-b last:border-none">
+                      <tr
+                        key={booking._id}
+                        className="border-b last:border-none"
+                      >
                         <td className="py-3 px-4 font-medium text-gray-800">
-                          {booking.user}
+                          {booking.user?.name || "-"}
                         </td>
                         <td className="py-3 px-4 text-gray-600">
-                          {booking.service}
+                          {booking.service?.title || booking.bookingType}
                         </td>
                         <td className="py-3 px-4 text-gray-600">
-                          {new Date(booking.date).toLocaleDateString()}
+                          {booking.bookingDate
+                            ? new Date(
+                                booking.bookingDate
+                              ).toLocaleDateString()
+                            : "-"}
                         </td>
                         <td className="py-3 px-4">
                           <span
                             className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              booking.status === "Completed"
+                              booking.status === "completed"
                                 ? "bg-green-100 text-green-700"
-                                : booking.status === "In Progress"
+                                : booking.status === "confirmed"
                                 ? "bg-blue-100 text-blue-700"
+                                : booking.status === "cancelled"
+                                ? "bg-red-100 text-red-700"
                                 : "bg-yellow-100 text-yellow-700"
                             }`}
                           >
@@ -216,7 +236,7 @@ const AdminDashboard = () => {
               <div className="space-y-4">
                 {recentUsers.map((user) => (
                   <div
-                    key={user.id}
+                    key={user._id}
                     className="flex items-center justify-between border-b last:border-none pb-3"
                   >
                     <div>
