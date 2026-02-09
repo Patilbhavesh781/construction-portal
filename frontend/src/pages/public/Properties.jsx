@@ -1,26 +1,47 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import React, { useEffect, useMemo, useState, Suspense } from "react";
+import { Search, Globe, Home as HomeIcon, MapPin, IndianRupee } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 
+// 3D
+import { Canvas, useLoader } from "@react-three/fiber";
+import { OrbitControls, Stage, PerspectiveCamera } from "@react-three/drei";
+import * as THREE from "three";
+
+// UI Components
 import FadeIn from "../../components/animations/FadeIn";
 import ScrollReveal from "../../components/animations/ScrollReveal";
-
 import PropertyCard from "../../components/cards/PropertyCard";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 
+// Services
 import PropertyService from "../../services/property.service";
+
+/* ================= 360° PREVIEW COMPONENT ================= */
+// This renders a small 360 room inside the card/modal
+function Property360Preview({ imageUrl }) {
+  const texture = useLoader(THREE.TextureLoader, imageUrl || "https://images.unsplash.com/photo-1558211583-d26f610c1eb1?q=80&w=2070");
+  
+  return (
+    <mesh>
+      <sphereGeometry args={[5, 60, 40]} />
+      <meshBasicMaterial map={texture} side={THREE.BackSide} />
+    </mesh>
+  );
+}
 
 const Properties = () => {
   const navigate = useNavigate();
-
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [preview3D, setPreview3D] = useState(null); // Stores ID of property being viewed in 3D
 
+  // Filter States
   const [search, setSearch] = useState("");
-  const [type, setType] = useState("all"); // sale | rent
-  const [category, setCategory] = useState("all"); // residential | commercial
-  const [priceRange, setPriceRange] = useState("all"); // all | <50L | 50L-1Cr | >1Cr
+  const [type, setType] = useState("all"); 
+  const [category, setCategory] = useState("all");
+  const [priceRange, setPriceRange] = useState("all");
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -29,300 +50,165 @@ const Properties = () => {
         const res = await PropertyService.getAllProperties();
         setProperties(res || []);
       } catch (error) {
-        console.error("Failed to fetch properties:", error);
+        console.error(error);
       } finally {
         setLoading(false);
       }
     };
-
     fetchProperties();
   }, []);
 
   const filteredProperties = useMemo(() => {
-    return properties.filter((property) => {
-      const matchesSearch =
-        property.title?.toLowerCase().includes(search.toLowerCase()) ||
-        property.location?.city
-          ?.toLowerCase()
-          .includes(search.toLowerCase()) ||
-        property.location?.address
-          ?.toLowerCase()
-          .includes(search.toLowerCase());
-
-      const matchesType =
-        type === "all" || property.purpose === type;
-
-      const matchesCategory =
-        category === "all" || property.type === category;
-
-      const matchesPrice =
-        priceRange === "all" ||
-        (priceRange === "under-50l" && property.price < 5000000) ||
-        (priceRange === "50l-1cr" &&
-          property.price >= 5000000 &&
-          property.price <= 10000000) ||
-        (priceRange === "above-1cr" && property.price > 10000000);
-
-      return (
-        matchesSearch &&
-        matchesType &&
-        matchesCategory &&
-        matchesPrice
-      );
+    return properties.filter((p) => {
+      const matchesSearch = p.title?.toLowerCase().includes(search.toLowerCase()) || 
+                           p.location?.city?.toLowerCase().includes(search.toLowerCase());
+      const matchesType = type === "all" || p.purpose === type;
+      const matchesCategory = category === "all" || p.type === category;
+      return matchesSearch && matchesType && matchesCategory;
     });
-  }, [properties, search, type, category, priceRange]);
+  }, [properties, search, type, category]);
 
   return (
-    <div className="w-full">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-orange-600 to-orange-500 text-white py-20">
-        <div className="max-w-7xl mx-auto px-6 text-center">
+    <div className="w-full bg-slate-50 min-h-screen">
+      
+      {/* ================= 1. 3D HERO SECTION ================= */}
+      <section className="relative h-[50vh] bg-slate-900 overflow-hidden flex items-center justify-center">
+        <div className="absolute inset-0 opacity-40">
+           <Canvas camera={{ position: [0, 0, 0.1] }}>
+              <Suspense fallback={null}>
+                 <Property360Preview />
+                 <OrbitControls autoRotate autoRotateSpeed={0.5} enableZoom={false} />
+              </Suspense>
+           </Canvas>
+        </div>
+        <div className="relative z-10 text-center px-6">
           <FadeIn>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Properties
+            <h1 className="text-5xl md:text-7xl font-black text-white mb-4 tracking-tighter">
+              VIRTUAL <span className="text-orange-500">REALTY.</span>
             </h1>
-            <p className="text-lg text-orange-100 max-w-2xl mx-auto">
-              Buy, sell, or rent residential and commercial properties with
-              confidence and transparency.
+            <p className="text-slate-300 text-lg max-w-xl mx-auto">
+              Explore Nashik's finest properties through high-fidelity 3D walkthroughs.
             </p>
           </FadeIn>
         </div>
       </section>
 
-      {/* Filters */}
-      <section className="py-10 bg-white border-b">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row gap-4 items-center justify-between">
-          {/* Search */}
+      {/* ================= 2. INTERACTIVE FILTERS ================= */}
+      <section className="sticky top-16 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200 py-6">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row gap-6 items-center">
           <div className="relative w-full lg:w-1/3">
-            <Search className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
+            <Search className="absolute left-4 top-3.5 text-slate-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="Search by title or location..."
+              placeholder="Search city or area..."
+              className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-slate-100 border-none focus:ring-2 focus:ring-orange-500 transition-all"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:outline-none"
             />
           </div>
-
-          {/* Type Filter */}
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setType("all")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                type === "all"
-                  ? "bg-orange-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              All
-            </button>
-            <button
-              onClick={() => setType("sale")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                type === "sale"
-                  ? "bg-orange-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              For Sale
-            </button>
-            <button
-              onClick={() => setType("rent")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                type === "rent"
-                  ? "bg-orange-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              For Rent
-            </button>
-          </div>
-
-          {/* Category Filter */}
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setCategory("all")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                category === "all"
-                  ? "bg-orange-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              All Categories
-            </button>
-            <button
-              onClick={() => setCategory("apartment")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                category === "apartment"
-                  ? "bg-orange-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              Apartment
-            </button>
-            <button
-              onClick={() => setCategory("house")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                category === "house"
-                  ? "bg-orange-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              House
-            </button>
-            <button
-              onClick={() => setCategory("villa")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                category === "villa"
-                  ? "bg-orange-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              Villa
-            </button>
-            <button
-              onClick={() => setCategory("commercial")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                category === "commercial"
-                  ? "bg-orange-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              Commercial
-            </button>
-            <button
-              onClick={() => setCategory("land")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                category === "land"
-                  ? "bg-orange-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              Land
-            </button>
-            <button
-              onClick={() => setCategory("office")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                category === "office"
-                  ? "bg-orange-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              Office
-            </button>
-          </div>
-
-          {/* Price Filter */}
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setPriceRange("all")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                priceRange === "all"
-                  ? "bg-orange-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              All Prices
-            </button>
-            <button
-              onClick={() => setPriceRange("under-50l")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                priceRange === "under-50l"
-                  ? "bg-orange-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              Under ₹50L
-            </button>
-            <button
-              onClick={() => setPriceRange("50l-1cr")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                priceRange === "50l-1cr"
-                  ? "bg-orange-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              ₹50L - ₹1Cr
-            </button>
-            <button
-              onClick={() => setPriceRange("above-1cr")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                priceRange === "above-1cr"
-                  ? "bg-orange-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              Above ₹1Cr
-            </button>
+          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 w-full lg:w-auto">
+             {["all", "sale", "rent"].map((t) => (
+                <button 
+                  key={t}
+                  onClick={() => setType(t)}
+                  className={`px-6 py-2.5 rounded-full text-sm font-bold capitalize transition-all ${type === t ? 'bg-orange-600 text-white shadow-lg' : 'bg-white text-slate-600 border border-slate-200'}`}
+                >
+                  {t}
+                </button>
+             ))}
           </div>
         </div>
       </section>
 
-      {/* Properties Grid */}
-      <section className="py-20 bg-gray-50">
+      {/* ================= 3. PROPERTY GRID WITH 3D TOGGLE ================= */}
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-6">
           {loading ? (
-            <div className="flex justify-center py-10">
-              <Loader size="lg" />
-            </div>
-          ) : filteredProperties.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-gray-600 mb-4">
-                No properties found matching your criteria.
-              </p>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setSearch("");
-                  setType("all");
-                  setCategory("all");
-                  setPriceRange("all");
-                }}
-              >
-                Reset Filters
-              </Button>
-            </div>
+            <div className="flex justify-center py-20"><Loader size="lg" /></div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
               {filteredProperties.map((property) => (
-                <ScrollReveal key={property._id}>
-                  <PropertyCard property={property} />
-                </ScrollReveal>
+                <motion.div 
+                  key={property._id}
+                  layout
+                  className="group bg-white rounded-[2.5rem] overflow-hidden shadow-xl shadow-slate-200/50 border border-slate-100 relative"
+                >
+                  {/* Image/3D Switcher Container */}
+                  <div className="relative h-72 overflow-hidden">
+                    {preview3D === property._id ? (
+                      <div className="h-full w-full bg-black">
+                        <Canvas camera={{ position: [0, 0, 0.1] }}>
+                          <Suspense fallback={null}>
+                            <Property360Preview imageUrl={property.images?.[0]?.url || property.images?.[0]} />
+                            <OrbitControls enableZoom={false} />
+                          </Suspense>
+                        </Canvas>
+                        <button 
+                          onClick={() => setPreview3D(null)}
+                          className="absolute top-4 right-4 bg-white/20 backdrop-blur-md text-white p-2 rounded-full hover:bg-orange-600 transition-colors"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <img 
+                          src={property.images?.[0]?.url || property.images?.[0] || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c"} 
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                          alt={property.title}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                        <button 
+                          onClick={() => setPreview3D(property._id)}
+                          className="absolute bottom-4 right-4 flex items-center gap-2 bg-orange-600 text-white px-4 py-2 rounded-full text-xs font-bold shadow-lg transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all"
+                        >
+                          <Globe size={14} /> 360° View
+                        </button>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-8">
+                    <div className="flex justify-between items-start mb-4">
+                       <span className="px-3 py-1 bg-orange-50 text-orange-600 text-[10px] font-black uppercase rounded-lg tracking-widest">
+                          {property.purpose}
+                       </span>
+                       <p className="text-xl font-black text-slate-900">₹{property.price?.toLocaleString()}</p>
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-2 truncate">{property.title}</h3>
+                    <div className="flex items-center gap-1 text-slate-400 text-sm mb-6">
+                       <MapPin size={14} />
+                       <span>{property.location?.city}, Nashik</span>
+                    </div>
+                    <Button 
+                      className="w-full rounded-2xl bg-slate-900 text-white font-bold"
+                      onClick={() => navigate(`/properties/${property._id}`)}
+                    >
+                      View Property Details
+                    </Button>
+                  </div>
+                </motion.div>
               ))}
             </div>
           )}
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-orange-600 to-orange-500 text-white">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Looking to Buy, Sell, or Rent a Property?
-            </h2>
-            <p className="text-lg text-orange-100 mb-8 max-w-2xl mx-auto">
-              Our experts are here to help you find the perfect property or get
-              the best deal.
-            </p>
-            <div className="flex justify-center gap-4 flex-wrap">
-              <Button
-                size="lg"
-                onClick={() => navigate("/contact")}
-              >
-                Contact Our Experts
-              </Button>
-              <Button
-                variant="secondary"
-                size="lg"
-                onClick={() => navigate("/services")}
-              >
-                Explore Services
-              </Button>
-            </div>
-          </FadeIn>
+      {/* ================= 4. FINAL CTA ================= */}
+      <section className="py-24 px-6">
+        <div className="max-w-5xl mx-auto bg-orange-600 rounded-[3.5rem] p-12 text-center text-white relative overflow-hidden shadow-2xl shadow-orange-200">
+           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 blur-3xl rounded-full" />
+           <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tighter">LIST YOUR PROPERTY.</h2>
+           <p className="text-orange-100 text-lg mb-10 max-w-xl mx-auto">
+              Get a professional 3D scan of your property and find buyers faster with BuildPro.
+           </p>
+           <Button size="lg" className="bg-white text-orange-600 px-12 rounded-full font-black">
+              Get Started Now
+           </Button>
         </div>
       </section>
+
     </div>
   );
 };
