@@ -1,22 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { ArrowRight, PhoneCall } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Autoplay, EffectFade } from "swiper/modules";
 
-import FadeIn from "../../components/animations/FadeIn";
-import SlideIn from "../../components/animations/SlideIn";
-import ScrollReveal from "../../components/animations/ScrollReveal";
-
-import ServiceCard from "../../components/cards/ServiceCard";
-import ProjectCard from "../../components/cards/ProjectCard";
-import PropertyCard from "../../components/cards/PropertyCard";
-import TestimonialCard from "../../components/cards/TestimonialCard";
-
-import Button from "../../components/common/Button";
-import Loader from "../../components/common/Loader";
-
-import ServiceService from "../../services/service.service";
-import ProjectService from "../../services/project.service";
-import PropertyService from "../../services/property.service";
+// Swiper styles
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "swiper/css/effect-fade";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -57,7 +47,8 @@ const Home = () => {
       rating: 5,
       message:
         "BuildPro transformed my house beautifully. The team was professional, punctual, and delivered exactly what they promised.",
-      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+      avatar:
+        "https://randomuser.me/api/portraits/men/32.jpg",
     },
     {
       name: "Priya Patel",
@@ -66,7 +57,8 @@ const Home = () => {
       rating: 5,
       message:
         "Amazing interior design work! The quality and attention to detail were outstanding. Highly recommended.",
-      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+      avatar:
+        "https://randomuser.me/api/portraits/women/44.jpg",
     },
     {
       name: "Amit Verma",
@@ -75,7 +67,8 @@ const Home = () => {
       rating: 4,
       message:
         "Great experience buying property through BuildPro. Transparent process and excellent support throughout.",
-      avatar: "https://randomuser.me/api/portraits/men/65.jpg",
+      avatar:
+        "https://randomuser.me/api/portraits/men/65.jpg",
     },
   ];
 
@@ -88,14 +81,13 @@ const Home = () => {
           <FadeIn direction="left">
             <div>
               <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
-                Complete Construction Solutions by{" "}
+                Build Your Dream Home With{" "}
                 <span className="text-yellow-300">BuildPro</span>
               </h1>
               <p className="text-lg text-orange-100 mb-8">
-                Bricks and plaster, plumbing, waterproofing, gypsum, painting,
-                electrical, fabrication, tile, door and window, lock and key,
-                plus renovation, interior design, architecture and RCC, and
-                property services.
+                From architecture planning and RCC work to interiors,
+                renovations, and property services — we handle everything end
+                to end.
               </p>
               <div className="flex flex-wrap gap-4">
                 <Button
@@ -113,21 +105,6 @@ const Home = () => {
                 >
                   Contact Us
                 </Button>
-              </div>
-              <div className="mt-6 flex flex-wrap gap-2">
-                {[
-                  "Renovation",
-                  "Interior Design",
-                  "Architecture & RCC",
-                  "Property Buy/Sell",
-                ].map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-3 py-1 rounded-full text-xs font-semibold bg-white/15 text-white"
-                  >
-                    {tag}
-                  </span>
-                ))}
               </div>
             </div>
           </FadeIn>
@@ -150,11 +127,11 @@ const Home = () => {
           <FadeIn>
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-gray-800 mb-2">
-                Construction Work Types
+                Our Construction Services
               </h2>
               <p className="text-gray-600 max-w-2xl mx-auto">
-                All core construction works plus renovation, interior design,
-                architecture and RCC, and property services in one place.
+                We provide complete construction and renovation solutions —
+                from foundation to finishing.
               </p>
             </div>
           </FadeIn>
@@ -172,7 +149,10 @@ const Home = () => {
           )}
 
           <div className="text-center mt-10">
-            <Button variant="outline" onClick={() => navigate("/services")}>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/services")}
+            >
               View All Services
             </Button>
           </div>
@@ -185,11 +165,11 @@ const Home = () => {
           <FadeIn>
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-gray-800 mb-2">
-                Recent Projects
+                Our Recent Projects
               </h2>
               <p className="text-gray-600 max-w-2xl mx-auto">
-                Built and renovated spaces across residential and commercial
-                categories, delivered on time and on budget.
+                Take a look at some of the projects we’ve successfully
+                completed across residential and commercial sectors.
               </p>
             </div>
           </FadeIn>
@@ -207,7 +187,10 @@ const Home = () => {
           )}
 
           <div className="text-center mt-10">
-            <Button variant="outline" onClick={() => navigate("/projects")}>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/projects")}
+            >
               View All Projects
             </Button>
           </div>
@@ -220,10 +203,10 @@ const Home = () => {
           <FadeIn>
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-gray-800 mb-2">
-                Buy, Sell, or Rent Properties
+                Properties for Sale & Rent
               </h2>
               <p className="text-gray-600 max-w-2xl mx-auto">
-                Verified listings and transparent support for property buying,
+                Explore our curated list of properties available for buying,
                 selling, and renting.
               </p>
             </div>
@@ -236,13 +219,19 @@ const Home = () => {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {properties.map((property) => (
-                <PropertyCard key={property._id} property={property} />
+                <PropertyCard
+                  key={property._id}
+                  property={property}
+                />
               ))}
             </div>
           )}
 
           <div className="text-center mt-10">
-            <Button variant="outline" onClick={() => navigate("/properties")}>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/properties")}
+            >
               View All Properties
             </Button>
           </div>
@@ -266,7 +255,10 @@ const Home = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <TestimonialCard key={index} testimonial={testimonial} />
+              <TestimonialCard
+                key={index}
+                testimonial={testimonial}
+              />
             ))}
           </div>
         </div>
@@ -284,7 +276,10 @@ const Home = () => {
               into reality.
             </p>
             <div className="flex justify-center gap-4 flex-wrap">
-              <Button size="lg" onClick={() => navigate("/contact")}>
+              <Button
+                size="lg"
+                onClick={() => navigate("/contact")}
+              >
                 Get Free Consultation
               </Button>
               <Button
@@ -297,8 +292,21 @@ const Home = () => {
             </div>
           </ScrollReveal>
         </div>
-      </section>
-    </div>
+
+        <button className="mt-10 text-sm uppercase tracking-widest font-semibold text-red-600 hover:underline">
+          View Plan
+        </button>
+      </div>
+    ))}
+
+  </div>
+
+</section>
+
+
+      
+
+    </main>
   );
 };
 
