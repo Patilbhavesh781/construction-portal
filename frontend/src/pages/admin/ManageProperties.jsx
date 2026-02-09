@@ -305,7 +305,7 @@ const ManageProperties = () => {
 
       const formData = new FormData();
       formData.append("data", JSON.stringify(payload));
-      createImages.forEach((file) => formData.append("images", file));
+      createImages.slice(0, 6).forEach((file) => formData.append("images", file));
 
       const created = await PropertyService.createProperty(formData);
       setProperties((prev) => [created, ...prev]);
@@ -368,7 +368,7 @@ const ManageProperties = () => {
 
       const formData = new FormData();
       formData.append("data", JSON.stringify(payload));
-      editImages.forEach((file) => formData.append("images", file));
+      editImages.slice(0, 6).forEach((file) => formData.append("images", file));
 
       const updated = await PropertyService.updateProperty(
         editForm.id,
@@ -829,14 +829,14 @@ const ManageProperties = () => {
 
           <div>
             <label className="text-sm font-medium text-gray-700">
-              Property Images
+              Property Images (max 6)
             </label>
             <input
               type="file"
               multiple
               accept="image/*"
               onChange={(e) =>
-                setCreateImages(Array.from(e.target.files || []))
+                setCreateImages(Array.from(e.target.files || []).slice(0, 6))
               }
               className="w-full mt-2"
             />
@@ -1115,14 +1115,19 @@ const ManageProperties = () => {
 
           <div>
             <label className="text-sm font-medium text-gray-700">
-              Add/Replace Images
+              Add/Replace Images (max 6 total)
             </label>
             <input
               type="file"
               multiple
               accept="image/*"
               onChange={(e) =>
-                setEditImages(Array.from(e.target.files || []))
+                setEditImages(
+                  Array.from(e.target.files || []).slice(
+                    0,
+                    Math.max(6 - editKeepImages.length, 0)
+                  )
+                )
               }
               className="w-full mt-2"
             />

@@ -31,13 +31,25 @@ const ServiceService = {
 
   // Create new service (admin only)
   createService: async (serviceData) => {
-    const response = await api.post("/services", serviceData);
+    const isFormData =
+      typeof FormData !== "undefined" && serviceData instanceof FormData;
+    const response = await api.post(
+      "/services",
+      serviceData,
+      isFormData ? { headers: { "Content-Type": "multipart/form-data" } } : {}
+    );
     return response.data?.data || response.data; // created service
   },
 
   // Update service (admin only)
   updateService: async (serviceId, serviceData) => {
-    const response = await api.put(`/services/${serviceId}`, serviceData);
+    const isFormData =
+      typeof FormData !== "undefined" && serviceData instanceof FormData;
+    const response = await api.put(
+      `/services/${serviceId}`,
+      serviceData,
+      isFormData ? { headers: { "Content-Type": "multipart/form-data" } } : {}
+    );
     return response.data?.data || response.data; // updated service
   },
 

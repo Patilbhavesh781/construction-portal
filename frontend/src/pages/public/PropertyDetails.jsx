@@ -1,6 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, MapPin, Home, IndianRupee } from "lucide-react";
+import {
+  ArrowLeft,
+  MapPin,
+  Home,
+  IndianRupee,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 import FadeIn from "../../components/animations/FadeIn";
 import SlideIn from "../../components/animations/SlideIn";
@@ -16,6 +23,7 @@ const PropertyDetails = () => {
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -24,6 +32,7 @@ const PropertyDetails = () => {
       try {
         const data = await PropertyService.getPropertyById(id);
         setProperty(data);
+        setActiveIndex(0);
       } catch (err) {
         console.error("Failed to fetch property:", err);
         setError("Unable to load property details. Please try again later.");
@@ -34,6 +43,25 @@ const PropertyDetails = () => {
 
     if (id) fetchProperty();
   }, [id]);
+
+  const images = useMemo(() => {
+    if (Array.isArray(property?.images) && property.images.length > 0) {
+      return property.images.map((img) => img.url || img);
+    }
+    return [
+      "https://via.placeholder.com/1200x600?text=Property+Image",
+    ];
+  }, [property?.images]);
+
+  const coverImage = images[activeIndex] || images[0];
+
+  const prevImage = () => {
+    setActiveIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  const nextImage = () => {
+    setActiveIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  };
 
   if (loading) {
     return (
@@ -55,10 +83,6 @@ const PropertyDetails = () => {
   }
 
   if (!property) return null;
-
-  const coverImage =
-    property.images?.[0]?.url ||
-    "https://via.placeholder.com/1200x600?text=Property+Image";
 
   return (
     <div className="w-full">
@@ -89,11 +113,33 @@ const PropertyDetails = () => {
           {/* Left */}
           <div className="lg:col-span-2 space-y-8">
             <FadeIn direction="left">
-              <img
-                src={coverImage}
-                alt={property.title}
-                className="w-full h-[350px] object-cover rounded-3xl shadow-lg"
-              />
+              <div className="relative">
+                <img
+                  src={coverImage}
+                  alt={property.title}
+                  className="w-full h-[350px] object-cover rounded-3xl shadow-lg"
+                />
+                {images.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={prevImage}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-700 p-2 rounded-full shadow"
+                      aria-label="Previous image"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={nextImage}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-700 p-2 rounded-full shadow"
+                      aria-label="Next image"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </>
+                )}
+              </div>
             </FadeIn>
 
             <FadeIn direction="left">
