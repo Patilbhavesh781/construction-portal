@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Star, Clock, IndianRupee } from "lucide-react";
+import { Clock, IndianRupee } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
 import FadeIn from "../animations/FadeIn";
@@ -26,7 +26,6 @@ const ServiceCard = ({
     priceMax,
     priceType,
     duration,
-    rating = 0,
   } = service;
 
   const imageUrl =
@@ -52,7 +51,7 @@ const ServiceCard = ({
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
           {category && (
-            <span className="absolute top-3 left-3 bg-orange-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow">
+            <span className="absolute top-3 left-3 bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow">
               {category}
             </span>
           )}
@@ -69,18 +68,12 @@ const ServiceCard = ({
           </p>
 
           {/* Meta Info */}
-          <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
-            <div className="flex items-center gap-1">
-              <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-              <span className="font-medium">{rating.toFixed(1)}</span>
+          {duration && (
+            <div className="flex items-center gap-1 text-sm text-gray-600 mb-4">
+              <Clock className="w-4 h-4 text-gray-500" />
+              <span>{duration}</span>
             </div>
-            {duration && (
-              <div className="flex items-center gap-1">
-                <Clock className="w-4 h-4 text-gray-500" />
-                <span>{duration}</span>
-              </div>
-            )}
-          </div>
+          )}
 
           {/* Price */}
           {(price != null || priceMin || priceMax) && (
@@ -98,9 +91,9 @@ const ServiceCard = ({
             <Button
               fullWidth
               onClick={() => navigate(`${detailsPathBase}/${_id}`)}
-              variant="primary"
+              variant="secondary"
             >
-              View Details
+              View Service
             </Button>
           </div>
         </div>

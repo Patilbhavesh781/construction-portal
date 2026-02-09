@@ -14,7 +14,7 @@ const PublicLayout = () => {
       {/* Main Content */}
       <main className="flex-1 pt-20">
         <ScrollReveal>
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="w-full">
             <Outlet />
           </div>
         </ScrollReveal>

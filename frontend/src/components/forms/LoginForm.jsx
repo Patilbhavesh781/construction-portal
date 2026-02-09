@@ -7,7 +7,7 @@ import Button from "../common/Button";
 import Loader from "../common/Loader";
 import useAuthStore from "../../store/authStore";
 
-const LoginForm = () => {
+const LoginForm = ({ redirectTo }) => {
   const navigate = useNavigate();
   const { login: loginUser } = useAuthStore();
 
@@ -32,18 +32,10 @@ const LoginForm = () => {
 
     try {
       const response = await loginUser(data.email, data.password);
-
-      /**
-       * Expected response shape:
-       * {
-       *   user: { id, name, email, role },
-       *   token: "jwt-token"
-       * }
-       */
       if (response.user.role === "admin") {
         navigate("/admin/dashboard");
       } else {
-        navigate("/user/dashboard");
+        navigate(redirectTo || "/user/dashboard");
       }
     } catch (error) {
       setApiError(
@@ -56,26 +48,13 @@ const LoginForm = () => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 space-y-6"
-    >
-      {/* Title */}
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-800">Welcome Back</h2>
-        <p className="text-sm text-gray-500 mt-1">
-          Login to continue to your account
-        </p>
-      </div>
-
-      {/* API Error */}
+    <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-6">
       {apiError && (
         <div className="bg-red-50 text-red-600 text-sm px-4 py-2 rounded-lg">
           {apiError}
         </div>
       )}
 
-      {/* Email */}
       <div className="space-y-1">
         <label className="text-sm font-medium text-gray-700">
           Email Address
@@ -83,10 +62,8 @@ const LoginForm = () => {
         <input
           type="email"
           placeholder="you@example.com"
-          className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 ${
-            errors.email
-              ? "border-red-500 focus:ring-red-300"
-              : "border-gray-300 focus:ring-orange-300"
+          className={`w-full border-b border-gray-300 bg-transparent py-3 outline-none focus:border-gray-900 transition ${
+            errors.email ? "border-red-500" : ""
           }`}
           {...register("email", {
             required: "Email is required",
@@ -101,17 +78,14 @@ const LoginForm = () => {
         )}
       </div>
 
-      {/* Password */}
       <div className="space-y-1">
         <label className="text-sm font-medium text-gray-700">Password</label>
         <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
             placeholder="••••••••"
-            className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 pr-10 ${
-              errors.password
-                ? "border-red-500 focus:ring-red-300"
-                : "border-gray-300 focus:ring-orange-300"
+            className={`w-full border-b border-gray-300 bg-transparent py-3 pr-10 outline-none focus:border-gray-900 transition ${
+              errors.password ? "border-red-500" : ""
             }`}
             {...register("password", {
               required: "Password is required",
@@ -124,7 +98,7 @@ const LoginForm = () => {
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
           >
             {showPassword ? (
               <EyeOff className="w-5 h-5" />
@@ -138,34 +112,30 @@ const LoginForm = () => {
         )}
       </div>
 
-      {/* Forgot Password */}
       <div className="flex justify-end">
         <button
           type="button"
           onClick={() => navigate("/forgot-password")}
-          className="text-sm text-orange-600 hover:underline"
+          className="text-sm  hover:text-red-600"
         >
           Forgot password?
         </button>
       </div>
 
-      {/* Submit */}
-      <Button
+      <button
         type="submit"
-        fullWidth
-        loading={loading}
+        className="mt-8 w-full px-12 py-4 border border-gray-900 uppercase tracking-widest hover:bg-gray-900 hover:text-white transition"
         disabled={loading}
       >
-        Login
-      </Button>
+        {loading ? "Logging in..." : "Login"}
+      </button>
 
-      {/* Register */}
       <p className="text-center text-sm text-gray-600">
         Don’t have an account?{" "}
         <button
           type="button"
           onClick={() => navigate("/register")}
-          className="text-orange-600 font-medium hover:underline"
+          className=" font-medium hover:text-red-600"
         >
           Create account
         </button>

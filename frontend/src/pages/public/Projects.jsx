@@ -38,7 +38,7 @@ const Projects = () => {
           alt="Projects"
           className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-white/70"></div>
+        <div className="absolute inset-0 bg-white/40"></div>
 
         <div className="relative z-10 max-w-4xl">
           <span className="text-sm uppercase tracking-[0.4em] text-red-600 font-semibold">

@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 
-import Button from "../common/Button";
 import Loader from "../common/Loader";
 import useAuthStore from "../../store/authStore";
 
@@ -82,41 +81,25 @@ const RegisterForm = () => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 space-y-6"
-    >
-      {/* Title */}
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-800">Create Account</h2>
-        <p className="text-sm text-gray-500 mt-1">
-          Join us to start your construction journey
-        </p>
-      </div>
-
-      {/* API Error */}
+    <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-6">
       {apiError && (
         <div className="bg-red-50 text-red-600 text-sm px-4 py-2 rounded-lg">
           {apiError}
         </div>
       )}
-      {/* Success */}
       {successMessage && (
         <div className="bg-green-50 text-green-700 text-sm px-4 py-2 rounded-lg">
           {successMessage}
         </div>
       )}
 
-      {/* Name */}
       <div className="space-y-1">
         <label className="text-sm font-medium text-gray-700">Full Name</label>
         <input
           type="text"
           placeholder="John Doe"
-          className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 ${
-            errors.name
-              ? "border-red-500 focus:ring-red-300"
-              : "border-gray-300 focus:ring-orange-300"
+          className={`w-full border-b border-gray-300 bg-transparent py-3 outline-none focus:border-gray-900 transition ${
+            errors.name ? "border-red-500" : ""
           }`}
           {...register("name", {
             required: "Full name is required",
@@ -131,7 +114,6 @@ const RegisterForm = () => {
         )}
       </div>
 
-      {/* Email */}
       <div className="space-y-1">
         <label className="text-sm font-medium text-gray-700">
           Email Address
@@ -139,10 +121,8 @@ const RegisterForm = () => {
         <input
           type="email"
           placeholder="you@example.com"
-          className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 ${
-            errors.email
-              ? "border-red-500 focus:ring-red-300"
-              : "border-gray-300 focus:ring-orange-300"
+          className={`w-full border-b border-gray-300 bg-transparent py-3 outline-none focus:border-gray-900 transition ${
+            errors.email ? "border-red-500" : ""
           }`}
           {...register("email", {
             required: "Email is required",
@@ -157,17 +137,14 @@ const RegisterForm = () => {
         )}
       </div>
 
-      {/* Password */}
       <div className="space-y-1">
         <label className="text-sm font-medium text-gray-700">Password</label>
         <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
-            placeholder="••••••••"
-            className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 pr-10 ${
-              errors.password
-                ? "border-red-500 focus:ring-red-300"
-                : "border-gray-300 focus:ring-orange-300"
+            placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+            className={`w-full border-b border-gray-300 bg-transparent py-3 pr-10 outline-none focus:border-gray-900 transition ${
+              errors.password ? "border-red-500" : ""
             }`}
             {...register("password", {
               required: "Password is required",
@@ -183,7 +160,7 @@ const RegisterForm = () => {
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
           >
             {showPassword ? (
               <EyeOff className="w-5 h-5" />
@@ -197,7 +174,6 @@ const RegisterForm = () => {
         )}
       </div>
 
-      {/* Confirm Password */}
       <div className="space-y-1">
         <label className="text-sm font-medium text-gray-700">
           Confirm Password
@@ -205,11 +181,9 @@ const RegisterForm = () => {
         <div className="relative">
           <input
             type={showConfirmPassword ? "text" : "password"}
-            placeholder="••••••••"
-            className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 pr-10 ${
-              errors.confirmPassword
-                ? "border-red-500 focus:ring-red-300"
-                : "border-gray-300 focus:ring-orange-300"
+            placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+            className={`w-full border-b border-gray-300 bg-transparent py-3 pr-10 outline-none focus:border-gray-900 transition ${
+              errors.confirmPassword ? "border-red-500" : ""
             }`}
             {...register("confirmPassword", {
               required: "Please confirm your password",
@@ -219,10 +193,8 @@ const RegisterForm = () => {
           />
           <button
             type="button"
-            onClick={() =>
-              setShowConfirmPassword((prev) => !prev)
-            }
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            onClick={() => setShowConfirmPassword((prev) => !prev)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
           >
             {showConfirmPassword ? (
               <EyeOff className="w-5 h-5" />
@@ -238,23 +210,20 @@ const RegisterForm = () => {
         )}
       </div>
 
-      {/* Submit */}
-      <Button
+      <button
         type="submit"
-        fullWidth
-        loading={loading}
+        className="mt-8 w-full px-12 py-4 border border-gray-900 uppercase tracking-widest hover:bg-gray-900 hover:text-white transition"
         disabled={loading}
       >
-        Create Account
-      </Button>
+        {loading ? "Creating account..." : "Create account"}
+      </button>
 
-      {/* Login */}
       <p className="text-center text-sm text-gray-600">
         Already have an account?{" "}
         <button
           type="button"
           onClick={() => navigate("/login")}
-          className="text-orange-600 font-medium hover:underline"
+          className=" font-medium hover:text-red-600"
         >
           Login here
         </button>
