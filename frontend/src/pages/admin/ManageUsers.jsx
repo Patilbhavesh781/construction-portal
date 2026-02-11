@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Search, Trash2, UserPlus } from "lucide-react";
 
 import FadeIn from "../../components/animations/FadeIn";
-import SlideIn from "../../components/animations/SlideIn";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 import Modal from "../../components/common/Modal";
@@ -72,28 +71,29 @@ const ManageUsers = () => {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <SlideIn direction="down">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">
-              Manage Users
-            </h1>
-            <p className="text-gray-600">
-              View, search, and manage all registered users.
-            </p>
-          </div>
-          <Button to="/admin/manage-users/create">
+    <main className="bg-white w-full overflow-x-hidden">
+      <section className="py-10 px-6 md:px-12 lg:px-16 border-b border-gray-100">
+        <span className="text-xs uppercase tracking-[0.35em] text-red-600 font-semibold">
+          Users
+        </span>
+        <h1 className="text-3xl md:text-5xl font-light text-gray-900 mt-4 leading-tight">
+          Manage Users
+        </h1>
+        <p className="mt-4 text-gray-600">
+          View, search, and manage all registered users.
+        </p>
+        <div className="mt-6">
+          <Button to="/admin/manage-users/create" className="rounded-none uppercase tracking-widest text-xs">
             <UserPlus className="w-5 h-5 mr-2" />
             Add User
           </Button>
         </div>
-      </SlideIn>
+      </section>
 
       {/* Search */}
+      <section className="py-12 px-6 md:px-12 lg:px-16">
       <FadeIn>
-        <div className="bg-white rounded-2xl shadow-md border p-5 flex flex-col md:flex-row items-center gap-4">
+        <div className="bg-white border border-gray-200 p-5 flex flex-col md:flex-row items-center gap-4">
           <div className="relative w-full md:max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
@@ -106,10 +106,12 @@ const ManageUsers = () => {
           </div>
         </div>
       </FadeIn>
+      </section>
 
       {/* Users Table */}
+      <section className="pb-20 px-6 md:px-12 lg:px-16">
       <FadeIn delay={0.1}>
-        <div className="bg-white rounded-2xl shadow-md border overflow-x-auto">
+        <div className="bg-white border border-gray-200 overflow-x-auto">
           <table className="min-w-full text-sm text-left">
             <thead>
               <tr className="border-b bg-gray-50 text-gray-600">
@@ -186,6 +188,7 @@ const ManageUsers = () => {
           </table>
         </div>
       </FadeIn>
+      </section>
 
       {/* Delete Confirmation Modal */}
       <Modal
@@ -210,7 +213,7 @@ const ManageUsers = () => {
           </Button>
         </div>
       </Modal>
-    </div>
+    </main>
   );
 };
 

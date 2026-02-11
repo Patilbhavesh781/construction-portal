@@ -9,7 +9,6 @@ import {
 } from "lucide-react";
 
 import FadeIn from "../../components/animations/FadeIn";
-import SlideIn from "../../components/animations/SlideIn";
 import DashboardStats from "../../components/dashboard/DashboardStats";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
@@ -132,33 +131,40 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="space-y-10">
-      {/* Header */}
-      <SlideIn direction="down">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">
-              Admin Dashboard
-            </h1>
-            <p className="text-gray-600">
-              Monitor platform performance and manage system data.
-            </p>
-          </div>
-          <div className="flex gap-3">
-            <Button to="/admin/manage-users">Manage Users</Button>
-            <Button variant="outline" to="/admin/manage-services">
-              Manage Services
-            </Button>
-          </div>
+    <main className="bg-white w-full overflow-x-hidden">
+      <section className="py-10 px-6 md:px-12 lg:px-16 border-b border-gray-100">
+        <span className="text-xs uppercase tracking-[0.35em] text-red-600 font-semibold">
+          Dashboard
+        </span>
+        <h1 className="text-3xl md:text-5xl font-light text-gray-900 mt-4 leading-tight">
+          Admin Dashboard
+        </h1>
+        <p className="mt-4 text-gray-600">
+          Monitor platform performance and manage system data.
+        </p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Button to="/admin/manage-users" className="rounded-none uppercase tracking-widest text-xs">
+            Manage Users
+          </Button>
+          <Button
+            variant="outline"
+            to="/admin/manage-services"
+            className="rounded-none uppercase tracking-widest text-xs"
+          >
+            Manage Services
+          </Button>
         </div>
-      </SlideIn>
+      </section>
 
       {/* Stats */}
-      <FadeIn>
+      <section className="py-12 px-6 md:px-12 lg:px-16">
+        <FadeIn>
         <DashboardStats stats={stats} />
-      </FadeIn>
+        </FadeIn>
+      </section>
 
       {/* Recent Activity */}
+      <section className="pb-20 px-6 md:px-12 lg:px-16">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Recent Bookings */}
         <FadeIn delay={0.1}>
@@ -257,7 +263,8 @@ const AdminDashboard = () => {
           </div>
         </FadeIn>
       </div>
-    </div>
+      </section>
+    </main>
   );
 };
 

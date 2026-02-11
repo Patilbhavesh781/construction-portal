@@ -7,7 +7,6 @@ import {
 } from "lucide-react";
 
 import FadeIn from "../../components/animations/FadeIn";
-import SlideIn from "../../components/animations/SlideIn";
 import DashboardStats from "../../components/dashboard/DashboardStats";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
@@ -86,64 +85,72 @@ const UserDashboard = () => {
   }
 
   return (
-    <div className="space-y-10">
-      {/* Header */}
-      <SlideIn direction="down">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">
-              Welcome Back!
-            </h1>
-            <p className="text-gray-600">
-              Here’s what’s happening with your projects and bookings.
-            </p>
-          </div>
-          <div className="flex gap-3">
-            <Button to="/user/services">Book a Service</Button>
-            <Button variant="outline" to="/user/profile">
-              View Profile
-            </Button>
-          </div>
+    <main className="bg-white w-full overflow-x-hidden">
+      <section className="py-10 px-6 md:px-12 lg:px-16 border-b border-gray-100">
+        <span className="text-xs uppercase tracking-[0.35em] text-red-600 font-semibold">
+          Dashboard
+        </span>
+        <h1 className="text-3xl md:text-5xl font-light text-gray-900 mt-4 leading-tight">
+          Welcome Back
+        </h1>
+        <p className="mt-4 text-gray-600 max-w-2xl">
+          Review your latest service activity, monitor statuses, and manage your
+          requests from one place.
+        </p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Button
+            to="/user/services"
+            className="rounded-none uppercase tracking-widest text-xs"
+          >
+            Book a Service
+          </Button>
+          <Button
+            variant="outline"
+            to="/user/profile"
+            className="rounded-none uppercase tracking-widest text-xs"
+          >
+            View Profile
+          </Button>
         </div>
-      </SlideIn>
+      </section>
 
-      {/* Stats */}
-      <FadeIn>
-        <DashboardStats stats={stats} />
-      </FadeIn>
+      <section className="py-16 px-6 md:px-12 lg:px-16 border-t border-gray-100">
+        <FadeIn>
+          <DashboardStats stats={stats} />
+        </FadeIn>
+      </section>
 
-      {/* Recent Bookings */}
-      <FadeIn delay={0.2}>
-        <div className="bg-white rounded-2xl shadow-md border p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">
-            Recent Bookings
-          </h2>
+      <section className="pb-20 px-6 md:px-12 lg:px-16">
+        <FadeIn delay={0.1}>
+          <div className="bg-white border border-gray-200 overflow-x-auto">
+            <div className="px-6 py-5 border-b border-gray-200">
+              <h2 className="text-2xl font-light text-gray-900">Recent Bookings</h2>
+            </div>
 
-          {recentBookings.length === 0 ? (
-            <p className="text-gray-600">No bookings found.</p>
-          ) : (
-            <div className="overflow-x-auto">
+            {recentBookings.length === 0 ? (
+              <p className="px-6 py-10 text-gray-600">No bookings found.</p>
+            ) : (
               <table className="min-w-full text-sm text-left">
                 <thead>
-                  <tr className="border-b text-gray-600">
-                    <th className="py-3 px-4">Service</th>
-                    <th className="py-3 px-4">Date</th>
-                    <th className="py-3 px-4">Status</th>
-                    <th className="py-3 px-4 text-right">Action</th>
+                  <tr className="border-b border-gray-200 text-gray-600 uppercase tracking-widest text-xs">
+                    <th className="py-3 px-6">Service</th>
+                    <th className="py-3 px-6">Date</th>
+                    <th className="py-3 px-6">Status</th>
+                    <th className="py-3 px-6 text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {recentBookings.map((booking) => (
-                    <tr key={booking._id} className="border-b last:border-none">
-                      <td className="py-3 px-4 font-medium text-gray-800">
+                    <tr key={booking._id} className="border-b border-gray-100 last:border-none">
+                      <td className="py-4 px-6 font-medium text-gray-900">
                         {booking.service?.title || booking.bookingType}
                       </td>
-                      <td className="py-3 px-4 text-gray-600">
+                      <td className="py-4 px-6 text-gray-600">
                         {new Date(booking.bookingDate).toLocaleDateString()}
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-4 px-6">
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          className={`px-3 py-1 text-xs font-medium uppercase tracking-wider ${
                             booking.status === "completed"
                               ? "bg-green-100 text-green-700"
                               : booking.status === "cancelled"
@@ -153,15 +160,15 @@ const UserDashboard = () => {
                               : "bg-yellow-100 text-yellow-700"
                           }`}
                         >
-                          {booking.status?.charAt(0).toUpperCase() +
-                            booking.status?.slice(1)}
+                          {booking.status?.charAt(0).toUpperCase() + booking.status?.slice(1)}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-right">
+                      <td className="py-4 px-6 text-right">
                         <Button
                           size="sm"
                           variant="ghost"
-                          to={`/user/bookings`}
+                          to="/user/bookings"
+                          className="rounded-none uppercase tracking-widest text-xs"
                         >
                           View
                         </Button>
@@ -170,11 +177,11 @@ const UserDashboard = () => {
                   ))}
                 </tbody>
               </table>
-            </div>
-          )}
-        </div>
-      </FadeIn>
-    </div>
+            )}
+          </div>
+        </FadeIn>
+      </section>
+    </main>
   );
 };
 

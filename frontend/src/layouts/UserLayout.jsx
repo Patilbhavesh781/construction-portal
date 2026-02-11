@@ -4,13 +4,12 @@ import { Menu } from "lucide-react";
 
 import UserSidebar from "../components/dashboard/UserSidebar";
 import Button from "../components/common/Button";
-import FadeIn from "../components/animations/FadeIn";
 
 const UserLayout = () => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    <div className="h-screen overflow-hidden flex bg-white">
       {/* Sidebar */}
       <UserSidebar
         isOpen={sidebarOpen}
@@ -18,9 +17,9 @@ const UserLayout = () => {
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Top Bar */}
-        <header className="bg-white border-b shadow-sm px-4 sm:px-6 py-4 flex items-center justify-between">
+        <header className="sticky top-0 z-30 shrink-0 bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-10 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
@@ -30,17 +29,20 @@ const UserLayout = () => {
             >
               <Menu className="w-5 h-5" />
             </Button>
-            <h1 className="text-lg font-semibold text-gray-800">
-              User Dashboard
-            </h1>
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.3em] text-red-600 font-semibold">
+                User Area
+              </p>
+              <h1 className="text-lg md:text-xl font-light text-gray-900">
+                Client Dashboard
+              </h1>
+            </div>
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
-          <FadeIn>
-            <Outlet />
-          </FadeIn>
+        <main className="flex-1 overflow-y-auto bg-white">
+          <Outlet />
         </main>
       </div>
     </div>

@@ -15,13 +15,14 @@ import {
   Building2,
   Search,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-import ServiceCard from "../../components/cards/ServiceCard";
 import Loader from "../../components/common/Loader";
 import ServiceService from "../../services/service.service";
 import { SERVICE_CATEGORIES } from "../../utils/constants";
 
 const Services = ({ detailsPathBase = "/services" }) => {
+  const navigate = useNavigate();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -78,6 +79,16 @@ const Services = ({ detailsPathBase = "/services" }) => {
       return matchesSearch && matchesCategory;
     });
   }, [services, search, category]);
+
+  const getServiceImage = (service) =>
+    service.images?.[0]?.url ||
+    service.images?.[0] ||
+    "https://images.unsplash.com/photo-1581092921461-eab10380bee1?auto=format&fit=crop&q=100";
+
+  const getServiceMeta = (service) =>
+    SERVICE_CATEGORIES.find((cat) => cat.value === service.category)?.label ||
+    service.category ||
+    "Service";
 
   return (
     <main className="bg-white w-full overflow-x-hidden">
@@ -192,13 +203,37 @@ const Services = ({ detailsPathBase = "/services" }) => {
               No services found for this filter.
             </p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-20">
               {filteredServices.map((service) => (
-                <ServiceCard
-                  key={service._id}
-                  service={service}
-                  detailsPathBase={detailsPathBase}
-                />
+                <div key={service._id} className="group">
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={getServiceImage(service)}
+                      alt={service.title}
+                      className="w-full h-[420px] object-cover transform group-hover:scale-105 transition duration-700"
+                    />
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition" />
+                  </div>
+
+                  <div className="mt-8">
+                    <p className="text-xs uppercase tracking-widest text-gray-500 mb-2">
+                      {getServiceMeta(service)}
+                    </p>
+                    <h3 className="text-2xl font-light text-gray-900">
+                      {service.title}
+                    </h3>
+                    <p className="mt-2 text-gray-600 text-lg line-clamp-2">
+                      {service.shortDescription || service.description}
+                    </p>
+
+                    <button
+                      className="mt-6 text-sm uppercase tracking-widest font-semibold text-red-600 hover:underline"
+                      onClick={() => navigate(`${detailsPathBase}/${service._id}`)}
+                    >
+                      View Service
+                    </button>
+                  </div>
+                </div>
               ))}
             </div>
           )}

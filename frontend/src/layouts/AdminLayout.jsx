@@ -1,16 +1,15 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import { Menu, ShieldCheck } from "lucide-react";
+import { Menu } from "lucide-react";
 
 import AdminSidebar from "../components/dashboard/AdminSidebar";
 import Button from "../components/common/Button";
-import FadeIn from "../components/animations/FadeIn";
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   return (
-    <div className="min-h-screen flex bg-gray-100">
+    <div className="h-screen overflow-hidden flex bg-white">
       {/* Sidebar */}
       <AdminSidebar
         isOpen={sidebarOpen}
@@ -18,9 +17,9 @@ const AdminLayout = () => {
       />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Top Bar */}
-        <header className="bg-white border-b shadow-sm px-4 sm:px-6 py-4 flex items-center justify-between">
+        <header className="sticky top-0 z-30 shrink-0 bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-10 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
@@ -30,20 +29,20 @@ const AdminLayout = () => {
             >
               <Menu className="w-5 h-5" />
             </Button>
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-orange-500" />
-              <h1 className="text-lg font-semibold text-gray-800">
-                Admin Dashboard
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.3em] text-red-600 font-semibold">
+                Admin Area
+              </p>
+              <h1 className="text-lg md:text-xl font-light text-gray-900">
+                Operations Dashboard
               </h1>
             </div>
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
-          <FadeIn>
-            <Outlet />
-          </FadeIn>
+        <main className="flex-1 overflow-y-auto bg-white">
+          <Outlet />
         </main>
       </div>
     </div>

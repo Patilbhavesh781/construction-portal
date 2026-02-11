@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Filter, CalendarCheck } from "lucide-react";
+import { Filter } from "lucide-react";
 import { io } from "socket.io-client";
 
 import FadeIn from "../../components/animations/FadeIn";
-import SlideIn from "../../components/animations/SlideIn";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 import BookingService from "../../services/booking.service";
@@ -48,9 +47,7 @@ const MyBookings = () => {
       if (!booking) return;
       if (String(booking.user) !== String(user._id)) return;
       setBookings((prev) =>
-        prev.some((b) => b._id === booking._id)
-          ? prev
-          : [booking, ...prev]
+        prev.some((b) => b._id === booking._id) ? prev : [booking, ...prev]
       );
     });
 
@@ -81,83 +78,88 @@ const MyBookings = () => {
   }
 
   return (
-    <div className="space-y-10">
-      {/* Header */}
-      <SlideIn direction="down">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">
-              My Bookings
-            </h1>
-            <p className="text-gray-600">
-              View and manage all your service bookings.
-            </p>
-          </div>
-          <Button to="/user/services">Book New Service</Button>
-        </div>
-      </SlideIn>
+    <main className="bg-white w-full overflow-x-hidden">
+      <section className="py-10 px-6 md:px-12 lg:px-16 border-b border-gray-100">
+        <span className="text-xs uppercase tracking-[0.35em] text-red-600 font-semibold">
+          My Bookings
+        </span>
+        <h1 className="text-3xl md:text-5xl font-light text-gray-900 mt-4 leading-tight">
+          Service Requests
+        </h1>
+      </section>
 
-      {/* Filter */}
-      <FadeIn>
-        <div className="flex flex-wrap gap-3 items-center">
-          <div className="flex items-center gap-2 text-gray-600">
-            <Filter className="w-5 h-5" />
-            <span className="font-medium">Filter:</span>
+      <section className="py-12 px-6 md:px-12 lg:px-16">
+        <FadeIn>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2 text-gray-700">
+                <Filter className="w-5 h-5" />
+                <span className="text-xs uppercase tracking-widest font-semibold">
+                  Filter by Status
+                </span>
+              </div>
+              {[
+                "all",
+                "pending",
+                "confirmed",
+                "completed",
+                "cancelled",
+              ].map((status) => (
+                <button
+                  key={status}
+                  onClick={() => setFilter(status)}
+                  className={`px-5 py-2 text-xs uppercase tracking-widest font-semibold border transition ${
+                    filter === status
+                      ? "bg-red-600 text-white border-red-600"
+                      : "bg-white text-gray-700 border-gray-200 hover:border-red-600"
+                  }`}
+                >
+                  {status === "all"
+                    ? "All"
+                    : status.charAt(0).toUpperCase() + status.slice(1)}
+                </button>
+              ))}
+            </div>
+            <Button to="/user/services" className="rounded-none uppercase tracking-widest text-xs">
+              Book New Service
+            </Button>
           </div>
-          {["all", "pending", "confirmed", "completed", "cancelled"].map((status) => (
-            <button
-              key={status}
-              onClick={() => setFilter(status)}
-              className={`px-4 py-2 rounded-full text-sm font-medium border transition ${
-                filter === status
-                  ? "bg-orange-600 text-white border-orange-600"
-                  : "bg-white text-gray-600 hover:bg-gray-100 border-gray-300"
-              }`}
-            >
-              {status === "all"
-                ? "All"
-                : status.charAt(0).toUpperCase() + status.slice(1)}
-            </button>
-          ))}
-        </div>
-      </FadeIn>
+        </FadeIn>
+      </section>
 
-      {/* Bookings Table */}
-      <FadeIn delay={0.1}>
-        <div className="bg-white rounded-2xl shadow-md border p-6">
-          {filteredBookings.length === 0 ? (
-            <p className="text-gray-600 text-center">
-              No bookings found for this filter.
-            </p>
-          ) : (
-            <div className="overflow-x-auto">
+      <section className="pb-20 px-6 md:px-12 lg:px-16">
+        <FadeIn delay={0.1}>
+          <div className="bg-white border border-gray-200 overflow-x-auto">
+            {filteredBookings.length === 0 ? (
+              <p className="py-10 text-center text-gray-600">
+                No bookings found for this filter.
+              </p>
+            ) : (
               <table className="min-w-full text-sm text-left">
                 <thead>
-                  <tr className="border-b text-gray-600">
-                    <th className="py-3 px-4">Service</th>
-                    <th className="py-3 px-4">Location</th>
-                    <th className="py-3 px-4">Date</th>
-                    <th className="py-3 px-4">Status</th>
-                    <th className="py-3 px-4 text-right">Actions</th>
+                  <tr className="border-b border-gray-200 text-gray-600 uppercase tracking-widest text-xs">
+                    <th className="py-3 px-6">Service</th>
+                    <th className="py-3 px-6">Location</th>
+                    <th className="py-3 px-6">Date</th>
+                    <th className="py-3 px-6">Status</th>
+                    <th className="py-3 px-6 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredBookings.map((booking) => (
-                    <tr key={booking._id} className="border-b last:border-none">
-                      <td className="py-3 px-4 font-medium text-gray-800">
+                    <tr key={booking._id} className="border-b border-gray-100 last:border-none">
+                      <td className="py-4 px-6 font-medium text-gray-900">
                         {booking.service?.title || booking.bookingType}
                       </td>
-                      <td className="py-3 px-4 text-gray-600">
-                        {booking.address?.city ||
-                          booking.address?.fullAddress ||
-                          "-"}
+                      <td className="py-4 px-6 text-gray-600">
+                        {booking.address?.city || booking.address?.fullAddress || "-"}
                       </td>
-                      <td className="py-3 px-4 text-gray-600">
+                      <td className="py-4 px-6 text-gray-600">
                         {new Date(booking.bookingDate).toLocaleDateString()}
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-4 px-6">
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          className={`px-3 py-1 text-xs font-medium uppercase tracking-wider ${
                             booking.status === "completed"
                               ? "bg-green-100 text-green-700"
                               : booking.status === "cancelled"
@@ -167,15 +169,15 @@ const MyBookings = () => {
                               : "bg-yellow-100 text-yellow-700"
                           }`}
                         >
-                          {booking.status?.charAt(0).toUpperCase() +
-                            booking.status?.slice(1)}
+                          {booking.status?.charAt(0).toUpperCase() + booking.status?.slice(1)}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-right space-x-2">
+                      <td className="py-4 px-6 text-right">
                         <Button
                           size="sm"
                           variant="ghost"
-                          to={`/user/bookings`}
+                          to="/user/bookings"
+                          className="rounded-none uppercase tracking-widest text-xs"
                         >
                           View
                         </Button>
@@ -184,11 +186,11 @@ const MyBookings = () => {
                   ))}
                 </tbody>
               </table>
-            </div>
-          )}
-        </div>
-      </FadeIn>
-    </div>
+            )}
+          </div>
+        </FadeIn>
+      </section>
+    </main>
   );
 };
 

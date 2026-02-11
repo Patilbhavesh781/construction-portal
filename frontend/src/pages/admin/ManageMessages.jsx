@@ -3,7 +3,6 @@ import { Send, UserCircle } from "lucide-react";
 import { io } from "socket.io-client";
 
 import FadeIn from "../../components/animations/FadeIn";
-import SlideIn from "../../components/animations/SlideIn";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 import ChatService from "../../services/chat.service";
@@ -140,22 +139,23 @@ const ManageMessages = () => {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <SlideIn direction="down">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-800">
-            Manage Messages
-          </h1>
-          <p className="text-gray-600">
-            Real-time chat between users and admin.
-          </p>
-        </div>
-      </SlideIn>
+    <main className="bg-white w-full overflow-x-hidden">
+      <section className="py-10 px-6 md:px-12 lg:px-16 border-b border-gray-100">
+        <span className="text-xs uppercase tracking-[0.35em] text-red-600 font-semibold">
+          Messages
+        </span>
+        <h1 className="text-3xl md:text-5xl font-light text-gray-900 mt-4 leading-tight">
+          Manage Messages
+        </h1>
+        <p className="mt-4 text-gray-600">
+          Real-time chat between users and admin.
+        </p>
+      </section>
 
       {/* Messages Layout */}
+      <section className="py-14 px-6 md:px-12 lg:px-16">
       <FadeIn>
-        <div className="bg-white rounded-2xl shadow-md border grid grid-cols-1 md:grid-cols-3 min-h-[500px] overflow-hidden">
+        <div className="bg-white border border-gray-200 grid grid-cols-1 md:grid-cols-3 min-h-[500px] overflow-hidden">
           {/* Threads List */}
           <div className="border-r p-4 overflow-y-auto">
             <h2 className="text-lg font-semibold text-gray-800 mb-4">
@@ -169,16 +169,16 @@ const ManageMessages = () => {
                 <button
                   key={thread.user?._id}
                   onClick={() => setActiveUser(thread.user)}
-                  className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition ${
+                  className={`w-full min-w-0 flex items-center gap-3 p-3 rounded-lg text-left transition ${
                     activeUser?._id === thread.user?._id
                       ? "bg-orange-100 text-orange-700"
                       : "hover:bg-gray-100"
                   }`}
                 >
                   <UserCircle className="w-8 h-8 text-gray-500" />
-                  <div className="flex-1">
-                    <p className="font-medium">{thread.user?.name}</p>
-                    <p className="text-sm text-gray-500 truncate">
+                  <div className="flex-1 min-w-0 overflow-hidden">
+                    <p className="font-medium truncate">{thread.user?.name}</p>
+                    <p className="block max-w-full text-sm text-gray-500 truncate">
                       {thread.lastText || "No messages"}
                     </p>
                   </div>
@@ -255,7 +255,8 @@ const ManageMessages = () => {
           </div>
         </div>
       </FadeIn>
-    </div>
+      </section>
+    </main>
   );
 };
 

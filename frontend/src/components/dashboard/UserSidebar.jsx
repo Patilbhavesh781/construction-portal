@@ -7,6 +7,7 @@ import {
   MessageSquare,
   LogOut,
   Wrench,
+  X,
 } from "lucide-react";
 import clsx from "clsx";
 import useAuthStore from "../../store/authStore";
@@ -51,7 +52,6 @@ const UserSidebar = ({ isOpen = true, onClose }) => {
 
   return (
     <>
-      {/* Overlay for mobile */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/30 z-40 lg:hidden"
@@ -59,44 +59,46 @@ const UserSidebar = ({ isOpen = true, onClose }) => {
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={clsx(
-          "fixed top-0 left-0 h-full z-50 w-64 bg-white border-r shadow-sm flex flex-col transition-transform duration-300",
+          "fixed top-0 left-0 h-full z-50 w-72 bg-white border-r border-gray-200 flex flex-col transition-transform duration-300",
           isOpen ? "translate-x-0" : "-translate-x-full",
-          "lg:translate-x-0 lg:static lg:shadow-none"
+          "lg:translate-x-0 lg:static lg:sticky lg:top-0"
         )}
       >
-        {/* Brand */}
-        <div className="flex items-center justify-between px-5 py-4 border-b">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200">
           <div
             className="flex items-center gap-2 cursor-pointer"
             onClick={() => navigate("/user/dashboard")}
           >
-            <span className="text-xl font-bold text-orange-600">
-              Build<span className="text-gray-800">Pro</span>
-            </span>
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.35em] text-red-600 font-semibold">
+                Construction
+              </p>
+              <span className="text-xl font-light text-gray-900">
+                Build<span className="font-semibold">Pro</span>
+              </span>
+            </div>
           </div>
           <button
             onClick={onClose}
             className="lg:hidden text-gray-500 hover:text-gray-700"
           >
-            ✕
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Menu */}
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-4 py-5 space-y-2">
           {menuItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
                 clsx(
-                  "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                  "flex items-center gap-3 px-4 py-3 rounded-none text-sm font-medium transition-colors border",
                   isActive
-                    ? "bg-orange-100 text-orange-700"
-                    : "text-gray-700 hover:bg-gray-100"
+                    ? "bg-red-600 text-white border-red-600"
+                    : "text-gray-700 border-transparent hover:border-gray-300"
                 )
               }
               onClick={onClose}
@@ -107,14 +109,14 @@ const UserSidebar = ({ isOpen = true, onClose }) => {
           ))}
         </nav>
 
-        {/* Logout */}
-        <div className="px-4 py-4 border-t">
+        <div className="px-4 py-4 border-t border-gray-200">
           <Button
             variant="danger"
             fullWidth
+            className="rounded-none uppercase tracking-widest text-xs py-3"
             onClick={handleLogout}
-            icon={<LogOut className="w-4 h-4" />}
           >
+            <LogOut className="w-4 h-4" />
             Logout
           </Button>
         </div>

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Search, CheckCircle, XCircle, Trash2, Eye } from "lucide-react";
 
 import FadeIn from "../../components/animations/FadeIn";
-import SlideIn from "../../components/animations/SlideIn";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 import Modal from "../../components/common/Modal";
@@ -88,22 +87,23 @@ const ManageReviews = () => {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <SlideIn direction="down">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-800">
-            Manage Reviews
-          </h1>
-          <p className="text-gray-600">
-            Approve, reject, and manage customer reviews.
-          </p>
-        </div>
-      </SlideIn>
+    <main className="bg-white w-full overflow-x-hidden">
+      <section className="py-10 px-6 md:px-12 lg:px-16 border-b border-gray-100">
+        <span className="text-xs uppercase tracking-[0.35em] text-red-600 font-semibold">
+          Reviews
+        </span>
+        <h1 className="text-3xl md:text-5xl font-light text-gray-900 mt-4 leading-tight">
+          Manage Reviews
+        </h1>
+        <p className="mt-4 text-gray-600">
+          Approve, reject, and manage customer reviews.
+        </p>
+      </section>
 
       {/* Search */}
+      <section className="py-12 px-6 md:px-12 lg:px-16">
       <FadeIn>
-        <div className="bg-white rounded-2xl shadow-md border p-5">
+        <div className="bg-white border border-gray-200 p-5">
           <div className="relative w-full md:max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
@@ -116,10 +116,12 @@ const ManageReviews = () => {
           </div>
         </div>
       </FadeIn>
+      </section>
 
       {/* Reviews Table */}
+      <section className="pb-20 px-6 md:px-12 lg:px-16">
       <FadeIn delay={0.1}>
-        <div className="bg-white rounded-2xl shadow-md border overflow-x-auto">
+        <div className="bg-white border border-gray-200 overflow-x-auto">
           <table className="min-w-full text-sm text-left">
             <thead>
               <tr className="border-b bg-gray-50 text-gray-600">
@@ -218,6 +220,7 @@ const ManageReviews = () => {
           </table>
         </div>
       </FadeIn>
+      </section>
 
       {/* Details Modal */}
       <Modal
@@ -271,7 +274,7 @@ const ManageReviews = () => {
           </Button>
         </div>
       </Modal>
-    </div>
+    </main>
   );
 };
 

@@ -93,12 +93,6 @@ const About = () => {
       {/* ================= DESIGN & SUSTAINABILITY ================= */}
       <section className="py-32 px-8 md:px-24">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-20 items-center">
-          <img
-            src="https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&q=100"
-            alt="Sustainable Design"
-            className="w-full h-[420px] object-cover"
-          />
-
           <div>
             <h2 className="text-4xl md:text-5xl font-light text-gray-900 mb-8">
               Designed With Responsibility
@@ -109,6 +103,13 @@ const About = () => {
               and long-term environmental impact.
             </p>
           </div>
+          <img
+            src="https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&q=100"
+            alt="Sustainable Design"
+            className="w-full h-[420px] object-cover"
+          />
+
+          
         </div>
       </section>
 

@@ -10,8 +10,6 @@ import {
 } from "lucide-react";
 
 import FadeIn from "../../components/animations/FadeIn";
-import SlideIn from "../../components/animations/SlideIn";
-import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 
 import PropertyService from "../../services/property.service";
@@ -49,11 +47,24 @@ const PropertyDetails = () => {
       return property.images.map((img) => img.url || img);
     }
     return [
-      "https://via.placeholder.com/1200x600?text=Property+Image",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=100",
     ];
   }, [property?.images]);
 
-  const coverImage = images[activeIndex] || images[0];
+  const heroImage = images[activeIndex] || images[0];
+  const propertyLocation =
+    [
+      property?.location?.city,
+      property?.location?.state,
+      property?.location?.country,
+      !property?.location?.city &&
+      !property?.location?.state &&
+      !property?.location?.country
+        ? property?.location?.address
+        : null,
+    ]
+      .filter(Boolean)
+      .join(", ") || "";
 
   const prevImage = () => {
     setActiveIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
@@ -75,9 +86,12 @@ const PropertyDetails = () => {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-6">
         <p className="text-red-600 mb-4">{error}</p>
-        <Button onClick={() => navigate("/properties")}>
+        <button
+          onClick={() => navigate("/properties")}
+          className="text-sm uppercase tracking-widest font-semibold text-red-600 hover:underline"
+        >
           Back to Properties
-        </Button>
+        </button>
       </div>
     );
   }
@@ -85,46 +99,44 @@ const PropertyDetails = () => {
   if (!property) return null;
 
   return (
-    <div className="w-full">
-      {/* Header */}
-      <section className="bg-gradient-to-r from-orange-600 to-orange-500 text-white py-16">
-        <div className="max-w-7xl mx-auto px-6">
-          <FadeIn>
-            <button
-              onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-orange-100 hover:text-white mb-6 transition"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              Back
-            </button>
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">
-              {property.title}
-            </h1>
-            <p className="text-orange-100 max-w-3xl">
-              {property.shortDescription || property.description}
-            </p>
-          </FadeIn>
+    <main className="bg-white w-full overflow-x-hidden">
+      <section className="py-12 px-8 md:px-24 border-b border-gray-100">
+        <div className="max-w-7xl mx-auto">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-sm uppercase tracking-widest font-semibold text-red-600 hover:underline mb-6"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </button>
+          <p className="text-xs uppercase tracking-widest text-gray-500 mb-2">
+            {property.purpose || "Property"}
+          </p>
+          <h1 className="text-4xl md:text-6xl font-light text-gray-900 leading-tight">
+            {property.title}
+          </h1>
+          <p className="mt-6 text-lg md:text-xl text-gray-600 max-w-2xl">
+            {property.shortDescription || property.description}
+          </p>
         </div>
       </section>
 
-      {/* Content */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Left */}
-          <div className="lg:col-span-2 space-y-8">
-            <FadeIn direction="left">
-              <div className="relative">
+      <section className="py-24 px-8 md:px-24">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <div className="lg:col-span-2 space-y-12">
+            <FadeIn>
+              <div className="relative overflow-hidden">
                 <img
-                  src={coverImage}
+                  src={heroImage}
                   alt={property.title}
-                  className="w-full h-[350px] object-cover rounded-3xl shadow-lg"
+                  className="w-full h-[420px] object-cover"
                 />
                 {images.length > 1 && (
                   <>
                     <button
                       type="button"
                       onClick={prevImage}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-700 p-2 rounded-full shadow"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/85 hover:bg-white text-gray-700 p-2 rounded-full"
                       aria-label="Previous image"
                     >
                       <ChevronLeft className="w-5 h-5" />
@@ -132,7 +144,7 @@ const PropertyDetails = () => {
                     <button
                       type="button"
                       onClick={nextImage}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-700 p-2 rounded-full shadow"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/85 hover:bg-white text-gray-700 p-2 rounded-full"
                       aria-label="Next image"
                     >
                       <ChevronRight className="w-5 h-5" />
@@ -142,34 +154,49 @@ const PropertyDetails = () => {
               </div>
             </FadeIn>
 
-            <FadeIn direction="left">
+            {images.length > 1 && (
+              <FadeIn>
+                <div className="grid grid-cols-5 gap-3">
+                  {images.slice(0, 5).map((img, idx) => (
+                    <button
+                      key={`${img}-${idx}`}
+                      type="button"
+                      onClick={() => setActiveIndex(idx)}
+                      className={`overflow-hidden border-2 transition ${
+                        activeIndex === idx ? "border-red-600" : "border-transparent"
+                      }`}
+                    >
+                      <img
+                        src={img}
+                        alt={`${property.title} ${idx + 1}`}
+                        className="w-full h-20 object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              </FadeIn>
+            )}
+
+            <FadeIn>
               <div>
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-                  Property Overview
-                </h2>
-                <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                <h2 className="text-3xl font-light text-gray-900 mb-4">Property Overview</h2>
+                <p className="text-gray-600 text-lg leading-relaxed whitespace-pre-line">
                   {property.description}
                 </p>
               </div>
             </FadeIn>
           </div>
 
-          {/* Right */}
           <div className="lg:col-span-1">
-            <SlideIn direction="right">
-              <div className="sticky top-28 space-y-6">
-                <div className="bg-gray-50 rounded-2xl shadow-md p-6">
-                  <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                    Property Info
-                  </h3>
+            <div className="sticky top-28 space-y-6">
+              <FadeIn>
+                <div className="bg-gray-50 border border-gray-200 p-6">
+                  <h3 className="text-xl font-medium text-gray-900 mb-4">Property Info</h3>
 
-                  {(property.location?.city || property.location?.address) && (
+                  {propertyLocation && (
                     <div className="flex items-center gap-2 text-gray-700 mb-3">
                       <MapPin className="w-4 h-4 text-gray-500" />
-                      <span>
-                        {property.location?.city ||
-                          property.location?.address}
-                      </span>
+                      <span>{propertyLocation}</span>
                     </div>
                   )}
 
@@ -189,19 +216,19 @@ const PropertyDetails = () => {
                     </div>
                   )}
                 </div>
+              </FadeIn>
 
-                <Button
-                  className="w-full"
-                  onClick={() => navigate("/contact")}
-                >
-                  Enquire Now
-                </Button>
-              </div>
-            </SlideIn>
+              <button
+                className="w-full px-6 py-3 text-xs uppercase tracking-widest font-semibold border border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition"
+                onClick={() => navigate("/contact")}
+              >
+                Enquire Now
+              </button>
+            </div>
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 };
 

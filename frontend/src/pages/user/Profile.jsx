@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { User, Lock } from "lucide-react";
 
 import FadeIn from "../../components/animations/FadeIn";
-import SlideIn from "../../components/animations/SlideIn";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 import { useAuth } from "../../hooks/useAuth";
@@ -24,13 +23,7 @@ const Profile = () => {
     const addr = user?.address;
     if (!addr) return "";
     if (typeof addr === "string") return addr;
-    const parts = [
-      addr.street,
-      addr.city,
-      addr.state,
-      addr.country,
-      addr.zipCode,
-    ].filter(Boolean);
+    const parts = [addr.street, addr.city, addr.state, addr.country, addr.zipCode].filter(Boolean);
     return parts.join(", ");
   }, [user?.address]);
 
@@ -95,142 +88,147 @@ const Profile = () => {
   }
 
   return (
-    <div className="space-y-10">
-      {/* Header */}
-      <SlideIn direction="down">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-800">My Profile</h1>
-          <p className="text-gray-600">
-            View and update your personal information.
-          </p>
-        </div>
-      </SlideIn>
+    <main className="bg-white w-full overflow-x-hidden">
+      <section className="py-10 px-6 md:px-12 lg:px-16 border-b border-gray-100">
+        <span className="text-xs uppercase tracking-[0.35em] text-red-600 font-semibold">
+          My Profile
+        </span>
+        <h1 className="text-3xl md:text-5xl font-light text-gray-900 mt-4 leading-tight">
+          Account Details
+        </h1>
+      </section>
 
-      {/* Profile Card */}
-      <FadeIn>
-        <div className="bg-white rounded-2xl shadow-md border p-6 max-w-3xl">
-          {/* Basic Info */}
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center">
-              <User className="w-8 h-8 text-orange-600" />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold text-gray-800">
-                {profile?.name || "-"}
-              </h2>
-              <p className="text-gray-600">{profile?.email || "-"}</p>
-            </div>
-          </div>
-
-          {error && (
-            <div className="mb-4 bg-red-50 text-red-600 text-sm px-4 py-2 rounded-lg">
-              {error}
-            </div>
-          )}
-
-          {/* Form */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                disabled={!isEditing}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none ${
-                  !isEditing ? "bg-gray-100 cursor-not-allowed" : ""
-                }`}
-              />
+      <section className="py-14 px-6 md:px-12 lg:px-16">
+        <FadeIn>
+          <div className="bg-white border border-gray-200 p-6 md:p-8 max-w-4xl">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-16 h-16 bg-red-50 flex items-center justify-center border border-red-100">
+                <User className="w-8 h-8 text-red-600" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-light text-gray-900">{profile?.name || "-"}</h2>
+                <p className="text-gray-600">{profile?.email || "-"}</p>
+              </div>
             </div>
 
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={form.email}
-                onChange={handleChange}
-                disabled
-                className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed"
-              />
-            </div>
-
-            {/* Phone */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Phone Number
-              </label>
-              <input
-                type="text"
-                name="phone"
-                value={form.phone}
-                onChange={handleChange}
-                disabled={!isEditing}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none ${
-                  !isEditing ? "bg-gray-100 cursor-not-allowed" : ""
-                }`}
-              />
-            </div>
-
-            {/* Address */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Address
-              </label>
-              <input
-                type="text"
-                name="address"
-                value={form.address}
-                onChange={handleChange}
-                disabled={!isEditing}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none ${
-                  !isEditing ? "bg-gray-100 cursor-not-allowed" : ""
-                }`}
-              />
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex flex-wrap gap-4 mt-8">
-            {!isEditing ? (
-              <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
-            ) : (
-              <>
-                <Button onClick={handleSave} disabled={loading}>
-                  {loading ? "Saving..." : "Save Changes"}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setForm({
-                      name: profile?.name || "",
-                      email: profile?.email || "",
-                      phone: profile?.phone || "",
-                      address: addressText,
-                    });
-                    setIsEditing(false);
-                  }}
-                >
-                  Cancel
-                </Button>
-              </>
+            {error && (
+              <div className="mb-6 bg-red-50 text-red-700 text-sm px-4 py-3 border border-red-200">
+                {error}
+              </div>
             )}
 
-            <Button variant="ghost" className="ml-auto" to="/forgot-password">
-              <Lock className="w-4 h-4 mr-2" />
-              Change Password
-            </Button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-xs uppercase tracking-widest font-semibold text-gray-600 mb-2">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                  className={`w-full px-4 py-3 border focus:ring-2 focus:ring-red-500 focus:outline-none ${
+                    !isEditing ? "bg-gray-50 cursor-not-allowed" : "bg-white"
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs uppercase tracking-widest font-semibold text-gray-600 mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  disabled
+                  className="w-full px-4 py-3 border bg-gray-50 cursor-not-allowed"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs uppercase tracking-widest font-semibold text-gray-600 mb-2">
+                  Phone Number
+                </label>
+                <input
+                  type="text"
+                  name="phone"
+                  value={form.phone}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                  className={`w-full px-4 py-3 border focus:ring-2 focus:ring-red-500 focus:outline-none ${
+                    !isEditing ? "bg-gray-50 cursor-not-allowed" : "bg-white"
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs uppercase tracking-widest font-semibold text-gray-600 mb-2">
+                  Address
+                </label>
+                <input
+                  type="text"
+                  name="address"
+                  value={form.address}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                  className={`w-full px-4 py-3 border focus:ring-2 focus:ring-red-500 focus:outline-none ${
+                    !isEditing ? "bg-gray-50 cursor-not-allowed" : "bg-white"
+                  }`}
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-3 mt-8">
+              {!isEditing ? (
+                <Button
+                  onClick={() => setIsEditing(true)}
+                  className="rounded-none uppercase tracking-widest text-xs"
+                >
+                  Edit Profile
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    onClick={handleSave}
+                    disabled={loading}
+                    className="rounded-none uppercase tracking-widest text-xs"
+                  >
+                    {loading ? "Saving..." : "Save Changes"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setForm({
+                        name: profile?.name || "",
+                        email: profile?.email || "",
+                        phone: profile?.phone || "",
+                        address: addressText,
+                      });
+                      setIsEditing(false);
+                    }}
+                    className="rounded-none uppercase tracking-widest text-xs"
+                  >
+                    Cancel
+                  </Button>
+                </>
+              )}
+
+              <Button
+                variant="ghost"
+                className="ml-auto rounded-none uppercase tracking-widest text-xs"
+                to="/forgot-password"
+              >
+                <Lock className="w-4 h-4 mr-1" />
+                Change Password
+              </Button>
+            </div>
           </div>
-        </div>
-      </FadeIn>
-    </div>
+        </FadeIn>
+      </section>
+    </main>
   );
 };
 

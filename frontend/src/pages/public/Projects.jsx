@@ -1,36 +1,54 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const projects = [
-  {
-    name: "Urban Living Estates",
-    location: "Mumbai, India",
-    type: "Residential Apartments",
-    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=100",
-  },
-  {
-    name: "Green Horizon",
-    location: "Pune, India",
-    type: "Integrated Township",
-    image: "https://images.unsplash.com/photo-1600585153490-76fb20a32601?auto=format&fit=crop&q=100",
-  },
-  {
-    name: "Sky Garden Residences",
-    location: "Nashik, India",
-    type: "Luxury Residences",
-    image: "https://images.unsplash.com/photo-1600566752355-35792bedcfea?auto=format&fit=crop&q=100",
-  },
-  {
-    name: "The Grand Atrium",
-    location: "Bengaluru, India",
-    type: "Premium Housing",
-    image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&q=100",
-  },
-];
+import Loader from "../../components/common/Loader";
+import ProjectService from "../../services/project.service";
 
 const Projects = () => {
+  const navigate = useNavigate();
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await ProjectService.getAllProjects();
+        setProjects(res || []);
+      } catch (err) {
+        console.error("Failed to fetch projects:", err);
+        setError("Unable to load projects. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  const getProjectImage = (project) =>
+    project.images?.[0]?.url ||
+    project.images?.[0] ||
+    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=100";
+
+  const getProjectLocation = (project) =>
+    [
+      project.location?.city,
+      project.location?.state,
+      project.location?.country,
+      !project.location?.city &&
+      !project.location?.state &&
+      !project.location?.country
+        ? project.location?.address
+        : null,
+    ]
+      .filter(Boolean)
+      .join(", ") || "Location TBA";
+
   return (
     <main className="bg-white w-full overflow-x-hidden">
-
       {/* ================= HERO ================= */}
       <section className="relative h-[60svh] flex items-center px-8 md:px-24 overflow-hidden">
         <img
@@ -57,37 +75,52 @@ const Projects = () => {
 
       {/* ================= PROJECT GRID ================= */}
       <section className="py-32 px-8 md:px-24">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-20">
-
-          {projects.map((project, i) => (
-            <div key={i} className="group">
-              <div className="relative overflow-hidden">
-                <img
-                  src={project.image}
-                  alt={project.name}
-                  className="w-full h-[420px] object-cover transform group-hover:scale-105 transition duration-700"
-                />
-                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition"></div>
-              </div>
-
-              <div className="mt-8">
-                <p className="text-xs uppercase tracking-widest text-gray-500 mb-2">
-                  {project.location}
-                </p>
-                <h3 className="text-2xl font-light text-gray-900">
-                  {project.name}
-                </h3>
-                <p className="mt-2 text-gray-600 text-lg">
-                  {project.type}
-                </p>
-
-                <button className="mt-6 text-sm uppercase tracking-widest font-semibold text-red-600 hover:underline">
-                  View Project
-                </button>
-              </div>
+        <div className="max-w-7xl mx-auto">
+          {loading ? (
+            <div className="flex justify-center py-10">
+              <Loader size="lg" />
             </div>
-          ))}
+          ) : error ? (
+            <p className="text-center text-red-600">{error}</p>
+          ) : projects.length === 0 ? (
+            <p className="text-center text-gray-600">
+              No projects found at the moment.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-20">
+              {projects.map((project) => (
+                <div key={project._id} className="group">
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={getProjectImage(project)}
+                      alt={project.title}
+                      className="w-full h-[420px] object-cover transform group-hover:scale-105 transition duration-700"
+                    />
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition" />
+                  </div>
 
+                  <div className="mt-8">
+                    <p className="text-xs uppercase tracking-widest text-gray-500 mb-2">
+                      {getProjectLocation(project)}
+                    </p>
+                    <h3 className="text-2xl font-light text-gray-900">
+                      {project.title}
+                    </h3>
+                    <p className="mt-2 text-gray-600 text-lg">
+                      {project.category || "Construction Project"}
+                    </p>
+
+                    <button
+                      className="mt-6 text-sm uppercase tracking-widest font-semibold text-red-600 hover:underline"
+                      onClick={() => navigate(`/projects/${project._id}`)}
+                    >
+                      View Project
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -98,13 +131,16 @@ const Projects = () => {
           <span className="font-medium italic">Next Home</span>
         </h2>
         <p className="mt-8 text-gray-400 text-lg">
-          Explore residences designed for comfort, sustainability, and long-term value.
+          Explore residences designed for comfort, sustainability, and long-term
+          value.
         </p>
-        <button className="mt-12 px-12 py-4 border border-white uppercase tracking-widest hover:bg-white hover:text-gray-900 transition">
+        <button
+          className="mt-12 px-12 py-4 border border-white uppercase tracking-widest hover:bg-white hover:text-gray-900 transition"
+          onClick={() => navigate("/contact")}
+        >
           Enquire Now
         </button>
       </section>
-
     </main>
   );
 };
