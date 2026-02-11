@@ -1,75 +1,81 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavLink, Link } from "react-router-dom";
 import { ChevronDown, Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const navItemClass = ({ isActive }) =>
-    `transition-colors ${
-      isActive ? "text-red-600" : "text-gray-700 hover:text-red-600"
+    `relative transition-colors duration-300 ${
+      isActive
+        ? "text-red-500"
+        : "text-gray-300 hover:text-white"
     }`;
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-white border-b border-gray-200">
-      <nav className="w-full px-4 sm:px-6 xl:px-20 py-5 flex items-center justify-between">
-        {/* Left: Hamburger + Logo */}
-        <div className="flex items-center gap-2">
-          <button
-            className="inline-flex items-center md:hidden"
-            onClick={() => setMobileOpen((v) => !v)}
-            aria-label="Toggle menu"
-          >
-            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
-          <Link
-            to="/"
-            aria-label="JSW Homes"
-            className="mb-[3px] text-2xl font-semibold tracking-wide text-gray-900"
-          >
-            JSW<span className="font-light">Homes</span>
-          </Link>
-        </div>
+    <header
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
+        scrolled
+          ? "bg-black/80 backdrop-blur-xl border-b border-white/10"
+          : "bg-transparent"
+      }`}
+    >
+      <nav className="w-full px-6 xl:px-24 py-6 flex items-center justify-between">
+
+        {/* Logo */}
+        <Link
+          to="/"
+          className="text-2xl font-semibold tracking-wider text-white"
+        >
+          JSW<span className="font-light text-red-500">Homes</span>
+        </Link>
 
         {/* Desktop Menu */}
-        <ul className="hidden md:flex items-center gap-8 text-sm tracking-widest uppercase font-medium">
-          <li>
-            <NavLink to="/" className={navItemClass}>
-              Home
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/about" className={navItemClass}>
-              About
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/services" className={navItemClass}>
-              Services
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/projects" className={navItemClass}>
-              Projects
-            </NavLink>
-          </li>
+        <ul className="hidden md:flex items-center gap-10 text-xs tracking-[0.3em] uppercase font-medium">
+
+          {["/", "/about", "/services", "/projects"].map((path, i) => (
+            <li key={i}>
+              <NavLink to={path} className={navItemClass}>
+                {({ isActive }) => (
+                  <span className="relative group">
+                    {path === "/" ? "Home" : path.replace("/", "")}
+                    <span
+                      className={`absolute left-0 -bottom-2 h-[1px] bg-red-500 transition-all duration-300 ${
+                        isActive ? "w-full" : "w-0 group-hover:w-full"
+                      }`}
+                    />
+                  </span>
+                )}
+              </NavLink>
+            </li>
+          ))}
+
+          {/* Dropdown */}
           <li className="relative group">
-            <button
-              type="button"
-              className="flex items-center gap-1 text-gray-700 hover:text-red-600 transition-colors"
-            >
-              MORE <ChevronDown size={16} />
+            <button className="flex items-center gap-1 text-gray-300 hover:text-white transition-colors">
+              MORE <ChevronDown size={14} />
             </button>
-            <div className="absolute top-5 left-0 bg-white border border-gray-200 shadow-lg rounded-md py-2 w-44 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition">
+
+            <div className="absolute top-8 left-0 bg-black/90 backdrop-blur-xl border border-white/10 rounded-xl py-4 w-44 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 shadow-2xl">
               <NavLink
                 to="/properties"
-                className="block px-4 py-2 text-sm text-gray-700 hover:text-red-600 hover:bg-gray-50"
+                className="block px-6 py-2 text-xs tracking-widest text-gray-300 hover:text-red-500 transition"
               >
                 Properties
               </NavLink>
               <NavLink
                 to="/contact"
-                className="block px-4 py-2 text-sm text-gray-700 hover:text-red-600 hover:bg-gray-50"
+                className="block px-6 py-2 text-xs tracking-widest text-gray-300 hover:text-red-500 transition"
               >
                 Contact
               </NavLink>
@@ -77,54 +83,51 @@ const Navbar = () => {
           </li>
         </ul>
 
-        {/* Login Button */}
-        <div className="flex items-center">
-          <NavLink
-            to="/login"
-            className="px-6 py-2 border border-gray-900 text-gray-900 uppercase tracking-widest text-xs hover:bg-gray-900 hover:text-white transition-all"
-          >
-            Login
-          </NavLink>
-        </div>
+        {/* CTA Button */}
+        <NavLink
+          to="/login"
+          className="hidden md:inline-block px-8 py-3 text-xs tracking-[0.3em] uppercase
+                     border border-red-500 text-red-500
+                     hover:bg-red-500 hover:text-white
+                     transition-all duration-500 rounded-full"
+        >
+          Login
+        </NavLink>
+
+        {/* Mobile Toggle */}
+        <button
+          className="md:hidden text-white"
+          onClick={() => setMobileOpen(!mobileOpen)}
+        >
+          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </nav>
 
-      {/* Mobile Menu */}
-      {mobileOpen && (
-        <div className="md:hidden border-t border-gray-200 bg-white">
-          <ul className="flex flex-col gap-4 px-6 py-6 text-sm tracking-widest uppercase font-medium">
-            <li>
-              <NavLink to="/" className={navItemClass} onClick={() => setMobileOpen(false)}>
-                Home
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/about" className={navItemClass} onClick={() => setMobileOpen(false)}>
-                About
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/services" className={navItemClass} onClick={() => setMobileOpen(false)}>
-                Services
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/projects" className={navItemClass} onClick={() => setMobileOpen(false)}>
-                Projects
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/properties" className={navItemClass} onClick={() => setMobileOpen(false)}>
-                Properties
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/contact" className={navItemClass} onClick={() => setMobileOpen(false)}>
-                Contact
-              </NavLink>
-            </li>
-          </ul>
-        </div>
-      )}
+      {/* Mobile Menu Animation */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "100vh", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            className="md:hidden bg-black text-white flex flex-col items-center justify-center gap-10 text-lg uppercase tracking-widest"
+          >
+            {["Home", "About", "Services", "Projects", "Properties", "Contact"].map(
+              (item, i) => (
+                <NavLink
+                  key={i}
+                  to={item === "Home" ? "/" : `/${item.toLowerCase()}`}
+                  onClick={() => setMobileOpen(false)}
+                  className="hover:text-red-500 transition-colors"
+                >
+                  {item}
+                </NavLink>
+              )
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 };
