@@ -2,131 +2,197 @@ import React from "react";
 
 const Contact = () => {
   return (
-    <main className="bg-white w-full overflow-x-hidden">
+    <div className="font-sans text-gray-900">
 
       {/* ================= HERO ================= */}
-      <section className="relative h-[60svh] flex items-center px-8 md:px-24 overflow-hidden">
-        <img
-          src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=100"
-          alt="Contact Us"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-white/70"></div>
+      <section
+        className="h-[70vh] bg-cover bg-center relative flex items-center px-16"
+        style={{
+          backgroundImage:
+            "url('https://images.unsplash.com/photo-1503387762-592deb58ef4e')",
+        }}
+      >
+        <div className="absolute inset-0 bg-black/50"></div>
 
-        <div className="relative z-10 max-w-4xl">
-          <span className="text-sm uppercase tracking-[0.4em] text-red-600 font-semibold">
-            Contact
-          </span>
-          <h1 className="text-5xl md:text-7xl font-light text-gray-900 mt-6 leading-tight">
-            Let’s Start a <br />
-            <span className="font-medium italic">Conversation</span>
-          </h1>
-          <p className="mt-8 text-lg md:text-xl text-gray-600 max-w-2xl">
-            Whether you’re exploring a new home or need more information,
-            our team is here to help.
+        <div className="relative text-white">
+          <h1 className="text-5xl font-bold mb-4">Contact Us.</h1>
+          <p className="text-lg">
+            Let’s Build Something Great Together
           </p>
         </div>
       </section>
 
-      {/* ================= CONTACT SECTION ================= */}
-      <section className="py-32 px-8 md:px-24">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-20 items-start">
+      {/* ================= GET IN TOUCH ================= */}
+      <section className="py-20 px-16 bg-gray-100 grid md:grid-cols-2 gap-12 items-center">
+        
+        {/* LEFT TEXT */}
+        <div>
+          <h2 className="text-3xl font-bold mb-6">Get in Touch</h2>
+          <p className="text-gray-600 mb-6">
+            We’re here to help you with your construction needs. Our dedicated
+            team is ready to assist you in making your dream home a reality.
+          </p>
 
-          {/* LEFT: INFO */}
-          <div>
-            <h2 className="text-4xl md:text-5xl font-light text-gray-900 mb-8">
-              Reach Out to Us
-            </h2>
-            <p className="text-gray-600 text-lg md:text-xl leading-relaxed mb-12 max-w-lg">
-              Our sales and support teams are available to guide you through
-              every step of your home-buying journey.
-            </p>
+          <img
+            src="https://images.unsplash.com/photo-1492724441997-5dc865305da7"
+            alt="Office"
+            className="rounded-xl shadow mb-6"
+          />
+        </div>
 
-            <div className="space-y-8 text-gray-700">
-              <div>
-                <p className="text-xs uppercase tracking-widest text-gray-500 mb-1">
-                  Corporate Office
-                </p>
-                <p className="text-lg">
-                  JSW Homes Experience Centre <br />
-                  Mumbai, Maharashtra, India
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs uppercase tracking-widest text-gray-500 mb-1">
-                  Phone
-                </p>
-                <p className="text-lg">+91 98765 43210</p>
-              </div>
-
-              <div>
-                <p className="text-xs uppercase tracking-widest text-gray-500 mb-1">
-                  Email
-                </p>
-                <p className="text-lg">sales@jswhomes.com</p>
-              </div>
-            </div>
-          </div>
-
-          {/* RIGHT: FORM */}
-          <div className="bg-gray-50 p-10 md:p-14">
-            <h3 className="text-2xl font-light text-gray-900 mb-8">
-              Send Us a Message
-            </h3>
-
-            <form className="space-y-6">
-              <input
-                type="text"
-                placeholder="Full Name"
-                className="w-full border-b border-gray-300 bg-transparent py-3 outline-none focus:border-gray-900 transition"
-              />
-
-              <input
-                type="email"
-                placeholder="Email Address"
-                className="w-full border-b border-gray-300 bg-transparent py-3 outline-none focus:border-gray-900 transition"
-              />
-
-              <input
-                type="tel"
-                placeholder="Phone Number"
-                className="w-full border-b border-gray-300 bg-transparent py-3 outline-none focus:border-gray-900 transition"
-              />
-
-              <textarea
-                rows="4"
-                placeholder="Your Message"
-                className="w-full border-b border-gray-300 bg-transparent py-3 outline-none focus:border-gray-900 transition resize-none"
-              />
-
-              <button
-                type="submit"
-                className="mt-8 px-12 py-4 border border-gray-900 uppercase tracking-widest hover:bg-gray-900 hover:text-white transition"
-              >
-                Submit Enquiry
-              </button>
-            </form>
-          </div>
-
+        {/* RIGHT IMAGES */}
+        <div className="grid grid-cols-1 gap-6">
+          <img
+            src="https://images.unsplash.com/photo-1497366216548-37526070297c"
+            alt="Meeting"
+            className="rounded-xl shadow"
+          />
+          <img
+            src="https://images.unsplash.com/photo-1551434678-e076c223a692"
+            alt="Discussion"
+            className="rounded-xl shadow"
+          />
         </div>
       </section>
 
-      {/* ================= MAP / CTA ================= */}
-      <section className="py-40 px-8 md:px-24 bg-gray-900 text-white text-center">
-        <h2 className="text-4xl md:text-6xl font-light leading-tight">
-          Experience Our Homes <br />
-          <span className="font-medium italic">In Person</span>
+      {/* ================= WHY CHOOSE US ================= */}
+      <section
+        className="relative py-20 text-center text-black"
+        style={{
+          backgroundImage:
+            "url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="absolute inset-0 bg-white/80"></div>
+
+        <div className="relative px-16">
+          <h2 className="text-3xl font-bold mb-12">
+            Why Choose Us
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-10 max-w-6xl mx-auto">
+            <div>
+              <h3 className="font-semibold text-lg mb-3">
+                Expertise in Construction
+              </h3>
+              <p className="text-sm text-gray-700">
+                We prioritize your vision and work closely with you to ensure
+                your project meets the highest standards of quality and craftsmanship.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-lg mb-3">
+                Client Focused
+              </h3>
+              <p className="text-sm text-gray-700">
+                Our team is committed to providing excellent service and support
+                throughout your construction journey.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-lg mb-3">
+                Quality Assurance
+              </h3>
+              <p className="text-sm text-gray-700">
+                Utilizing the latest building technologies, we ensure your project
+                is efficient and up to date with industry standards.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= AVAILABLE POSITIONS ================= */}
+      <section className="py-20 px-16 bg-gray-100">
+        <h2 className="text-3xl font-bold mb-10">
+          Available Positions
         </h2>
-        <p className="mt-8 text-gray-400 text-lg">
-          Visit one of our experience centres to explore our developments.
-        </p>
-        <button className="mt-12 px-12 py-4 border border-white uppercase tracking-widest hover:bg-white hover:text-gray-900 transition">
-          Book a Site Visit
+
+        {[
+          {
+            title: "Project Manager",
+            desc: "Lead projects from concept to completion, ensuring timelines and budgets are met.",
+          },
+          {
+            title: "Site Supervisor",
+            desc: "Oversee daily operations on-site, ensuring safety protocols are followed.",
+          },
+          {
+            title: "Estimator",
+            desc: "Analyze project costs and prepare detailed estimates.",
+          },
+        ].map((job, index) => (
+          <div
+            key={index}
+            className="flex justify-between items-center bg-white p-6 rounded-lg shadow mb-6"
+          >
+            <div>
+              <h4 className="font-semibold">{job.title}</h4>
+              <p className="text-sm text-gray-600 mt-2">
+                {job.desc}
+              </p>
+            </div>
+
+            <button className="bg-blue-600 text-white px-6 py-2 rounded">
+              Apply
+            </button>
+          </div>
+        ))}
+      </section>
+
+      {/* ================= CTA BANNER ================= */}
+      <section
+        className="relative h-[40vh] bg-cover bg-center flex items-center justify-between px-16"
+        style={{
+          backgroundImage:
+            "url('https://images.unsplash.com/photo-1581090700227-4c4f50c30e3c')",
+        }}
+      >
+        <div className="absolute inset-0 bg-black/50"></div>
+
+        <h2 className="relative text-white text-4xl font-bold">
+          Need Assistance with Your Project?
+        </h2>
+
+        <button className="relative bg-blue-600 text-white px-6 py-3 rounded">
+          Contact Us
         </button>
       </section>
 
-    </main>
+      {/* ================= FOOTER ================= */}
+      <footer className="bg-gray-200 py-10 px-16 grid md:grid-cols-4 gap-8 text-sm">
+        <div>
+          <h4 className="font-semibold mb-3">Contact Us</h4>
+          <p>Connecting since 2021</p>
+        </div>
+
+        <div>
+          <h4 className="font-semibold mb-3">Services</h4>
+          <p>About Us</p>
+          <p>Careers</p>
+          <p>Contact</p>
+          <p>Blog</p>
+        </div>
+
+        <div>
+          <h4 className="font-semibold mb-3">Testimonials</h4>
+          <p>FAQs</p>
+          <p>Join Our Team</p>
+        </div>
+
+        <div>
+          <h4 className="font-semibold mb-3">Follow Us</h4>
+          <p>Facebook</p>
+          <p>Twitter</p>
+          <p>Instagram</p>
+        </div>
+      </footer>
+
+    </div>
   );
 };
 

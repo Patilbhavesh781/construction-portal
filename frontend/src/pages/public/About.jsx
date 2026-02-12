@@ -2,164 +2,202 @@ import React from "react";
 
 const About = () => {
   return (
-    <main className="bg-white w-full overflow-x-hidden">
+    <div className="font-sans text-gray-800">
 
       {/* ================= HERO ================= */}
-      <section className="relative h-[70svh] flex items-center px-8 md:px-24 overflow-hidden">
-        <img
-          src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=100"
-          alt="Premium Homes"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-white/70"></div>
-
-        <div className="relative z-10 max-w-4xl">
-          <span className="text-sm uppercase tracking-[0.4em] text-red-600 font-semibold">
-            About Us
-          </span>
-          <h1 className="text-5xl md:text-7xl font-light text-gray-900 mt-6 leading-tight">
-            Building Homes That <br />
-            <span className="font-medium italic">Stand the Test of Time</span>
+      <section className="grid md:grid-cols-2 min-h-[80vh]">
+        
+        {/* LEFT */}
+        <div className="flex flex-col justify-center px-16 bg-gray-100">
+          <h1 className="text-4xl font-bold mb-4">
+            Discover the <br /> creators of your
           </h1>
-          <p className="mt-8 text-lg md:text-xl text-gray-600 max-w-2xl">
-            We create thoughtfully planned residential developments rooted in
-            quality, responsibility, and long-term value.
+          <p className="text-gray-600">
+            We’re dedicated to transforming spaces.
           </p>
         </div>
-      </section>
 
-      {/* ================= PHILOSOPHY ================= */}
-      <section className="py-32 px-8 md:px-24 border-t border-gray-100">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-20 items-center">
-          <div>
-            <h2 className="text-4xl md:text-5xl font-light text-gray-900 mb-8">
-              Our Philosophy
-            </h2>
-            <p className="text-gray-600 text-lg md:text-xl leading-relaxed">
-              Our approach goes beyond construction. Every project is guided by
-              responsible planning, intelligent design, and a focus on enhancing
-              everyday living experiences.
-            </p>
-          </div>
-
+        {/* RIGHT */}
+        <div>
           <img
-            src="https://images.unsplash.com/photo-1502005097973-6a7082348e28?auto=format&fit=crop&q=100"
-            alt="Design Philosophy"
-            className="w-full h-[420px] object-cover"
+            src="https://images.unsplash.com/photo-1506744038136-46273834b3fb"
+            alt="Hero"
+            className="h-full w-full object-cover"
           />
         </div>
       </section>
 
-      {/* ================= LEGACY ================= */}
-      <section className="py-32 px-8 md:px-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-20 items-center">
-          <img
-            src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=100"
-            alt="Residential Development"
-            className="w-full h-[420px] object-cover"
-          />
-
-          <div>
-            <h2 className="text-4xl md:text-5xl font-light text-gray-900 mb-8">
-              A Legacy of Trust
-            </h2>
-            <p className="text-gray-600 text-lg md:text-xl leading-relaxed mb-12">
-              Over the years, our developments have earned the trust of thousands
-              of families through consistent delivery, transparency, and
-              uncompromising quality standards.
-            </p>
-
-            <div className="grid grid-cols-2 gap-10">
-              {[
-                { label: "Years of Experience", value: "25+" },
-                { label: "Homes Delivered", value: "10,000+" },
-                { label: "Cities", value: "12" },
-                { label: "Sq. Ft. Developed", value: "45 Mn+" },
-              ].map((item, i) => (
-                <div key={i}>
-                  <p className="text-3xl md:text-4xl font-light text-red-600">
-                    {item.value}
-                  </p>
-                  <p className="mt-2 text-xs uppercase tracking-widest text-gray-500">
-                    {item.label}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ================= DESIGN & SUSTAINABILITY ================= */}
-      <section className="py-32 px-8 md:px-24">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-20 items-center">
-          <img
-            src="https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&q=100"
-            alt="Sustainable Design"
-            className="w-full h-[420px] object-cover"
-          />
-
-          <div>
-            <h2 className="text-4xl md:text-5xl font-light text-gray-900 mb-8">
-              Designed With Responsibility
-            </h2>
-            <p className="text-gray-600 text-lg md:text-xl leading-relaxed">
-              Sustainability is embedded into every phase of development — from
-              site planning and material selection to energy-efficient systems
-              and long-term environmental impact.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ================= CORE VALUES ================= */}
-      <section className="py-32 px-8 md:px-24 bg-gray-50 text-center">
-        <h2 className="text-4xl md:text-5xl font-light text-gray-900 mb-20">
-          Our Core Values
+      {/* ================= OUR JOURNEY ================= */}
+      <section className="py-20 text-center px-6">
+        <h2 className="text-2xl font-semibold mb-4">
+          Our Journey
         </h2>
 
-        <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-16">
+        <p className="max-w-2xl mx-auto text-gray-600 mb-10">
+          Started as a small team, we’ve evolved into a trusted partner in
+          residential construction and design, helping homeowners realize their visions.
+        </p>
+
+        <div className="max-w-4xl mx-auto">
+          <img
+            src="https://images.unsplash.com/photo-1521791136064-7986c2920216"
+            alt="Journey"
+            className="rounded-lg shadow"
+          />
+        </div>
+      </section>
+
+      {/* ================= ACHIEVEMENTS ================= */}
+      <section className="py-16 text-center bg-gray-100">
+        <h2 className="text-2xl font-semibold mb-10">
+          Our Achievements
+        </h2>
+
+        <div className="grid md:grid-cols-3 gap-10 max-w-4xl mx-auto">
+          <div>
+            <h3 className="text-2xl font-bold">2023</h3>
+            <p className="text-sm text-gray-500">Year Established</p>
+          </div>
+
+          <div>
+            <h3 className="text-2xl font-bold">500+</h3>
+            <p className="text-sm text-gray-500">Users Trust Design Hub</p>
+          </div>
+
+          <div>
+            <h3 className="text-2xl font-bold">$50M</h3>
+            <p className="text-sm text-gray-500">In Projects</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= TEAM ================= */}
+      <section className="py-20 px-6 text-center">
+        <h2 className="text-2xl font-semibold mb-4">Team</h2>
+        <p className="text-gray-600 mb-10">
+          Meet the minds behind our innovative designs
+        </p>
+
+        <div className="grid md:grid-cols-4 gap-8 max-w-6xl mx-auto">
           {[
-            {
-              title: "Integrity",
-              desc: "Transparent processes and ethical practices at every stage.",
-            },
-            {
-              title: "Quality",
-              desc: "Superior materials, precision execution, and lasting value.",
-            },
-            {
-              title: "Responsibility",
-              desc: "Building communities that respect people and the planet.",
-            },
-          ].map((item, i) => (
-            <div key={i}>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                {item.title}
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                {item.desc}
-              </p>
+            "Emma Johnson",
+            "David Brown",
+            "Sophia White",
+            "James Smith",
+            "Lucas Green",
+            "Ava Taylor",
+            "Mia Wilson",
+            "Ethan Davis",
+            "Alex Johnson",
+            "Maria Gomez",
+            "David Smith",
+            "Emma Brown",
+          ].map((name, index) => (
+            <div key={index} className="text-center">
+              <img
+                src={`https://source.unsplash.com/300x300/?person,${index}`}
+                alt={name}
+                className="rounded-lg mb-3"
+              />
+              <h4 className="text-sm font-semibold">{name}</h4>
+              <p className="text-xs text-gray-500">Team Member</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ================= FINAL CTA ================= */}
-      <section className="py-40 px-8 md:px-24 text-center bg-gray-900 text-white">
-        <h2 className="text-4xl md:text-6xl font-light leading-tight">
-          Shaping the Future of <br />
-          <span className="font-medium italic">Urban Living</span>
+      {/* ================= BLUE BANNER ================= */}
+      <section className="bg-indigo-600 text-white py-20 px-16">
+        <h2 className="text-3xl font-bold">
+          Our team and <br /> partners
         </h2>
-        <p className="mt-8 text-gray-400 text-lg">
-          Discover homes designed for modern lifestyles and long-term value.
-        </p>
-        <button className="mt-12 px-12 py-4 border border-white uppercase tracking-widest hover:bg-white hover:text-gray-900 transition">
-          Explore Our Projects
-        </button>
       </section>
 
-    </main>
+      {/* ================= JOIN TEAM ================= */}
+      <section className="py-20 px-6 text-center">
+        <h2 className="text-2xl font-semibold mb-4">
+          Join our team
+        </h2>
+
+        <p className="text-gray-600 mb-10">
+          We’re looking for passionate individuals to help shape beautiful homes.
+        </p>
+
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {[
+            "Interior Designer",
+            "Construction",
+            "Design Engineer",
+            "Quality Assurance",
+            "Site Supervisor",
+            "?",
+          ].map((role, index) => (
+            <div key={index} className="bg-white shadow p-8 rounded">
+              <h3 className="font-semibold mb-3">{role}</h3>
+              <p className="text-sm text-gray-500 mb-4">
+                Discover more
+              </p>
+              <button className="text-sm underline">
+                Discover more
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ================= LOCATIONS ================= */}
+      <section className="py-20 text-center bg-gray-100 px-6">
+        <h2 className="text-2xl font-semibold mb-4">
+          Our locations
+        </h2>
+
+        <p className="text-gray-600 mb-10">
+          Visit us to discuss your dream project in person!
+        </p>
+
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="bg-white shadow p-6 rounded">
+            <h4 className="font-semibold">New York</h4>
+            <p className="text-sm text-gray-500">
+              123 Building Ave New York, NY 10001
+            </p>
+          </div>
+
+          <div className="bg-white shadow p-6 rounded">
+            <h4 className="font-semibold">Los Angeles</h4>
+            <p className="text-sm text-gray-500">
+              456 Design Blvd Los Angeles, CA 90001
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= CTA ================= */}
+      <section className="bg-black text-white text-center py-20">
+        <h2 className="text-2xl font-semibold mb-4">
+          Start your project
+        </h2>
+
+        <p className="text-gray-400 mb-8">
+          No obligation. Schedule your consultation today.
+        </p>
+
+        <div className="flex justify-center gap-6">
+          <button className="bg-white text-black px-6 py-2 rounded">
+            Get Started
+          </button>
+          <button className="border border-white px-6 py-2 rounded">
+            Contact Support
+          </button>
+        </div>
+      </section>
+
+      {/* ================= FOOTER ================= */}
+      <footer className="bg-black text-gray-400 text-center py-6 text-xs">
+        © 2025 BuildCraft Homes. All rights reserved.
+      </footer>
+
+    </div>
   );
 };
 
