@@ -1,0 +1,130 @@
+import { useState } from "react";
+import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
+
+const testimonials = [
+  {
+    name: "Mr. Gururaj Naik",
+    text: "JSW One’s expert team guided me at every step. Their quality gave me total confidence throughout the journey.",
+    image:
+      "https://images.unsplash.com/photo-1589571894960-20bbe2828d0a?q=80&w=1200&auto=format&fit=crop",
+  },
+  {
+    name: "Mr. Hariharasudan",
+    text: "JSW Homes exceeded our expectations! The construction quality and timely delivery were remarkable. Truly a dream home.",
+    image:
+      "https://images.unsplash.com/photo-1557862921-37829c790f19?q=80&w=1200&auto=format&fit=crop",
+  },
+  {
+    name: "Mr. Suryanarayanan",
+    text: "Most people struggle with delays or contractors. JSW One Homes made my journey smooth and hassle-free.",
+    image:
+      "https://images.unsplash.com/photo-1607746882042-944635dfe10e?q=80&w=1200&auto=format&fit=crop",
+  },
+  {
+    name: "Mr. Santosh",
+    text: "With JSW One Homes, we didn’t just build a home - we gained trust, care, and peace of mind.",
+    image:
+      "https://images.unsplash.com/photo-1527980965255-d3b416303d12?q=80&w=1200&auto=format&fit=crop",
+  },
+];
+
+const TestimonialsCarousel = () => {
+  const [current, setCurrent] = useState(0);
+
+  const prev = () =>
+    setCurrent((c) => (c === 0 ? testimonials.length - 1 : c - 1));
+
+  const next = () =>
+    setCurrent((c) => (c === testimonials.length - 1 ? 0 : c + 1));
+
+  return (
+    <section className="bg-[#FCFCF7] py-20">
+      <div className="max-w-7xl mx-auto px-4">
+
+        {/* Heading */}
+        <div className="text-center mb-14">
+          <h2 className="text-3xl md:text-4xl font-semibold text-gray-900">
+            Happy customers, real stories
+          </h2>
+          <p className="text-gray-500 mt-3">
+            Don’t believe us? See what our customers have to say.
+          </p>
+        </div>
+
+        {/* Carousel */}
+        <div className="relative">
+
+          {/* Cards */}
+          <div className="grid md:grid-cols-3 gap-6 transition-all duration-500">
+            {testimonials
+              .slice(current, current + 3)
+              .concat(
+                current + 3 > testimonials.length
+                  ? testimonials.slice(0, (current + 3) % testimonials.length)
+                  : []
+              )
+              .map((item, index) => (
+                <div
+                  key={index}
+                  className="relative h-[420px] rounded-xl overflow-hidden shadow-md"
+                >
+                  {/* Background Image */}
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+
+                  {/* Overlay */}
+                  <div className="absolute bottom-0 w-full bg-black/60 backdrop-blur-sm text-white p-6 flex flex-col items-center text-center">
+                    <Quote className="w-6 h-6 mb-3 opacity-80" />
+                    <p className="text-sm md:text-base leading-relaxed">
+                      {item.text}
+                    </p>
+                    <p className="mt-3 font-medium">{item.name}</p>
+                  </div>
+                </div>
+              ))}
+          </div>
+
+          {/* Arrows */}
+          <button
+            onClick={prev}
+            className="hidden md:flex absolute -left-6 top-1/2 -translate-y-1/2 bg-white w-10 h-10 rounded-full shadow items-center justify-center"
+          >
+            <ChevronLeft />
+          </button>
+
+          <button
+            onClick={next}
+            className="hidden md:flex absolute -right-6 top-1/2 -translate-y-1/2 bg-white w-10 h-10 rounded-full shadow items-center justify-center"
+          >
+            <ChevronRight />
+          </button>
+
+          {/* Dots */}
+          <div className="flex justify-center gap-2 mt-8">
+            {testimonials.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrent(i)}
+                className={`h-2 rounded-full transition-all ${
+                  i === current ? "bg-black w-6" : "bg-gray-300 w-2"
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* View More Button */}
+        <div className="flex justify-center mt-10">
+          <button className="border-2 border-black px-10 py-3 rounded-xl font-medium hover:bg-black hover:text-white transition">
+            View more
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default TestimonialsCarousel;

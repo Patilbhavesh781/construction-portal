@@ -8,20 +8,34 @@ import AdminLayout from "../layouts/AdminLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import AdminRoute from "./AdminRoute";
 
-// Public Pages
-import Home from "../pages/public/Home";
-import About from "../pages/public/About";
-import Services from "../pages/public/Services";
-import ServiceDetails from "../pages/public/ServiceDetails";
-import Projects from "../pages/public/Projects";
-import Properties from "../pages/public/Properties";
-import ProjectDetails from "../pages/public/ProjectDetails";
-import PropertyDetails from "../pages/public/PropertyDetails";
-import Contact from "../pages/public/Contact";
-import NotFound from "../pages/public/NotFound";
+// // Public Pages
+// import Home from "../pages/public/Home";
+// import About from "../pages/public/About";
+// import Services from "../pages/public/Services";
+// import ServiceDetails from "../pages/public/ServiceDetails";
+// import Projects from "../pages/public/Projects";
+// import Properties from "../pages/public/Properties";
+// import ProjectDetails from "../pages/public/ProjectDetails";
+// import PropertyDetails from "../pages/public/PropertyDetails";
+// import Contact from "../pages/public/Contact";
+// import NotFound from "../pages/public/NotFound";
+
+//ui
+// import { Toaster } from "@/components/ui/toaster";
+// import { TooltipProvider } from "@/components/ui/tooltip";
+// import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+// import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Index from "../pages/Index";
+import Projects from "../pages/Projects";
+import Testimonials from "../pages/Testimonials";
+import Contact from "../pages/Contact";
+import About from "../pages/About";
+import Login from "../pages/Login";
+import BookMeeting from "../pages/BookMeeting";
+import NotFound from "../pages/NotFound";
 
 // Auth Pages
-import Login from "../pages/auth/Login";
+// import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import ForgotPassword from "../pages/auth/ForgotPassword";
 import ResetPassword from "../pages/auth/ResetPassword";
@@ -49,7 +63,7 @@ import ManageReviews from "../pages/admin/ManageReviews";
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Public Routes */}
+      {/* Public Routes
       <Route element={<PublicLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
@@ -60,10 +74,21 @@ const AppRoutes = () => {
         <Route path="/properties" element={<Properties />} />
         <Route path="/properties/:id" element={<PropertyDetails />} />
         <Route path="/contact" element={<Contact />} />
-      </Route>
+      </Route> */}
+      <Route element={<PublicLayout />}>
+          <Route path="/" element={<Index />} />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/testimonials" element={<Testimonials />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/book-meeting" element={<BookMeeting />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
 
       {/* Auth Routes */}
-      <Route path="/login" element={<Login />} />
+      {/* /login is already served inside PublicLayout above */}
+      {/* <Route path="/login" element={<Login />} /> */}
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
