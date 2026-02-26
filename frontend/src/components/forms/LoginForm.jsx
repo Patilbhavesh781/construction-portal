@@ -40,7 +40,7 @@ const LoginForm = () => {
        *   token: "jwt-token"
        * }
        */
-      if (response.user.role === "admin") {
+      if (response?.user?.role === "admin") {
         navigate("/admin/dashboard");
       } else {
         navigate("/user/dashboard");
@@ -177,3 +177,4 @@ const LoginForm = () => {
 };
 
 export default LoginForm;
+

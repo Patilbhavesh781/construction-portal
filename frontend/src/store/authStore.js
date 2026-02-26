@@ -7,15 +7,25 @@ const useAuthStore = create((set, get) => ({
   token: getToken() || null,
   isAuthenticated: !!getToken(),
   isLoading: false,
-
   // Login user
   login: async (email, password) => {
     set({ isLoading: true });
     try {
       const data = await AuthService.login(email, password);
       setToken(data.token);
-      set({ user: data.user, token: data.token, isAuthenticated: true });
-      return data;
+
+      let user = data.user || null;
+      if (!user && data.token) {
+        try {
+          const profile = await AuthService.getProfile();
+          user = profile?.user || profile || null;
+        } catch (profileError) {
+          console.warn("Profile fetch after login failed:", profileError);
+        }
+      }
+
+      set({ user, token: data.token, isAuthenticated: !!data.token });
+      return { ...data, user };
     } catch (error) {
       throw error;
     } finally {
@@ -103,3 +113,4 @@ const useAuthStore = create((set, get) => ({
 }));
 
 export default useAuthStore;
+

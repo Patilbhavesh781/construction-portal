@@ -7,7 +7,7 @@ const Footer = () => {
         <div className="grid md:grid-cols-4 gap-10">
           <div>
             <span className="text-xl font-extrabold">
-              JSW <span className="text-primary">ONE</span> HOMES
+              BUILD<span className="text-primary">PRO</span>
             </span>
             <p className="mt-4 text-sm text-accent-foreground/60 leading-relaxed">
               Build your dream home hassle-free with India's most trusted home construction partner.
@@ -36,15 +36,15 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-accent-foreground/50">Contact</h4>
             <div className="flex flex-col gap-3 text-sm text-accent-foreground/70">
-              <span>info@jswonehomes.com</span>
+              <span>info@buildpro.com</span>
               <span>+91 1800-XXX-XXXX</span>
-              <span>JSW Centre, Mumbai</span>
+              <span>BuildPro Centre, Mumbai</span>
             </div>
           </div>
         </div>
 
         <div className="border-t border-accent-foreground/10 mt-12 pt-8 text-center text-sm text-accent-foreground/40">
-          © 2025 JSW One Homes. All rights reserved.
+          © 2025 BuildPro. All rights reserved.
         </div>
       </div>
     </footer>

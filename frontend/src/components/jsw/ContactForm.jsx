@@ -1,13 +1,71 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import BookingService from "@/services/booking.service";
 
-const ContactForm = () => {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", city: "Pune", hasPlot: "yes", timeline: "" });
+const ContactForm = ({ selectedDate, selectedTime }) => {
+  const navigate = useNavigate();
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    city: "Pune",
+    hasPlot: "yes",
+    timeline: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Thank you! We'll get back to you shortly.");
+    setError("");
+    setSuccess("");
+
+    if (!selectedDate || !selectedTime) {
+      setError("Please select your preferred date and time first.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const payload = {
+        bookingType: "consultation",
+        bookingDate: selectedDate,
+        timeSlot: selectedTime,
+        notes: `Consultation request | timeline: ${form.timeline || "not specified"} | own plot: ${form.hasPlot}`,
+        address: {
+          city: form.city,
+          fullAddress: form.city,
+        },
+        contactDetails: {
+          name: form.name,
+          phone: form.phone,
+          email: form.email,
+        },
+      };
+
+      await BookingService.createBooking(payload);
+
+      setSuccess("Meeting request sent successfully. Our team will contact you shortly.");
+      setForm({
+        name: "",
+        email: "",
+        phone: "",
+        city: "Pune",
+        hasPlot: "yes",
+        timeline: "",
+      });
+    } catch (err) {
+      if (err?.response?.status === 401) {
+        navigate("/login", { state: { from: { pathname: "/book-meeting" } } });
+        return;
+      }
+      setError(err?.response?.data?.message || "Failed to send meeting request. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -16,6 +74,16 @@ const ContactForm = () => {
       <p className="text-muted-foreground text-sm mb-6">With you every step of the way</p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {error && (
+          <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+        {success && (
+          <div className="rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">
+            {success}
+          </div>
+        )}
         <Input
           placeholder="Full name"
           value={form.name}
@@ -74,8 +142,8 @@ const ContactForm = () => {
           <option>6+ months</option>
         </select>
 
-        <Button type="submit" className="w-full rounded-xl" size="lg">
-          Request consultation
+        <Button type="submit" className="w-full rounded-xl" size="lg" disabled={loading}>
+          {loading ? "Sending..." : "Request consultation"}
         </Button>
 
         <p className="text-xs text-muted-foreground text-center">

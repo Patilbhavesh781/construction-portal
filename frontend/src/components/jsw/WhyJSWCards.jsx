@@ -1,4 +1,4 @@
-import subHeroImage from "../../assets/hero-home.jpg"; // change if needed
+import subHeroImage from "@/assets/Apartment6.jpeg";
 
 const features = [
   {
@@ -32,7 +32,7 @@ export default function WhyJSWCards() {
         <div className="relative w-full xl:w-1/2 h-[400px] xl:h-[580px] rounded-xl overflow-hidden">
           <img
             src={subHeroImage}
-            alt="Why JSW One Homes"
+            alt="Why BuildPro"
             className="absolute inset-0 w-full h-full object-cover"
           />
         </div>
@@ -40,10 +40,10 @@ export default function WhyJSWCards() {
         {/* Content Side */}
         <div className="w-full xl:w-1/2">
           <h2 className="text-3xl xl:text-4xl font-semibold text-[#030712] mb-4">
-            Why JSW One Homes
+            Why BuildPro
           </h2>
           <p className="text-[#6B7280] text-base xl:text-lg mb-10 max-w-xl">
-            You build your dream home once. Build it right with JSW One Homes.
+            You build your dream home once. Build it right with BuildPro.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

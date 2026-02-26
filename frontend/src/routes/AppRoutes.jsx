@@ -27,15 +27,18 @@ import AdminRoute from "./AdminRoute";
 // import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "../pages/Index";
 import Projects from "../pages/Projects";
+import Services from "../pages/Services";
 import Testimonials from "../pages/Testimonials";
 import Contact from "../pages/Contact";
 import About from "../pages/About";
 import Login from "../pages/Login";
 import BookMeeting from "../pages/BookMeeting";
 import NotFound from "../pages/NotFound";
+import ServiceDetails from "../pages/public/ServiceDetails";
+import ProjectDetails from "../pages/public/ProjectDetails";
 
 // Auth Pages
-// import Login from "../pages/auth/Login";
+// Login imported above from auth page
 import Register from "../pages/auth/Register";
 import ForgotPassword from "../pages/auth/ForgotPassword";
 import ResetPassword from "../pages/auth/ResetPassword";
@@ -77,7 +80,10 @@ const AppRoutes = () => {
       </Route> */}
       <Route element={<PublicLayout />}>
           <Route path="/" element={<Index />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/services/:id" element={<ServiceDetails />} />
           <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/:id" element={<ProjectDetails />} />
           <Route path="/testimonials" element={<Testimonials />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<About />} />
@@ -140,3 +146,5 @@ const AppRoutes = () => {
 };
 
 export default AppRoutes;
+
+

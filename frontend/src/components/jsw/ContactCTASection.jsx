@@ -1,4 +1,5 @@
 import { useState } from "react";
+import formBackground from "@/assets/Apartment7.jpeg";
 
 export default function ContactCTASection() {
   const [form, setForm] = useState({
@@ -24,7 +25,7 @@ export default function ContactCTASection() {
 
       {/* Background Image */}
       <img
-        src="https://cdn.jswonehomes.com/Form_Background_613731d985/Form_Background_613731d985.png"
+        src={formBackground}
         alt="Background"
         className="absolute inset-0 w-full h-full object-cover"
       />

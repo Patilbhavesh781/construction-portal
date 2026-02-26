@@ -102,6 +102,10 @@ const bookingSchema = new mongoose.Schema(
 
 /* 🔗 Validation: Ensure at least one reference exists */
 bookingSchema.pre("validate", function (next) {
+  if (this.bookingType === "consultation") {
+    return next();
+  }
+
   if (!this.service && !this.property && !this.project) {
     return next(
       new Error("Booking must be linked to a service, property, or project.")

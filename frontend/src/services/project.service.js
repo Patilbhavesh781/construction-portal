@@ -15,13 +15,21 @@ const ProjectService = {
 
   // Create new project (admin only)
   createProject: async (projectData) => {
-    const response = await api.post("/projects", projectData);
+    const config =
+      typeof FormData !== "undefined" && projectData instanceof FormData
+        ? { headers: { "Content-Type": "multipart/form-data" } }
+        : undefined;
+    const response = await api.post("/projects", projectData, config);
     return response.data?.data || response.data; // created project
   },
 
   // Update project (admin only)
   updateProject: async (projectId, projectData) => {
-    const response = await api.put(`/projects/${projectId}`, projectData);
+    const config =
+      typeof FormData !== "undefined" && projectData instanceof FormData
+        ? { headers: { "Content-Type": "multipart/form-data" } }
+        : undefined;
+    const response = await api.put(`/projects/${projectId}`, projectData, config);
     return response.data?.data || response.data; // updated project
   },
 

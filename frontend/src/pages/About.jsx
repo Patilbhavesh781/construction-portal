@@ -6,14 +6,14 @@ import { Target, Eye, Heart, Clock } from "lucide-react";
 import heroImage from "@/assets/hero-home.jpg";
 
 const values = [
-  { icon: Target, title: "Quality First", desc: "Every home is built with JSW Steel — the strongest foundation for lasting durability." },
+  { icon: Target, title: "Quality First", desc: "Every home is built with BuildPro Steel — the strongest foundation for lasting durability." },
   { icon: Eye, title: "Transparency", desc: "Real-time updates, clear timelines, and honest communication at every stage." },
   { icon: Heart, title: "Customer Centric", desc: "Your vision drives everything we do. We listen, design, and deliver." },
   { icon: Clock, title: "On-Time Delivery", desc: "We respect your time with disciplined project management and timely handovers." },
 ];
 
 const timeline = [
-  { year: "2019", event: "JSW One Homes launched with a vision to transform home construction in India." },
+  { year: "2019", event: "BuildPro launched with a vision to transform home construction in India." },
   { year: "2020", event: "Expanded to 5 major cities with 50+ completed homes." },
   { year: "2022", event: "Crossed 100+ homes delivered with an NPS of 81+." },
   { year: "2024", event: "180+ homes delivered, 227+ under construction across India." },
@@ -32,13 +32,13 @@ const About = () => (
               Building dreams,<br />one home at a time.
             </h1>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-              JSW One Homes is part of the JSW Group — India's leading conglomerate. 
+              BuildPro is part of the BuildPro Group — India's leading conglomerate. 
               We bring world-class materials, expert architects, and end-to-end service 
               to make home construction hassle-free.
             </p>
           </div>
           <div className="rounded-2xl overflow-hidden shadow-lg">
-            <img src={heroImage} alt="About JSW" className="w-full h-80 object-cover" />
+            <img src={heroImage} alt="About BuildPro" className="w-full h-80 object-cover" />
           </div>
         </div>
       </div>

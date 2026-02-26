@@ -5,7 +5,7 @@ import { MapPin, Phone, Mail } from "lucide-react";
 
 const offices = [
   { city: "Pune", address: "Baner Road, Pune 411045", phone: "+91 20 XXXX XXXX" },
-  { city: "Mumbai", address: "JSW Centre, BKC, Mumbai 400051", phone: "+91 22 XXXX XXXX" },
+  { city: "Mumbai", address: "BuildPro Centre, BKC, Mumbai 400051", phone: "+91 22 XXXX XXXX" },
   { city: "Bangalore", address: "Whitefield, Bangalore 560066", phone: "+91 80 XXXX XXXX" },
 ];
 
@@ -39,7 +39,7 @@ const Contact = () => (
               <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
                 <Mail className="w-5 h-5 text-primary" /> Email Us
               </h3>
-              <p className="text-sm text-muted-foreground mt-2">info@jswonehomes.com</p>
+              <p className="text-sm text-muted-foreground mt-2">info@buildpro.com</p>
             </div>
           </div>
         </div>

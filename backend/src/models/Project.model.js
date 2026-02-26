@@ -68,6 +68,22 @@ const projectSchema = new mongoose.Schema(
       type: Number,
       min: 0,
     },
+    floor: {
+      type: String,
+      trim: true,
+    },
+    plotDimension: {
+      type: String,
+      trim: true,
+    },
+    facing: {
+      type: String,
+      trim: true,
+    },
+    budgetRange: {
+      type: String,
+      trim: true,
+    },
     startDate: {
       type: Date,
     },

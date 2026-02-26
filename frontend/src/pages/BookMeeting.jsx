@@ -2,7 +2,6 @@ import { useState } from "react";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/jsw/Footer";
 import ContactForm from "@/components/jsw/ContactForm";
-import { Button } from "@/components/ui/button";
 import { CalendarDays, Clock, Video } from "lucide-react";
 
 const timeSlots = ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"];
@@ -101,7 +100,7 @@ const BookMeeting = () => {
 
             {/* Form */}
             <div>
-              <ContactForm />
+              <ContactForm selectedDate={selectedDate} selectedTime={selectedTime} />
             </div>
           </div>
         </div>

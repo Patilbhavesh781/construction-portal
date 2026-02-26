@@ -23,7 +23,7 @@ const HeroSection = () => {
                 <span className="text-foreground">We Deliver.</span>
               </h1>
               <p className="mt-6 text-lg text-muted-foreground max-w-md">
-                Build your dream home hassle-free with JSW One Homes.
+                Build your dream home hassle-free with BuildPro.
               </p>
             </div>
 
