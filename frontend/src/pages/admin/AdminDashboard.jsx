@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Users,
   CalendarCheck,
@@ -24,104 +24,110 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState([]);
   const [recentBookings, setRecentBookings] = useState([]);
   const [recentUsers, setRecentUsers] = useState([]);
+  const [lastUpdated, setLastUpdated] = useState(null);
+
+  const fetchAdminDashboardData = useCallback(async (showLoader = true) => {
+    if (showLoader) setLoading(true);
+    try {
+      const results = await Promise.allSettled([
+        UserService.getAllUsers(),
+        BookingService.getAllBookings(),
+        ProjectService.getAllProjects(),
+        PropertyService.getAllProperties(),
+        MessageService.getAllMessages(),
+      ]);
+
+      const users = results[0].status === "fulfilled" ? results[0].value : [];
+      const bookings = results[1].status === "fulfilled" ? results[1].value : [];
+      const projects = results[2].status === "fulfilled" ? results[2].value : [];
+      const properties =
+        results[3].status === "fulfilled" ? results[3].value : [];
+      const messages = results[4].status === "fulfilled" ? results[4].value : [];
+
+      const nonAdminUsers = (users || []).filter((u) => u.role !== "admin");
+      const unreadMessages = (messages || []).filter((m) => !m.isRead);
+      const totalRevenue = (bookings || []).reduce(
+        (sum, booking) =>
+          sum + (booking.paymentStatus === "paid" ? Number(booking.amount || 0) : 0),
+        0
+      );
+
+      setStats([
+        {
+          key: "users",
+          label: "Total Users",
+          value: nonAdminUsers.length,
+          icon: <Users className="w-6 h-6 text-blue-600" />,
+          bg: "bg-blue-50",
+        },
+        {
+          key: "bookings",
+          label: "Total Bookings",
+          value: bookings?.length || 0,
+          icon: <CalendarCheck className="w-6 h-6 text-green-600" />,
+          bg: "bg-green-50",
+        },
+        {
+          key: "projects",
+          label: "Active Projects",
+          value: (projects || []).filter((p) => p.status === "ongoing").length,
+          icon: <FolderKanban className="w-6 h-6 text-purple-600" />,
+          bg: "bg-purple-50",
+        },
+        {
+          key: "properties",
+          label: "Properties Listed",
+          value: properties?.length || 0,
+          icon: <Building2 className="w-6 h-6 text-orange-600" />,
+          bg: "bg-orange-50",
+        },
+        {
+          key: "revenue",
+          label: "Total Revenue",
+          value: totalRevenue,
+          icon: <IndianRupee className="w-6 h-6 text-yellow-600" />,
+          bg: "bg-yellow-50",
+          isCurrency: true,
+        },
+        {
+          key: "messages",
+          label: "New Enquiries",
+          value: unreadMessages.length,
+          icon: <MessageSquare className="w-6 h-6 text-pink-600" />,
+          bg: "bg-pink-50",
+        },
+      ]);
+
+      const recentBookingsData = [...(bookings || [])]
+        .sort(
+          (a, b) =>
+            new Date(b.bookingDate || b.createdAt) -
+            new Date(a.bookingDate || a.createdAt)
+        )
+        .slice(0, 5);
+
+      const recentUsersData = [...nonAdminUsers]
+        .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+        .slice(0, 5);
+
+      setRecentBookings(recentBookingsData);
+      setRecentUsers(recentUsersData);
+      setLastUpdated(new Date());
+    } catch (error) {
+      console.error("Failed to load admin dashboard data", error);
+    } finally {
+      if (showLoader) setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchAdminDashboardData = async () => {
-      setLoading(true);
-      try {
-        const [
-          users,
-          bookings,
-          projects,
-          properties,
-          messages,
-        ] = await Promise.all([
-          UserService.getAllUsers(),
-          BookingService.getAllBookings(),
-          ProjectService.getAllProjects(),
-          PropertyService.getAllProperties(),
-          MessageService.getAllMessages(),
-        ]);
+    fetchAdminDashboardData(true);
+    const timer = setInterval(() => {
+      fetchAdminDashboardData(false);
+    }, 30000);
 
-        const nonAdminUsers = (users || []).filter(
-          (u) => u.role !== "admin"
-        );
-        const unreadMessages = (messages || []).filter((m) => !m.isRead);
-
-        setStats([
-          {
-            key: "users",
-            label: "Total Users",
-            value: nonAdminUsers.length,
-            icon: <Users className="w-6 h-6 text-blue-600" />,
-            bg: "bg-blue-50",
-          },
-          {
-            key: "bookings",
-            label: "Total Bookings",
-            value: bookings?.length || 0,
-            icon: <CalendarCheck className="w-6 h-6 text-green-600" />,
-            bg: "bg-green-50",
-          },
-          {
-            key: "projects",
-            label: "Active Projects",
-            value: (projects || []).filter(
-              (p) => p.status === "ongoing"
-            ).length,
-            icon: <FolderKanban className="w-6 h-6 text-purple-600" />,
-            bg: "bg-purple-50",
-          },
-          {
-            key: "properties",
-            label: "Properties Listed",
-            value: properties?.length || 0,
-            icon: <Building2 className="w-6 h-6 text-orange-600" />,
-            bg: "bg-orange-50",
-          },
-          {
-            key: "revenue",
-            label: "Total Revenue",
-            value: 0,
-            icon: <IndianRupee className="w-6 h-6 text-yellow-600" />,
-            bg: "bg-yellow-50",
-            isCurrency: true,
-          },
-          {
-            key: "messages",
-            label: "New Messages",
-            value: unreadMessages.length,
-            icon: <MessageSquare className="w-6 h-6 text-pink-600" />,
-            bg: "bg-pink-50",
-          },
-        ]);
-
-        const recentBookingsData = [...(bookings || [])]
-          .sort(
-            (a, b) =>
-              new Date(b.bookingDate || b.createdAt) -
-              new Date(a.bookingDate || a.createdAt)
-          )
-          .slice(0, 5);
-
-        const recentUsersData = [...nonAdminUsers]
-          .sort(
-            (a, b) =>
-              new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
-          )
-          .slice(0, 5);
-
-        setRecentBookings(recentBookingsData);
-        setRecentUsers(recentUsersData);
-      } catch (error) {
-        console.error("Failed to load admin dashboard data", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAdminDashboardData();
-  }, []);
+    return () => clearInterval(timer);
+  }, [fetchAdminDashboardData]);
 
   if (loading) {
     return (
@@ -143,6 +149,11 @@ const AdminDashboard = () => {
             <p className="text-gray-600">
               Monitor platform performance and manage system data.
             </p>
+            {lastUpdated && (
+              <p className="text-xs text-gray-400 mt-1">
+                Last updated: {lastUpdated.toLocaleTimeString()}
+              </p>
+            )}
           </div>
           <div className="flex gap-3">
             <Button to="/admin/manage-users">Manage Users</Button>

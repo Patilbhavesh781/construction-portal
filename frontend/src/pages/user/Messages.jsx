@@ -120,11 +120,11 @@ const Messages = () => {
               Conversations
             </h2>
             <div className="space-y-2">
-              <div className="w-full flex items-center gap-3 p-3 rounded-lg text-left bg-orange-100 text-orange-700">
+              <div className="w-full flex items-center gap-3 p-3 rounded-lg text-left bg-orange-100 text-orange-700 overflow-hidden">
                 <UserCircle className="w-8 h-8 text-gray-500" />
-                <div className="flex-1">
+                <div className="flex-1 min-w-0 overflow-hidden">
                   <p className="font-medium">Admin Support</p>
-                  <p className="text-sm text-gray-500 truncate">
+                  <p className="text-sm text-gray-500 truncate max-w-full">
                     {lastMessage}
                   </p>
                 </div>
@@ -161,7 +161,9 @@ const Messages = () => {
                             : "bg-white text-gray-800 rounded-bl-none"
                         }`}
                       >
-                        <p>{msg.text || msg.message}</p>
+                        <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
+                          {msg.text || msg.message}
+                        </p>
                         <p className="text-xs mt-1 opacity-70 text-right">
                           {msg.createdAt
                             ? new Date(msg.createdAt).toLocaleTimeString([], {

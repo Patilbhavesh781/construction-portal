@@ -1,6 +1,12 @@
 import api from "./api";
 
 const MessageService = {
+  // Public: send enquiry/contact message
+  sendEnquiry: async (payload) => {
+    const response = await api.post("/messages", payload);
+    return response.data?.data || response.data;
+  },
+
   // Admin: fetch all messages
   getAllMessages: async () => {
     const response = await api.get("/messages");

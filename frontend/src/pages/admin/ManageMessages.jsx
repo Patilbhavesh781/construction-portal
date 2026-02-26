@@ -169,16 +169,16 @@ const ManageMessages = () => {
                 <button
                   key={thread.user?._id}
                   onClick={() => setActiveUser(thread.user)}
-                  className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition ${
+                  className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition overflow-hidden ${
                     activeUser?._id === thread.user?._id
                       ? "bg-orange-100 text-orange-700"
                       : "hover:bg-gray-100"
                   }`}
                 >
                   <UserCircle className="w-8 h-8 text-gray-500" />
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0 overflow-hidden">
                     <p className="font-medium">{thread.user?.name}</p>
-                    <p className="text-sm text-gray-500 truncate">
+                    <p className="text-sm text-gray-500 truncate max-w-full">
                       {thread.lastText || "No messages"}
                     </p>
                   </div>
@@ -217,7 +217,9 @@ const ManageMessages = () => {
                             : "bg-white text-gray-800 rounded-bl-none"
                         }`}
                       >
-                        <p>{msg.text || msg.message}</p>
+                        <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
+                          {msg.text || msg.message}
+                        </p>
                         <p className="text-xs mt-1 opacity-70 text-right">
                           {msg.createdAt
                             ? new Date(msg.createdAt).toLocaleTimeString([], {

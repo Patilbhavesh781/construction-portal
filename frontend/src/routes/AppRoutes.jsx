@@ -62,6 +62,7 @@ import ManageProperties from "../pages/admin/ManageProperties";
 import Reports from "../pages/admin/Reports";
 import ManageMessages from "../pages/admin/ManageMessages";
 import ManageReviews from "../pages/admin/ManageReviews";
+import ManageEnquiries from "../pages/admin/ManageEnquiries";
 
 const AppRoutes = () => {
   return (
@@ -136,10 +137,15 @@ const AppRoutes = () => {
         <Route path="manage-properties" element={<ManageProperties />} />
         <Route path="reports" element={<Reports />} />
         <Route path="manage-messages" element={<ManageMessages />} />
+        <Route path="enquiries" element={<ManageEnquiries />} />
         <Route path="manage-reviews" element={<ManageReviews />} />
       </Route>
 
       {/* Catch All */}
+      <Route
+        path="/enquiries"
+        element={<Navigate to="/admin/enquiries" replace />}
+      />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

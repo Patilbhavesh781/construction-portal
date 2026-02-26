@@ -18,7 +18,7 @@ export const sendMessage = async (req, res, next) => {
       email,
       subject,
       message,
-      user: req.user?._id || null,
+      sender: req.user?._id || null,
     });
 
     res
@@ -35,7 +35,7 @@ export const sendMessage = async (req, res, next) => {
 export const getAllMessages = async (req, res, next) => {
   try {
     const messages = await Message.find()
-      .populate("user", "name email")
+      .populate("sender", "name email")
       .sort({ createdAt: -1 });
 
     res
@@ -51,7 +51,7 @@ export const getAllMessages = async (req, res, next) => {
  */
 export const getUserMessages = async (req, res, next) => {
   try {
-    const messages = await Message.find({ user: req.user._id })
+    const messages = await Message.find({ sender: req.user._id })
       .sort({ createdAt: -1 });
 
     res

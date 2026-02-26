@@ -12,7 +12,7 @@ import { authorize } from "../middlewares/role.middleware.js";
 const router = express.Router();
 
 // Authenticated user
-router.post("/", protect, sendMessage);
+router.post("/", sendMessage);
 router.get("/my", protect, getUserMessages);
 router.patch("/:id/read", protect, markMessageAsRead);
 
@@ -21,3 +21,4 @@ router.get("/", protect, authorize("admin"), getAllMessages);
 router.delete("/:id", protect, authorize("admin"), deleteMessage);
 
 export default router;
+

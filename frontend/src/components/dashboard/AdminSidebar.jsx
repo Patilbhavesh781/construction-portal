@@ -11,6 +11,7 @@ import {
   LogOut,
   MessageSquare,
   Star,
+  Mail,
 } from "lucide-react";
 import clsx from "clsx";
 import useAuthStore from "../../store/authStore";
@@ -60,6 +61,11 @@ const AdminSidebar = ({ isOpen = true, onClose }) => {
       name: "Messages",
       path: "/admin/manage-messages",
       icon: <MessageSquare className="w-5 h-5" />,
+    },
+    {
+      name: "Enquiries",
+      path: "/admin/enquiries",
+      icon: <Mail className="w-5 h-5" />,
     },
     {
       name: "Reviews",
