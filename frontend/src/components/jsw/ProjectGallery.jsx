@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import ProjectService from "@/services/project.service";
 import apartment1 from "@/assets/Apartment1.jpeg";
 import apartment2 from "@/assets/Apartment2.jpeg";
@@ -129,14 +130,14 @@ const ProjectGallery = () => {
               onClick={prevSlide}
               className="absolute left-4 top-1/2 -translate-y-1/2 bg-white w-11 h-11 rounded-full shadow-md flex items-center justify-center text-xl"
             >
-              ‹
+              <ChevronLeft/>
             </button>
 
             <button
               onClick={nextSlide}
               className="absolute right-4 top-1/2 -translate-y-1/2 bg-white w-11 h-11 rounded-full shadow-md flex items-center justify-center text-xl"
             >
-              ›
+              <ChevronRight/>
             </button>
           </div>
 

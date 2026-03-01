@@ -21,7 +21,7 @@ const Home = () => (
     <PackagesSection />
     <TestimonialsCarousel />
     <BookingCTA />
-    <ExperienceCentres />
+    {/* <ExperienceCentres /> */}
     <ContactCTASection/>
     <Footer />
   </div>

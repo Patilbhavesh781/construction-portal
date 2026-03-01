@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from "react";
 
 const counters = [
   { value: 81, prefix: "+", suffix: "", label: "NPS Score" },
-  { value: 180, prefix: "", suffix: "+", label: "Homes Delivered" },
-  { value: 227, prefix: "", suffix: "+", label: "Homes Under Construction" },
-  { value: 100, prefix: "", suffix: "+", label: "Architects & Engineers" },
+  { value: 12, prefix: "", suffix: "+", label: "Homes Delivered" },
+  { value: 5, prefix: "", suffix: "+", label: "Homes Under Construction" },
+  { value: 15, prefix: "", suffix: "+", label: "Services Available" },
 ];
 
 const StatsCounter = () => {

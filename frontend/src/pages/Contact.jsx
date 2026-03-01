@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import Navbar from "@/components/landing/Navbar";
+import { ChevronRight } from "lucide-react";
 import Footer from "@/components/jsw/Footer";
 import ExperienceCentres from "@/components/jsw/ExperienceCentres";
 import ContactCTASection from "@/components/jsw/ContactCTASection";
@@ -130,13 +131,13 @@ const Contact = () => {
                 <a href="/book-meeting">
                   <button className="inline-flex items-center gap-2 border-2 border-input py-2 bg-[#FAF0DC] rounded-lg h-11 px-3 w-full xl:rounded-xl justify-start xl:px-6 xl:w-[450px] xl:h-[68px]">
                     <p className="text-[#464646] text-xs xl:text-lg font-medium">Book a meeting</p>
-                    <span className="text-[#464646] ml-auto">�</span>
+                    <span className="text-[#464646] ml-auto"><ChevronRight/></span>
                   </button>
                 </a>
                 <a href="#contact-faq">
                   <button className="inline-flex items-center gap-2 border-2 border-input py-2 bg-[#FAF0DC] rounded-lg h-11 px-3 w-full xl:rounded-xl justify-start xl:px-6 xl:w-[450px] xl:h-[68px]">
                     <p className="text-[#464646] text-xs xl:text-lg font-medium">Read frequently asked questions</p>
-                    <span className="text-[#464646] ml-auto">�</span>
+                    <span className="text-[#464646] ml-auto"><ChevronRight/></span>
                   </button>
                 </a>
               </div>

@@ -7,32 +7,32 @@ import apartment4 from "@/assets/Apartment4.jpeg";
 
 const centres = [
   {
-    name: "Bengaluru Centre - 1",
+    name: "Pune Centre",
     address:
-      "291, First floor, Outer Ring Road, 15th Cross, 5th Phase, J P Nagar, Bangalore - 560078",
+      "",
     image: apartment1,
-    map: "#",
+    map: "",
   },
-  {
-    name: "Bengaluru Centre - 2",
-    address:
-      "2nd floor, No.18, Krishna Summit, Aswath Nagar, Marathahalli, Bengaluru - 560037",
-    image: apartment2,
-    map: "#",
-  },
-  {
-    name: "Hyderabad Centre",
-    address:
-      "Kamala Towers, Near US Consulate, Begumpet, Hyderabad - 500003",
-    image: apartment3,
-    map: "#",
-  },
-  {
-    name: "Bellary Centre",
-    address: "1st floor, Infantry Road, Bellary - 583101",
-    image: apartment4,
-    map: "#",
-  },
+  // {
+  //   name: "Bengaluru Centre - 2",
+  //   address:
+  //     "2nd floor, No.18, Krishna Summit, Aswath Nagar, Marathahalli, Bengaluru - 560037",
+  //   image: apartment2,
+  //   map: "#",
+  // },
+  // {
+  //   name: "Hyderabad Centre",
+  //   address:
+  //     "Kamala Towers, Near US Consulate, Begumpet, Hyderabad - 500003",
+  //   image: apartment3,
+  //   map: "#",
+  // },
+  // {
+  //   name: "Bellary Centre",
+  //   address: "1st floor, Infantry Road, Bellary - 583101",
+  //   image: apartment4,
+  //   map: "#",
+  // },
 ];
 
 export default function ExperienceCentres() {
@@ -96,8 +96,8 @@ export default function ExperienceCentres() {
                     href={centre.map}
                     className="inline-flex items-center gap-1 text-sm text-[#FC7F11] mt-3 font-medium"
                   >
-                    <MapPin size={14} />
-                    Directions
+                    {/* <MapPin size={14} />
+                    Directions */}
                   </a>
                 </div>
               </div>

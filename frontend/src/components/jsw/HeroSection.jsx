@@ -5,24 +5,24 @@ import heroImage from "@/assets/hero-home.jpg";
 
 const stats = [
   { icon: Star, value: "+81", label: "NPS\nScore" },
-  { icon: Home, value: "180+", label: "Homes\nDelivered" },
-  { icon: LayoutGrid, value: "227+", label: "Homes Under\nConstruction" },
+  { icon: Home, value: "12+", label: "Homes\nDelivered" },
+  { icon: LayoutGrid, value: "5+", label: "Homes Under\nConstruction" },
 ];
 
 const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+        <div className="grid lg:grid-cols-[1fr_1.05fr] gap-8 lg:gap-4 items-center">
           {/* Left */}
-          <div className="space-y-8">
+          <div className="space-y-6 lg:pr-4">
             <div>
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tight text-foreground">
                 You Dream.
                 <br />
                 <span className="text-foreground">We Deliver.</span>
               </h1>
-              <p className="mt-6 text-lg text-muted-foreground max-w-md">
+              <p className="mt-4 text-lg text-muted-foreground max-w-lg">
                 Build your dream home hassle-free with BuildPro.
               </p>
             </div>
@@ -49,7 +49,7 @@ const HeroSection = () => {
           </div>
 
           {/* Right - Hero image */}
-          <div className="relative">
+          <div className="relative lg:-ml-2">
             <div className="rounded-2xl overflow-hidden shadow-xl">
               <img
                 src={heroImage}
